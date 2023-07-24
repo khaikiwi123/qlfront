@@ -12,6 +12,7 @@ const ProtectedPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currID, setCurr] = useState("");
   const [loadingStatus, setLoadingStatus] = useState({});
+  const [total, setTotal] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -28,10 +29,23 @@ const ProtectedPage = () => {
       Router.push("/login");
       return;
     }
+
+    const { pageIndex, pageSize } = pagination;
+    let params = {};
+
+    if (pageSize !== "All") {
+      params = {
+        pageNumber: pageIndex + 1,
+        pageSize: pageSize,
+      };
+    }
+
     api
-      .get("/users/")
+      .get("/users/", {
+        params: params,
+      })
       .then((res) => {
-        const sortedUsers = res.data.sort((a, b) => {
+        const sortedUsers = res.data.users.sort((a, b) => {
           const aNameParts = a.name.split(" ");
           const bNameParts = b.name.split(" ");
 
@@ -54,7 +68,7 @@ const ProtectedPage = () => {
 
           return 0;
         });
-
+        setTotal(res.data.total);
         setUsers(sortedUsers);
         setIsLoading(false);
       })
@@ -63,7 +77,7 @@ const ProtectedPage = () => {
         setVerify(false);
         console.error(error);
       });
-  }, []);
+  }, [pagination]);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "2-digit", day: "2-digit" };
@@ -170,6 +184,7 @@ const ProtectedPage = () => {
           <MaterialReactTable
             columns={columns}
             data={users}
+            totalCount={total}
             enableFullScreenToggle={false}
             enableHiding={false}
             enableDensityToggle={false}
@@ -180,14 +195,30 @@ const ProtectedPage = () => {
               showColumnFilters: true,
             }}
             muiTablePaginationProps={{
-              rowsPerPageOptions: [
-                10,
-                50,
-                { label: "All", value: users.length },
-              ],
+              rowsPerPageOptions: [1, 2, "All"],
+              count: total,
+              page: pagination.pageSize === "All" ? 0 : pagination.pageIndex,
+              rowsPerPage:
+                pagination.pageSize === "All" ? total : pagination.pageSize,
+              onPageChange: (event, newPage) =>
+                setPagination((prev) => ({ ...prev, pageIndex: newPage })),
+              onRowsPerPageChange: (event) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  pageIndex: 0,
+                  pageSize:
+                    event.target.value === "All"
+                      ? "All"
+                      : parseInt(event.target.value, 10),
+                })),
+              labelDisplayedRows: ({ from, to, count }) =>
+                pagination.pageSize === "All"
+                  ? `${count} of ${count}`
+                  : `${from}-${to} of ${count}`,
+              SelectProps: {
+                renderValue: (value) => (value === total ? "All" : value),
+              },
             }}
-            onPaginationChange={setPagination}
-            state={{ pagination }}
           />
           <Link href="/users/create">
             <button>Create</button>
