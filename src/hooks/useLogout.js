@@ -13,7 +13,7 @@ const useLogout = () => {
 
     try {
       const response = await axios.post(
-        `https://83vr7x9yp1.execute-api.ap-southeast-2.amazonaws.com/Prod/auth/logout`,
+        `http://127.0.0.1:3000/auth/logout`,
         {},
         {
           headers: {

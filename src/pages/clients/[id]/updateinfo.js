@@ -24,9 +24,9 @@ const Update = () => {
       address,
     };
     try {
-      const response = await api.put(`/khachs/${id}`, data);
+      const response = await api.put(`/clients/${id}`, data);
       console.log(response);
-      router.push(`/khachs/${id}`);
+      router.push(`/clients/${id}`);
     } catch (error) {
       console.error(error);
       setMsg(error.response.data.error);
@@ -67,7 +67,7 @@ const Update = () => {
         <button disabled={loading} onClick={handleSubmit}>
           {loading ? "Updating..." : "Update"}
         </button>
-        <Link href={`/khachs/${id}`}>
+        <Link href={`/clients/${id}`}>
           <button>Back to customers profile</button>
         </Link>
       </div>

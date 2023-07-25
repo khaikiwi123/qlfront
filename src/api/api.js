@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: " https://83vr7x9yp1.execute-api.ap-southeast-2.amazonaws.com/Prod",
+  baseURL: "http://127.0.0.1:3000",
 });
 
 export async function refreshToken() {

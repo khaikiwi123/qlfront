@@ -3,27 +3,39 @@ import api from "../../api/api";
 import Link from "next/link";
 import Router from "next/router";
 import useCheckLogin from "../../hooks/useCheckLogin";
+import { TroubleshootOutlined } from "@mui/icons-material";
 
 const Create = () => {
   const errRef = useRef();
 
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [unit, setUnit] = useState("");
+  const [represent, setRep] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [id, setId] = useState("");
+  useEffect(() => {
+    setId(localStorage.getItem("currID"));
+  });
   useCheckLogin();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(TroubleshootOutlined);
     try {
-      await api.post(`/khachs`, {
-        name,
+      await api.post(`/clients`, {
+        email,
         phone,
-        address,
+        unit,
+        represent,
+        createdBy: id,
       });
-      Router.push("/khachs");
+      Router.push("/clients");
     } catch (error) {
       console.error(error);
       setErrMsg(error.response.data.error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,12 +49,12 @@ const Create = () => {
         >
           {errMsg}
         </p>
-        <h1>Create Khach</h1>
+        <h1>Create client</h1>
         <form onSubmit={handleSubmit}>
           <input
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             placeholder="Phone"
@@ -50,12 +62,19 @@ const Create = () => {
             onChange={(e) => setPhone(e.target.value)}
           />
           <input
-            placeholder="address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Representer"
+            value={represent}
+            onChange={(e) => setRep(e.target.value)}
           />
-          <button type="submit">Create</button>
-          <Link href="/khachs/">
+          <input
+            placeholder="Unit"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+          />
+          <button disabled={loading} type="submit">
+            {loading ? "Creating..." : "Create"}
+          </button>
+          <Link href="/clients/">
             <button>Back to customer list</button>
           </Link>
         </form>

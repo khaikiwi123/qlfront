@@ -15,7 +15,7 @@ const ProtectedPage = () => {
   const [total, setTotal] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 1,
   });
   const { logOut, loading } = useLogout();
   useEffect(() => {
@@ -67,6 +67,7 @@ const ProtectedPage = () => {
           if (aMiddle > bMiddle) return 1;
 
           return 0;
+          //lower case will be sorted last
         });
         setTotal(res.data.total);
         setUsers(sortedUsers);

@@ -7,13 +7,14 @@ import { useRouter } from "next/router";
 import useLogout from "../../hooks/useLogout";
 
 const ProtectedPage = () => {
-  const [khachs, setKhachs] = useState([]);
+  const [clients, setclients] = useState([]);
   const [verify, setVerify] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState({});
+  const [total, setTotal] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 1,
   });
   const router = useRouter();
 
@@ -26,10 +27,22 @@ const ProtectedPage = () => {
       router.push("/login");
       return;
     }
+    const { pageIndex, pageSize } = pagination;
+    let params = {};
+    if (pageSize !== "All") {
+      params = {
+        pageNumber: pageIndex + 1,
+        pageSize: pageSize,
+      };
+    }
+
     api
-      .get("/khachs/")
+      .get("/clients/", {
+        params: params,
+      })
       .then((res) => {
-        setKhachs(res.data);
+        setTotal(res.data.total);
+        setclients(res.data.clients);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -37,14 +50,14 @@ const ProtectedPage = () => {
         setVerify(false);
         console.error(error);
       });
-  }, []);
+  }, [pagination]);
   const toggleStatus = async (id, currentStatus) => {
     setLoadingStatus({ ...loadingStatus, [id]: true });
     try {
-      await api.put(`/khachs/${id}`, { status: !currentStatus });
-      setKhachs(
-        khachs.map((khach) =>
-          khach._id === id ? { ...khach, status: !currentStatus } : khach
+      await api.put(`/clients/${id}`, { status: !currentStatus });
+      setclients(
+        clients.map((client) =>
+          client._id === id ? { ...client, status: !currentStatus } : client
         )
       );
     } catch (error) {
@@ -56,29 +69,35 @@ const ProtectedPage = () => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: "name",
-        header: "Name",
+        accessorKey: "email",
+        header: "Email",
         size: 150,
         enableColumnFilter: false,
         Cell: (props) => (
-          <Link href={`/khachs/${props.row.original._id}`}>
+          <Link href={`/clients/${props.row.original._id}`}>
             <Button
               color="neutral"
               size="sm"
               variant="plain"
               onClick={(e) => {
                 e.preventDefault();
-                router.push(`/khachs/${props.row.original._id}`);
+                router.push(`/clients/${props.row.original._id}`);
               }}
             >
-              {props.row.original.name}
+              {props.row.original.email}
             </Button>
           </Link>
         ),
       },
       {
-        accessorKey: "address",
-        header: "Address",
+        accessorKey: "unit",
+        header: "Unit",
+        size: 200,
+        enableColumnFilter: false,
+      },
+      {
+        accessorKey: "represent",
+        header: "Representer",
         size: 200,
         enableColumnFilter: false,
       },
@@ -111,7 +130,7 @@ const ProtectedPage = () => {
         size: 150,
       },
     ],
-    [khachs, loadingStatus]
+    [clients, loadingStatus]
   );
 
   return (
@@ -120,10 +139,10 @@ const ProtectedPage = () => {
         <div>Loading...</div>
       ) : verify ? (
         <div className="App">
-          <h2 style={{ textAlign: "left" }}>Khachs List</h2>
+          <h2 style={{ textAlign: "left" }}>clients List</h2>
           <MaterialReactTable
             columns={columns}
-            data={khachs}
+            data={clients}
             enableFullScreenToggle={false}
             enableHiding={false}
             enableDensityToggle={false}
@@ -134,16 +153,32 @@ const ProtectedPage = () => {
               showColumnFilters: true,
             }}
             muiTablePaginationProps={{
-              rowsPerPageOptions: [
-                10,
-                50,
-                { label: "All", value: khachs.length },
-              ],
+              rowsPerPageOptions: [1, 2, "All"],
+              count: total,
+              page: pagination.pageSize === "All" ? 0 : pagination.pageIndex,
+              rowsPerPage:
+                pagination.pageSize === "All" ? total : pagination.pageSize,
+              onPageChange: (event, newPage) =>
+                setPagination((prev) => ({ ...prev, pageIndex: newPage })),
+              onRowsPerPageChange: (event) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  pageIndex: 0,
+                  pageSize:
+                    event.target.value === "All"
+                      ? "All"
+                      : parseInt(event.target.value, 10),
+                })),
+              labelDisplayedRows: ({ from, to, count }) =>
+                pagination.pageSize === "All"
+                  ? `${count} of ${count}`
+                  : `${from}-${to} of ${count}`,
+              SelectProps: {
+                renderValue: (value) => (value === total ? "All" : value),
+              },
             }}
-            onPaginationChange={setPagination}
-            state={{ pagination }}
           />
-          <Link href="/khachs/create">
+          <Link href="/clients/create">
             <button>Create</button>
           </Link>
           <Link href="/home">

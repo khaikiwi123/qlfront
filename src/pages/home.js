@@ -15,7 +15,7 @@ const Home = () => {
     <section>
       <h1>HOME</h1>
       <br />
-      <LinkSection href="/khachs" buttonText="Go to customer list" />
+      <LinkSection href="/clients" buttonText="Go to customer list" />
       {role === "admin" && (
         <LinkSection href="/users" buttonText="Go to user list" />
       )}

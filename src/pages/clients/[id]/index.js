@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import useLogout from "../../../hooks/useLogout";
 import useCheckLogin from "../../../hooks/useCheckLogin";
 
-export default function Khach() {
-  const [khach, setKhach] = useState(null);
+export default function client() {
+  const [client, setclient] = useState(null);
   const [loadingDelete, setDelete] = useState(false);
 
   const router = useRouter();
@@ -14,9 +14,9 @@ export default function Khach() {
   useCheckLogin();
   useEffect(() => {
     api
-      .get(`/khachs/${id}`)
+      .get(`/clients/${id}`)
       .then((response) => {
-        setKhach(response.data);
+        setclient(response.data);
       })
       .catch((err) => {
         console.error(err);
@@ -24,36 +24,36 @@ export default function Khach() {
   }, [id]);
   const onDelete = async (id) => {
     setDelete(true);
-    await api.delete(`/khachs/${id}`);
+    await api.delete(`/clients/${id}`);
 
-    router.push("/khachs/");
+    router.push("/clients/");
 
     setDelete(false);
   };
 
   const { logOut, loading } = useLogout();
 
-  if (khach === null) {
+  if (client === null) {
     return <p>Loading...</p>;
   }
 
   return (
     <div>
       <h1>Profile</h1>
-      <p>Name: {khach.name}</p>
-      <p>Email: {khach.phone}</p>
-      <p>Role: {khach.address}</p>
-      <p>Status: {khach.status ? "True" : "False"}</p>
-      <p>Created At: {new Date(khach.createdDate).toLocaleString()}</p>
+      <p>Name: {client.name}</p>
+      <p>Email: {client.phone}</p>
+      <p>Role: {client.address}</p>
+      <p>Status: {client.status ? "True" : "False"}</p>
+      <p>Created At: {new Date(client.createdDate).toLocaleString()}</p>
       <p>
-        <Link href={`/khachs/${id}/updateinfo`}>
-          <button>Update khach&apos;s information</button>
+        <Link href={`/clients/${id}/updateinfo`}>
+          <button>Update client&apos;s information</button>
         </Link>
         <button disabled={loadingDelete} onClick={() => onDelete(id)}>
           {loadingDelete ? "Deleting..." : "Delete"}
         </button>
       </p>
-      <Link href="/khachs">
+      <Link href="/clients">
         <button>Back to customers list</button>
       </Link>
       <Link href="/home">
