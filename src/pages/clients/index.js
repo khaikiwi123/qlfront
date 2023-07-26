@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { MaterialReactTable } from "material-react-table";
 import api from "../../api/api";
 import Link from "next/link";
@@ -9,18 +9,24 @@ import useLogout from "../../hooks/useLogout";
 const ProtectedPage = () => {
   const [clients, setclients] = useState([]);
   const [verify, setVerify] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState({});
   const [total, setTotal] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 1,
   });
-  const router = useRouter();
+  const [columnFilters, setColumnFilters] = useState([]);
+  const isUpdatingStatus = useRef(false);
 
+  const router = useRouter();
   const { logOut, loading } = useLogout();
 
   useEffect(() => {
+    if (isUpdatingStatus.current) {
+      isUpdatingStatus.current = false;
+      return;
+    }
     setIsLoading(true);
     const loggedin = localStorage.getItem("logged_in");
     if (loggedin !== "true") {
@@ -36,10 +42,20 @@ const ProtectedPage = () => {
       };
     }
 
+    const transformedFilters = columnFilters.reduce((acc, filter) => {
+      if (filter.value !== "all") {
+        acc[filter.id] = filter.value;
+      }
+      return acc;
+    }, {});
+
+    params = {
+      ...params,
+      ...transformedFilters,
+    };
+
     api
-      .get("/clients/", {
-        params: params,
-      })
+      .get("/clients/", { params })
       .then((res) => {
         setTotal(res.data.total);
         setclients(res.data.clients);
@@ -47,23 +63,32 @@ const ProtectedPage = () => {
       })
       .catch((error) => {
         setIsLoading(false);
-        setVerify(false);
+        if (error.response && error.response.status === 401) {
+          setVerify(false);
+        }
         console.error(error);
       });
-  }, [pagination]);
+  }, [pagination, columnFilters]);
+
   const toggleStatus = async (id, currentStatus) => {
-    setLoadingStatus({ ...loadingStatus, [id]: true });
+    setLoadingStatus((prevState) => ({ ...prevState, [id]: true }));
+
     try {
       await api.put(`/clients/${id}`, { status: !currentStatus });
-      setclients(
-        clients.map((client) =>
+      setclients((prevClients) =>
+        prevClients.map((client) =>
           client._id === id ? { ...client, status: !currentStatus } : client
         )
       );
     } catch (error) {
       console.error(error);
     }
-    setLoadingStatus({ ...loadingStatus, [id]: false });
+
+    setLoadingStatus((prevState) => ({ ...prevState, [id]: false }));
+  };
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const columns = useMemo(
@@ -108,36 +133,44 @@ const ProtectedPage = () => {
         size: 150,
       },
       {
+        accessorKey: "createdDate",
+        header: "Created",
+        size: 150,
+        Cell: (props) => formatDate(props.row.original.createdDate),
+        enableColumnFilter: false,
+      },
+      {
         accessorKey: "status",
         header: "Status",
         filterVariant: "select",
         filterSelectOptions: [
-          { text: "True", value: true },
-          { text: "False", value: false },
+          { text: "All", value: "all" },
+          { text: "True", value: "true" },
+          { text: "False", value: "false" },
         ],
         Cell: ({ row: { original } }) => (
-          <button
-            onClick={() => toggleStatus(original._id, original.status)}
-            disabled={loadingStatus[original._id]}
-          >
-            {loadingStatus[original._id]
-              ? "Loading..."
-              : original.status
-              ? "True"
-              : "False"}
-          </button>
+          <div>
+            <button
+              onClick={() => toggleStatus(original._id, original.status)}
+              disabled={loadingStatus[original._id]}
+            >
+              {loadingStatus[original._id]
+                ? "Loading..."
+                : original.status
+                ? "True"
+                : "False"}
+            </button>
+          </div>
         ),
         size: 150,
       },
     ],
-    [clients, loadingStatus]
+    [loadingStatus]
   );
 
   return (
     <>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : verify ? (
+      {verify ? (
         <div className="App">
           <h2 style={{ textAlign: "left" }}>clients List</h2>
           <MaterialReactTable
@@ -146,12 +179,13 @@ const ProtectedPage = () => {
             enableFullScreenToggle={false}
             enableHiding={false}
             enableDensityToggle={false}
-            enableFacetedValues
             initialState={{
               showGlobalFilter: true,
               density: "compact",
               showColumnFilters: true,
             }}
+            manualFiltering
+            onColumnFiltersChange={setColumnFilters}
             muiTablePaginationProps={{
               rowsPerPageOptions: [1, 2, "All"],
               count: total,
@@ -163,7 +197,7 @@ const ProtectedPage = () => {
               onRowsPerPageChange: (event) =>
                 setPagination((prev) => ({
                   ...prev,
-                  pageIndex: 0,
+                  pageIndex: event.target.value === "All" ? 0 : prev.pageIndex,
                   pageSize:
                     event.target.value === "All"
                       ? "All"
@@ -177,6 +211,7 @@ const ProtectedPage = () => {
                 renderValue: (value) => (value === total ? "All" : value),
               },
             }}
+            state={{ isLoading }}
           />
           <Link href="/clients/create">
             <button>Create</button>

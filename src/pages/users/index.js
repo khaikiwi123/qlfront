@@ -1,10 +1,11 @@
 import api from "../../api/api";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@mui/joy";
 import Router from "next/router";
 import { MaterialReactTable } from "material-react-table";
 import useLogout from "../../hooks/useLogout";
+import sortedName from "@/Utils/nameSort";
 
 const ProtectedPage = () => {
   const [users, setUsers] = useState([]);
@@ -17,12 +18,20 @@ const ProtectedPage = () => {
     pageIndex: 0,
     pageSize: 1,
   });
+  const [columnFilters, setColumnFilters] = useState([]);
+  const isUpdatingStatus = useRef(false);
+
   const { logOut, loading } = useLogout();
+
   useEffect(() => {
     setCurr(localStorage.getItem("currID"));
-    localStorage.removeItem("ID");
   }, []);
+
   useEffect(() => {
+    if (isUpdatingStatus.current) {
+      isUpdatingStatus.current = false;
+      return;
+    }
     setIsLoading(true);
     const loggedin = localStorage.getItem("logged_in");
     if (loggedin !== "true") {
@@ -40,63 +49,54 @@ const ProtectedPage = () => {
       };
     }
 
+    const transformedFilters = columnFilters.reduce((acc, filter) => {
+      if (filter.value !== "all") {
+        acc[filter.id] = filter.value;
+      }
+      return acc;
+    }, {});
+    params = {
+      ...params,
+      ...transformedFilters,
+    };
+
     api
-      .get("/users/", {
-        params: params,
-      })
+      .get("/users/", { params })
       .then((res) => {
-        const sortedUsers = res.data.users.sort((a, b) => {
-          const aNameParts = a.name.split(" ");
-          const bNameParts = b.name.split(" ");
-
-          const aLast = aNameParts[0];
-          const aFirst = aNameParts[aNameParts.length - 1];
-          const aMiddle = aNameParts.slice(1, -1).join(" ");
-
-          const bLast = bNameParts[0];
-          const bFirst = bNameParts[bNameParts.length - 1];
-          const bMiddle = bNameParts.slice(1, -1).join(" ");
-
-          if (aFirst < bFirst) return -1;
-          if (aFirst > bFirst) return 1;
-
-          if (aLast < bLast) return -1;
-          if (aLast > bLast) return 1;
-
-          if (aMiddle < bMiddle) return -1;
-          if (aMiddle > bMiddle) return 1;
-
-          return 0;
-          //lower case will be sorted last
-        });
+        const sortedUsers = res.data.users.sort(sortedName);
         setTotal(res.data.total);
         setUsers(sortedUsers);
         setIsLoading(false);
       })
       .catch((error) => {
         setIsLoading(false);
-        setVerify(false);
+        if (error.response && error.response.status === 401) {
+          setVerify(false);
+        }
         console.error(error);
       });
-  }, [pagination]);
+  }, [pagination, columnFilters]);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "2-digit", day: "2-digit" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
   const toggleStatus = async (id, currentStatus) => {
-    setLoadingStatus({ ...loadingStatus, [id]: true });
+    setLoadingStatus((prevState) => ({ ...prevState, [id]: true }));
+
     try {
       await api.put(`/users/${id}`, { status: !currentStatus });
-      setUsers(
-        users.map((user) =>
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
           user._id === id ? { ...user, status: !currentStatus } : user
         )
       );
     } catch (error) {
       console.error(error);
     }
-    setLoadingStatus({ ...loadingStatus, [id]: false });
+
+    setLoadingStatus((prevState) => ({ ...prevState, [id]: false }));
   };
 
   const columns = useMemo(
@@ -105,7 +105,6 @@ const ProtectedPage = () => {
         accessorKey: "email",
         header: "Email",
         size: 150,
-        enableColumnFilter: false,
         Cell: (props) => (
           <Link href={`/users/${props.row.original._id}`}>
             <Button
@@ -126,18 +125,21 @@ const ProtectedPage = () => {
         accessorKey: "name",
         header: "Name",
         size: 200,
-        enableColumnFilter: false,
       },
       {
         accessorKey: "role",
         header: "Role",
         filterVariant: "select",
+        filterSelectOptions: [
+          { text: "All", value: "all" },
+          { text: "Admin", value: "admin" },
+          { text: "User", value: "user" },
+        ],
         size: 200,
       },
       {
         accessorKey: "phone",
         header: "Phone",
-        enableColumnFilter: false,
         size: 150,
       },
       {
@@ -152,34 +154,36 @@ const ProtectedPage = () => {
         header: "Status",
         filterVariant: "select",
         filterSelectOptions: [
-          { text: "Active", value: true },
-          { text: "Inactive", value: false },
+          { text: "All", value: "all" },
+          { text: "Active", value: "true" },
+          { text: "Inactive", value: "false" },
         ],
         Cell: ({ row: { original } }) => (
-          <button
-            onClick={() => toggleStatus(original._id, original.status)}
-            disabled={loadingStatus[original._id] || original._id === currID}
-            title={
-              original._id === currID ? "Can't deactivate current user" : ""
-            }
-          >
-            {loadingStatus[original._id]
-              ? "Loading..."
-              : original.status
-              ? "Active"
-              : "Inactive"}
-          </button>
+          <div>
+            <button
+              onClick={() => toggleStatus(original._id, original.status)}
+              disabled={loadingStatus[original._id] || original._id === currID}
+              title={
+                original._id === currID ? "Can't deactivate current user" : ""
+              }
+            >
+              {loadingStatus[original._id]
+                ? "Loading..."
+                : original.status
+                ? "Active"
+                : "Inactive"}
+            </button>
+          </div>
         ),
         size: 150,
       },
     ],
-    [users, loadingStatus]
+    [loadingStatus]
   );
+
   return (
     <>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : verify ? (
+      {verify ? (
         <div className="App">
           <h2 style={{ textAlign: "left" }}>Users List</h2>
           <MaterialReactTable
@@ -190,11 +194,18 @@ const ProtectedPage = () => {
             enableHiding={false}
             enableDensityToggle={false}
             enableFacetedValues
+            localization={{
+              noRecordsToDisplay:
+                "Hệ thống chưa có dữ liệu theo yêu cầu. Vui lòng bổ sung dữ liệu hoặc thực hiện lại thao tác tìm kiếm",
+            }}
             initialState={{
               showGlobalFilter: true,
               density: "compact",
               showColumnFilters: true,
             }}
+            enableGlobalFilter={false}
+            manualFiltering
+            onColumnFiltersChange={setColumnFilters}
             muiTablePaginationProps={{
               rowsPerPageOptions: [1, 2, "All"],
               count: total,
@@ -206,7 +217,7 @@ const ProtectedPage = () => {
               onRowsPerPageChange: (event) =>
                 setPagination((prev) => ({
                   ...prev,
-                  pageIndex: 0,
+                  pageIndex: event.target.value === "All" ? 0 : prev.pageIndex,
                   pageSize:
                     event.target.value === "All"
                       ? "All"
@@ -220,6 +231,7 @@ const ProtectedPage = () => {
                 renderValue: (value) => (value === total ? "All" : value),
               },
             }}
+            state={{ isLoading }}
           />
           <Link href="/users/create">
             <button>Create</button>
