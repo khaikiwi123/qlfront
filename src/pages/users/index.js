@@ -3,9 +3,9 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@mui/joy";
 import Router from "next/router";
-import { MaterialReactTable } from "material-react-table";
+import { CustomTable } from "@/Utils/table";
 import useLogout from "../../hooks/useLogout";
-import sortedName from "@/Utils/nameSort";
+import generatePaginationProps from "@/Utils/pagination";
 
 const ProtectedPage = () => {
   const [users, setUsers] = useState([]);
@@ -16,7 +16,7 @@ const ProtectedPage = () => {
   const [total, setTotal] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 1,
+    pageSize: 10,
   });
   const [columnFilters, setColumnFilters] = useState([]);
   const isUpdatingStatus = useRef(false);
@@ -63,9 +63,8 @@ const ProtectedPage = () => {
     api
       .get("/users/", { params })
       .then((res) => {
-        const sortedUsers = res.data.users.sort(sortedName);
         setTotal(res.data.total);
-        setUsers(sortedUsers);
+        setUsers(res.data.users);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -180,58 +179,23 @@ const ProtectedPage = () => {
     ],
     [loadingStatus]
   );
-
+  const paginationProps = generatePaginationProps({
+    total,
+    pagination,
+    setPagination,
+  });
   return (
     <>
       {verify ? (
         <div className="App">
           <h2 style={{ textAlign: "left" }}>Users List</h2>
-          <MaterialReactTable
+          <CustomTable
             columns={columns}
             data={users}
             totalCount={total}
-            enableFullScreenToggle={false}
-            enableHiding={false}
-            enableDensityToggle={false}
-            enableFacetedValues
-            localization={{
-              noRecordsToDisplay:
-                "Hệ thống chưa có dữ liệu theo yêu cầu. Vui lòng bổ sung dữ liệu hoặc thực hiện lại thao tác tìm kiếm",
-            }}
-            initialState={{
-              showGlobalFilter: true,
-              density: "compact",
-              showColumnFilters: true,
-            }}
-            enableGlobalFilter={false}
-            manualFiltering
+            isLoading={isLoading}
             onColumnFiltersChange={setColumnFilters}
-            muiTablePaginationProps={{
-              rowsPerPageOptions: [1, 2, "All"],
-              count: total,
-              page: pagination.pageSize === "All" ? 0 : pagination.pageIndex,
-              rowsPerPage:
-                pagination.pageSize === "All" ? total : pagination.pageSize,
-              onPageChange: (event, newPage) =>
-                setPagination((prev) => ({ ...prev, pageIndex: newPage })),
-              onRowsPerPageChange: (event) =>
-                setPagination((prev) => ({
-                  ...prev,
-                  pageIndex: event.target.value === "All" ? 0 : prev.pageIndex,
-                  pageSize:
-                    event.target.value === "All"
-                      ? "All"
-                      : parseInt(event.target.value, 10),
-                })),
-              labelDisplayedRows: ({ from, to, count }) =>
-                pagination.pageSize === "All"
-                  ? `${count} of ${count}`
-                  : `${from}-${to} of ${count}`,
-              SelectProps: {
-                renderValue: (value) => (value === total ? "All" : value),
-              },
-            }}
-            state={{ isLoading }}
+            paginationProps={paginationProps}
           />
           <Link href="/users/create">
             <button>Create</button>

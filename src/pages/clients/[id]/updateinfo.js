@@ -68,7 +68,7 @@ const Update = () => {
           {loading ? "Updating..." : "Update"}
         </button>
         <Link href={`/clients/${id}`}>
-          <button>Back to customers profile</button>
+          <button>Back to clients profile</button>
         </Link>
       </div>
     </>

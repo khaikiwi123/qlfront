@@ -30,7 +30,7 @@ const Create = () => {
         represent,
         createdBy: id,
       });
-      Router.push("/clients");
+      Router.push("/clients/potential");
     } catch (error) {
       console.error(error);
       setErrMsg(error.response.data.error);
@@ -74,8 +74,8 @@ const Create = () => {
           <button disabled={loading} type="submit">
             {loading ? "Creating..." : "Create"}
           </button>
-          <Link href="/clients/">
-            <button>Back to customer list</button>
+          <Link href="/clients/potential">
+            <button>Back to potential client list</button>
           </Link>
         </form>
       </div>
