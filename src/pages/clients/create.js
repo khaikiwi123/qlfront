@@ -16,7 +16,7 @@ const Create = () => {
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState("");
   useEffect(() => {
-    setId(localStorage.getItem("currID"));
+    setId(localStorage.getItem("currUser"));
   });
   useCheckLogin();
   const handleSubmit = async (e) => {

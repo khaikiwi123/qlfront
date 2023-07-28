@@ -8,9 +8,10 @@ const Update = () => {
   const msgRef = useRef();
   const router = useRouter();
   const id = router.query.id;
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [unit, setUnit] = useState("");
+  const [represent, setRep] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -19,9 +20,10 @@ const Update = () => {
     e.preventDefault();
     setLoading(true);
     const data = {
-      name,
+      email,
       phone,
-      address,
+      unit,
+      represent,
     };
     try {
       const response = await api.put(`/clients/${id}`, data);
@@ -46,11 +48,11 @@ const Update = () => {
           {msg}
         </p>
         <h1>Update</h1>
-        <label>Name:</label>
+        <label>Email:</label>
         <input
           placeholder={""}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <label>Phone:</label>
         <input
@@ -58,11 +60,17 @@ const Update = () => {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
-        <label>Address:</label>
+        <label>Unit:</label>
         <input
           placeholder={""}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          value={unit}
+          onChange={(e) => setUnit(e.target.value)}
+        />
+        <label>Representer:</label>
+        <input
+          placeholder={""}
+          value={represent}
+          onChange={(e) => setRep(e.target.value)}
         />
         <button disabled={loading} onClick={handleSubmit}>
           {loading ? "Updating..." : "Update"}

@@ -11,6 +11,7 @@ const ProtectedPage = () => {
   const [users, setUsers] = useState([]);
   const [verify, setVerify] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [currID, setCurr] = useState("");
   const [loadingStatus, setLoadingStatus] = useState({});
   const [total, setTotal] = useState(0);
@@ -71,6 +72,9 @@ const ProtectedPage = () => {
         setIsLoading(false);
         if (error.response && error.response.status === 401) {
           setVerify(false);
+        }
+        if (error.response && error.response.status === 403) {
+          setUnauthorized(true);
         }
         console.error(error);
       });
@@ -177,7 +181,7 @@ const ProtectedPage = () => {
         size: 150,
       },
     ],
-    [loadingStatus]
+    [loadingStatus, currID]
   );
   const paginationProps = generatePaginationProps({
     total,
@@ -186,10 +190,21 @@ const ProtectedPage = () => {
   });
   return (
     <>
-      {verify ? (
+      {unauthorized ? (
+        <div>
+          <h1>UNAUTHORIZED</h1>
+          <p>You are not authorized to view this page.</p>
+          <Link href="/home">
+            <button>Home</button>
+          </Link>
+        </div>
+      ) : verify ? (
         <div className="App">
           <h2 style={{ textAlign: "left" }}>Users List</h2>
           <CustomTable
+            loadingStatus={loadingStatus}
+            currID={currID}
+            toggleStatus={toggleStatus}
             columns={columns}
             data={users}
             totalCount={total}
@@ -197,6 +212,7 @@ const ProtectedPage = () => {
             onColumnFiltersChange={setColumnFilters}
             paginationProps={paginationProps}
           />
+
           <Link href="/users/create">
             <button>Create</button>
           </Link>
@@ -209,11 +225,8 @@ const ProtectedPage = () => {
         </div>
       ) : (
         <div>
-          <h1>NOT AUTHORIZED</h1>
-          <p>Please log in with another account or go back to home</p>
-          <Link href="/home">
-            <button>Home</button>
-          </Link>
+          <h1>SESSION EXPIRED</h1>
+          <p>Please log in again</p>
           <button disabled={loading} onClick={logOut}>
             {loading ? "Logging out..." : "Log out"}
           </button>

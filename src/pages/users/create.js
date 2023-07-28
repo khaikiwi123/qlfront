@@ -86,8 +86,8 @@ const Register = () => {
             type={showPass ? "text" : "password"}
             placeholder="Password"
             value={password}
-            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,24}"
-            title="Password must be at least 8 and contain at least 1 lower case, 1 upper case, 1 special character and no space"
+            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,18}"
+            title="Password must be at least 8, max 18, and contain at least 1 lower case, 1 upper case, 1 special character and no space"
             onChange={(e) => setPassword(e.target.value)}
           />
           <input

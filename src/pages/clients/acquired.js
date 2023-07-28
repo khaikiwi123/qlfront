@@ -28,7 +28,7 @@ const ProtectedPage = () => {
       router.push("/login");
       return;
     }
-    const id = localStorage.getItem("currID");
+    const id = localStorage.getItem("currUser");
     const { pageIndex, pageSize } = pagination;
     let params = {};
     if (pageSize !== "All") {

@@ -9,11 +9,13 @@ export default function client() {
   const [client, setclient] = useState(null);
   const [loadingDelete, setDelete] = useState(false);
   const [loadingStatus, setStatus] = useState(false);
+  const [role, setRole] = useState("");
 
   const router = useRouter();
   const id = router.query.id;
   useCheckLogin();
   useEffect(() => {
+    setRole(localStorage.getItem("role"));
     api
       .get(`/clients/${id}`)
       .then((response) => {
@@ -77,11 +79,18 @@ export default function client() {
         </button>
       </p>
       <Link href="/clients/potential">
-        <button>Back to potential clients list</button>
+        <button>Potential Clients</button>
       </Link>
-      <Link href="/clients/acquired">
-        <button>Back to acquired clients list</button>
-      </Link>
+      {role === "admin" && (
+        <Link href="/clients/all">
+          <button>Clients List</button>
+        </Link>
+      )}
+      {role === "user" && (
+        <Link href="/clients/acquired">
+          <button>Acquired Clients</button>
+        </Link>
+      )}
       <Link href="/home">
         <button>Back to home</button>
       </Link>

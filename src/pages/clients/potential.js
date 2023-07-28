@@ -23,11 +23,11 @@ const ProtectedPage = () => {
   useEffect(() => {
     setIsLoading(true);
     const loggedin = localStorage.getItem("logged_in");
+    const id = localStorage.getItem("currUser");
     if (loggedin !== "true") {
       router.push("/login");
       return;
     }
-    const id = localStorage.getItem("currID");
     const { pageIndex, pageSize } = pagination;
     let params = {};
     if (pageSize !== "All") {
@@ -44,6 +44,7 @@ const ProtectedPage = () => {
 
     params = {
       status: "false",
+      userId: id,
       ...params,
       ...transformedFilters,
     };
@@ -130,9 +131,11 @@ const ProtectedPage = () => {
             onColumnFiltersChange={setColumnFilters}
             paginationProps={paginationProps}
           />
+
           <Link href="/clients/acquired">
             <button>Acquired Clients</button>
           </Link>
+
           <Link href="/clients/create">
             <button>Create</button>
           </Link>

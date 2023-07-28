@@ -10,7 +10,6 @@ const Home = () => {
   useEffect(() => {
     setRole(localStorage.getItem("role"));
   }, []);
-  //To do: Set users for sep list
   return (
     <section>
       <h1>HOME</h1>
@@ -18,6 +17,7 @@ const Home = () => {
       {role === "admin" && (
         <LinkSection href="/clients/all" buttonText="Go to all client list" />
       )}
+
       {role === "user" && (
         <LinkSection
           href="/clients/potential"

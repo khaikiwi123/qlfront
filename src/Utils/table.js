@@ -8,8 +8,14 @@ export const CustomTable = ({
   isLoading,
   onColumnFiltersChange,
   paginationProps,
+  loadingStatus,
+  currID,
+  toggleStatus,
 }) => {
-  const customColumns = useMemo(() => columns, []);
+  const customColumns = useMemo(
+    () => columns,
+    [loadingStatus, currID, toggleStatus]
+  );
 
   return (
     <MaterialReactTable

@@ -29,6 +29,7 @@ const useLogin = () => {
     localStorage.setItem("refresh_token", data.refresh);
     localStorage.setItem("currID", data.id);
     localStorage.setItem("role", data.role);
+    localStorage.setItem("currUser", data.user);
   };
 
   const handleSubmit = async (e) => {

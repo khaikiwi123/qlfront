@@ -29,7 +29,7 @@ export default function User() {
       .catch((err) => {
         console.error(err);
       });
-  }, [id, router]); // Added router as dependency
+  }, [id, router]);
   const onDelete = async (id) => {
     setDelete(true);
     const response = await api.delete(`/users/${id}`);
@@ -51,8 +51,8 @@ export default function User() {
       <p>Email: {user.email}</p>
       <p>Role: {user.role}</p>
       <p>Phone: {user.phone}</p>
-      <p>Status: {user.status ? "Active" : "Inactive"}</p>
       <p>Created At: {new Date(user.createdDate).toLocaleString()}</p>
+      <p>Status: {user.status ? "Active" : "Inactive"}</p>
       <p>
         <Link href={`/users/${id}/updateinfo`}>
           <button>Update user&apos;s information</button>

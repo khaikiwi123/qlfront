@@ -7,7 +7,6 @@ import useCheckLogin from "../../../hooks/useCheckLogin";
 const UpdateUserPW = () => {
   const msgRef = useRef();
   const [newPassword, setNewPassword] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -23,10 +22,10 @@ const UpdateUserPW = () => {
     if (newPassword.trim() !== confirmPassword.trim()) {
       setMsg("Passwords do not match!");
       setUpdate(false);
+      return;
     }
     const data = {
       newPassword,
-      oldPassword,
     };
 
     try {
@@ -56,12 +55,6 @@ const UpdateUserPW = () => {
           {msg}
         </p>
         <h2>Update Password</h2>
-        <input
-          type={showPass ? "text" : "password"}
-          placeholder="Old password"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-        />
         <input
           type={showPass ? "text" : "password"}
           placeholder="New password"

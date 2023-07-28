@@ -3,9 +3,11 @@ import api from "../../api/api";
 import Link from "next/link";
 import Router from "next/router";
 import useCheckLogin from "../../hooks/useCheckLogin";
+import useLogout from "@/hooks/useLogout";
 
 const UpdateUserPW = () => {
   const msgRef = useRef();
+  const { logOut } = useLogout();
   const [id, setID] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -34,7 +36,7 @@ const UpdateUserPW = () => {
       const response = await api.put(`/users/${id}`, data);
       console.log(response);
 
-      Router.push(`/profile`);
+      logOut(e);
     } catch (error) {
       console.error(error);
       setMsg(error.response.data.error);
