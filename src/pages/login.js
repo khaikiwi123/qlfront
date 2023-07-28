@@ -7,7 +7,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useLogin from "../hooks/useLogin";
 
 const Login = () => {
-  const errRef = useRef();
   const {
     email,
     setEmail,
@@ -20,19 +19,17 @@ const Login = () => {
     showPass,
   } = useLogin();
 
+  const emailErrorMsg = errMsg === "Wrong password" ? "" : errMsg;
+  const passwordErrorMsg = errMsg === "Wrong password" ? errMsg : "";
+
   return (
     <>
       <section>
-        <p
-          ref={errRef}
-          className={errMsg ? "errmsg" : "offscreen"}
-          aria-live="assertive"
-        >
-          {errMsg}
-        </p>
         <h1>Sign In</h1>
         <form onSubmit={handleSubmit}>
           <TextField
+            error={!!emailErrorMsg}
+            helperText={emailErrorMsg}
             id="email"
             type="email"
             label="Email"
@@ -45,6 +42,8 @@ const Login = () => {
             style={{ width: "280px" }}
           />
           <TextField
+            error={!!passwordErrorMsg}
+            helperText={passwordErrorMsg}
             id="password"
             type={showPass ? "text" : "password"}
             label="Password"
