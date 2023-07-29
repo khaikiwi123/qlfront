@@ -1,23 +1,26 @@
-import { useState, useRef } from "react";
-import api from "../../../api/api";
+import { useState } from "react";
+import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useCheckLogin from "../../../hooks/useCheckLogin";
+import useCheckLogin from "@/hooks/useCheckLogin";
+import TextField from "@mui/material/TextField";
 
 const Update = () => {
-  const msgRef = useRef();
   const router = useRouter();
   const id = router.query.id;
   const [email, setEmail] = useState("");
+  const [emailErr, setEmailErr] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
   const [unit, setUnit] = useState("");
   const [represent, setRep] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
 
   useCheckLogin();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setEmailErr("");
+    setPhoneErr("");
     setLoading(true);
     const data = {
       email,
@@ -31,7 +34,18 @@ const Update = () => {
       router.push(`/clients/${id}`);
     } catch (error) {
       console.error(error);
-      setMsg(error.response.data.error);
+      const errorMsg = error.response.data.error;
+      if (
+        errorMsg === "Email already in use, please choose a different one." ||
+        errorMsg === "Email isn't valid"
+      ) {
+        setEmailErr(errorMsg);
+      } else if (
+        errorMsg ===
+        "Phone number already in use, please choose a different one."
+      ) {
+        setPhoneErr(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -40,44 +54,55 @@ const Update = () => {
   return (
     <>
       <div>
-        <p
-          ref={msgRef}
-          className={msg ? "msg" : "offscreen"}
-          aria-live="assertive"
-        >
-          {msg}
-        </p>
-        <h1>Update</h1>
-        <label>Email:</label>
-        <input
-          placeholder={""}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label>Phone:</label>
-        <input
-          placeholder={""}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <label>Unit:</label>
-        <input
-          placeholder={""}
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-        />
-        <label>Representer:</label>
-        <input
-          placeholder={""}
-          value={represent}
-          onChange={(e) => setRep(e.target.value)}
-        />
-        <button disabled={loading} onClick={handleSubmit}>
-          {loading ? "Updating..." : "Update"}
-        </button>
-        <Link href={`/clients/${id}`}>
-          <button>Back to clients profile</button>
-        </Link>
+        <h1>Update Client</h1>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            error={!!emailErr}
+            helperText={emailErr}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            error={!!phoneErr}
+            helperText={phoneErr}
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            placeholder="Representer"
+            value={represent}
+            onChange={(e) => setRep(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            placeholder="Unit"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <button disabled={loading} type="submit">
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <Link href={`/clients/${id}`}>
+            <button>Back to clients profile</button>
+          </Link>
+        </form>
       </div>
     </>
   );

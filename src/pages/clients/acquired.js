@@ -137,9 +137,6 @@ const ProtectedPage = () => {
           <Link href="/clients/potential">
             <button>Potential Clients</button>
           </Link>
-          <Link href="/clients/create">
-            <button>Create</button>
-          </Link>
           <Link href="/home">
             <button>Home</button>
           </Link>

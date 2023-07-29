@@ -1,94 +1,94 @@
-import { useState, useRef } from "react";
-import api from "../../../api/api";
+import { useState } from "react";
+import api from "@/api/api";
 import Link from "next/link";
+import Router from "next/router";
+import useCheckLogin from "@/hooks/useCheckLogin";
+import TextField from "@mui/material/TextField";
 import { useRouter } from "next/router";
-import useCheckLogin from "../../../hooks/useCheckLogin";
 
-const UpdateUserInfo = () => {
-  const msgRef = useRef();
-  const [name, setName] = useState(" ");
-  const [phone, setPhone] = useState(" ");
-  const [email, setEmail] = useState(" ");
-  const [msg, setMsg] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
-  const [loadingUpdate, setUpdate] = useState(false);
+const UpdateInfo = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailErr, setEmailErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  useCheckLogin();
 
   const router = useRouter();
   const id = router.query.id;
 
-  useCheckLogin();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setUpdate(true);
+    setEmailErr("");
+    setLoading(true);
     const data = {
       name,
       phone,
       email,
     };
 
-    if (selectedRole !== "") {
-      data.role = selectedRole;
-    }
-
     try {
       const response = await api.put(`/users/${id}`, data);
       console.log(response);
-      router.push(`/users/${id}`);
+      Router.push(`/users/${id}`);
     } catch (error) {
       console.error(error);
-      setMsg(error.response.data.error);
+      const errorMsg = error.response.data.error;
+      if (
+        errorMsg === "Email already in use, please choose a different one." ||
+        errorMsg === "Email isn't valid"
+      ) {
+        setEmailErr(errorMsg);
+      }
     } finally {
-      setUpdate(false);
+      setLoading(false);
     }
   };
 
   return (
     <>
       <div>
-        <p
-          ref={msgRef}
-          className={msg ? "msg" : "offscreen"}
-          aria-live="assertive"
-        >
-          {msg}
-        </p>
         <h1>Update</h1>
-        <label>Name:</label>
-        <input
-          placeholder={""}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label>email:</label>
-        <input
-          placeholder={""}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label>Phone:</label>
-        <input
-          placeholder={""}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <select
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
-        >
-          <option value="">Select role</option>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button disabled={loadingUpdate} onClick={handleSubmit}>
-          {loadingUpdate ? "Updating..." : "Update"}
-        </button>
-        <Link href={`/users/${id}`}>
-          <button>Back to user&apos;s profile</button>
-        </Link>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            error={!!emailErr}
+            helperText={emailErr}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <button disabled={loading} type="submit">
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <Link href={`/users/${id}`}>
+            <button>Back to user&apos;s profile</button>
+          </Link>
+        </form>
       </div>
     </>
   );
 };
 
-export default UpdateUserInfo;
+export default UpdateInfo;

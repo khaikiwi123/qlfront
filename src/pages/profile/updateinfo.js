@@ -1,16 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/api";
 import Link from "next/link";
 import Router from "next/router";
 import useCheckLogin from "../../hooks/useCheckLogin";
+import TextField from "@mui/material/TextField";
 
 const UpdateInfo = () => {
-  const msgRef = useRef();
   const [id, setID] = useState(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [msg, setMsg] = useState("");
+  const [emailErr, setEmailErr] = useState("");
   const [loading, setLoading] = useState(false);
   useCheckLogin();
 
@@ -20,6 +20,7 @@ const UpdateInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setEmailErr("");
     setLoading(true);
     const data = {
       name,
@@ -33,7 +34,10 @@ const UpdateInfo = () => {
       Router.push(`/profile/`);
     } catch (error) {
       console.error(error);
-      setMsg(error.response.data.error);
+      const errorMsg = error.response.data.error;
+      if (errorMsg === "Email already in use, please choose a different one.") {
+        setEmailErr(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -42,38 +46,45 @@ const UpdateInfo = () => {
   return (
     <>
       <div>
-        <p
-          ref={msgRef}
-          className={msg ? "msg" : "offscreen"}
-          aria-live="assertive"
-        >
-          {msg}
-        </p>
         <h1>Update</h1>
-        <label>Name:</label>
-        <input
-          placeholder={""}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label>Email:</label>
-        <input
-          placeholder={""}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label>Phone:</label>
-        <input
-          placeholder={""}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button disabled={loading} onClick={handleSubmit}>
-          {loading ? "Updating..." : "Update"}
-        </button>
-        <Link href="/profile">
-          <button>Back to your profile</button>
-        </Link>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            error={!!emailErr}
+            helperText={emailErr}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+          <TextField
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
+          />
+
+          <button disabled={loading} type="submit">
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <Link href={`/profile/`}>
+            <button>Back to profile</button>
+          </Link>
+        </form>
       </div>
     </>
   );

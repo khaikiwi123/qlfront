@@ -1,19 +1,31 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import api from "../../api/api";
 import Link from "next/link";
 import Router from "next/router";
 import useCheckLogin from "../../hooks/useCheckLogin";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
 
 const Register = () => {
-  const errRef = useRef();
-
   const [email, setEmail] = useState("");
+  const [emailErr, setEmailErr] = useState("");
   const [name, setName] = useState("");
+  const [nameErr, setNameErr] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
   const [role, setRole] = useState("");
+  const [roleError, setRoleErr] = useState("");
   const [password, setPassword] = useState("");
+  const [passErr, setPassErr] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errMsg, setErrMsg] = useState("");
+  const [confirmErr, setConfirmErr] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -21,9 +33,15 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setEmailErr("");
+    setNameErr("");
+    setPhoneErr("");
+    setRoleErr("");
+    setPassErr("");
+    setConfirmErr("");
     setLoading(true);
     if (password !== confirmPassword) {
-      setErrMsg("Passwords do not match!");
+      setConfirmErr("Passwords do not match!");
       setLoading(false);
       return;
     }
@@ -38,7 +56,26 @@ const Register = () => {
       Router.push("/users");
     } catch (error) {
       console.error(error);
-      setErrMsg(error.response.data.error);
+      const errMsg = error.response.data.error;
+      if (errMsg === "Please fill out all the form") {
+        setEmailErr(email ? "" : "This field is required");
+        setNameErr(name ? "" : "This field is required");
+        setPhoneErr(phone ? "" : "This field is required");
+        setPassErr(password ? "" : "This field is required");
+        setConfirmErr(confirmPassword ? "" : "This field is required");
+      } else if (
+        errMsg === "User already existed, please login." ||
+        email === "Email isn't valid"
+      ) {
+        setEmail(errMsg);
+      } else if (
+        errMsg === "Password is too long" ||
+        errMsg === "Password isn't strong enough"
+      ) {
+        setPassErr(errMsg);
+      } else if (errMsg === "Invalid role") {
+        setRoleErr(errMsg);
+      }
     }
     setLoading(false);
   };
@@ -49,61 +86,116 @@ const Register = () => {
   return (
     <>
       <div>
-        <p
-          ref={errRef}
-          className={errMsg ? "errmsg" : "offscreen"}
-          aria-live="assertive"
-        >
-          {errMsg}
-        </p>
         <h1>Create User</h1>
         <form onSubmit={handleSubmit}>
-          <input
+          <TextField
+            error={!!emailErr}
+            helperText={emailErr}
+            id="email"
             type="email"
-            placeholder="Email"
+            label="Email"
             value={email}
-            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
-            title="Invalid email"
+            required
             onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
           />
-          <input
-            type="name"
-            placeholder="Name"
+          <TextField
+            error={!!nameErr}
+            helperText={nameErr}
+            id="name"
+            type="text"
+            label="Name"
             value={name}
+            required
             onChange={(e) => setName(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
           />
-          <input
-            placeholder="Phone"
+          <TextField
+            error={!!phoneErr}
+            helperText={phoneErr}
+            id="phone"
+            type="tel"
+            label="Phone"
             value={phone}
+            required
             onChange={(e) => setPhone(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+            }}
+            style={{ width: "280px" }}
           />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="">Select role</option>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-          <input
+          <FormControl style={{ width: "280px" }}>
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>Select role</em>
+              </MenuItem>
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            error={!!passErr}
+            helperText={passErr}
+            id="password"
             type={showPass ? "text" : "password"}
-            placeholder="Password"
+            label="Password"
             value={password}
-            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,18}"
-            title="Password must be at least 8, max 18, and contain at least 1 lower case, 1 upper case, 1 special character and no space"
+            required
             onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+              endAdornment: (
+                <IconButton
+                  aria-label="toggle password visibility"
+                  edge="end"
+                  onClick={togglePass}
+                >
+                  {showPass ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              ),
+            }}
+            style={{ width: "280px" }}
           />
-          <input
+          <TextField
+            error={!!confirmErr}
+            helperText={confirmErr}
+            id="confirmPassword"
             type={showPass ? "text" : "password"}
-            placeholder="Confirm Password"
+            label="Confirm Password"
             value={confirmPassword}
+            required
             onChange={(e) => setConfirmPassword(e.target.value)}
+            InputProps={{
+              style: { height: "40px" },
+              endAdornment: (
+                <IconButton
+                  aria-label="toggle password visibility"
+                  edge="end"
+                  onClick={togglePass}
+                >
+                  {showPass ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              ),
+            }}
+            style={{ width: "280px" }}
           />
-          <button type="button" onClick={togglePass}>
-            {showPass ? "Hide" : "Show"}
-          </button>
-          <button disabled={loading} type="submit">
+          <Button variant="contained" disabled={loading} type="submit">
             {loading ? "Creating..." : "Create"}
-          </button>
+          </Button>
           <Link href="/users/">
-            <button>Back to users list</button>
+            <Button variant="contained">Back to users list</Button>
           </Link>
         </form>
       </div>
