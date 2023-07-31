@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
+import FormHelperText from "@mui/material/FormHelperText";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -61,20 +62,21 @@ const Register = () => {
         setEmailErr(email ? "" : "This field is required");
         setNameErr(name ? "" : "This field is required");
         setPhoneErr(phone ? "" : "This field is required");
+        setRoleErr(role ? "" : "This field is required");
         setPassErr(password ? "" : "This field is required");
         setConfirmErr(confirmPassword ? "" : "This field is required");
       } else if (
         errMsg === "User already existed, please login." ||
-        email === "Email isn't valid"
+        errMsg === "Email isn't valid"
       ) {
-        setEmail(errMsg);
+        setEmailErr(errMsg);
       } else if (
         errMsg === "Password is too long" ||
         errMsg === "Password isn't strong enough"
       ) {
         setPassErr(errMsg);
       } else if (errMsg === "Invalid role") {
-        setRoleErr(errMsg);
+        setRoleErr("Please select Role");
       }
     }
     setLoading(false);
@@ -93,7 +95,7 @@ const Register = () => {
             helperText={emailErr}
             id="email"
             type="email"
-            label="Email"
+            placeholder="Email"
             value={email}
             required
             onChange={(e) => setEmail(e.target.value)}
@@ -107,7 +109,7 @@ const Register = () => {
             helperText={nameErr}
             id="name"
             type="text"
-            label="Name"
+            placeholder="Name"
             value={name}
             required
             onChange={(e) => setName(e.target.value)}
@@ -121,7 +123,7 @@ const Register = () => {
             helperText={phoneErr}
             id="phone"
             type="tel"
-            label="Phone"
+            placeholder="Phone"
             value={phone}
             required
             onChange={(e) => setPhone(e.target.value)}
@@ -130,27 +132,32 @@ const Register = () => {
             }}
             style={{ width: "280px" }}
           />
-          <FormControl style={{ width: "280px" }}>
-            <InputLabel id="role-label">Role</InputLabel>
+          <FormControl
+            error={!!roleError}
+            style={{ width: "280px", marginTop: "-8px" }}
+          >
             <Select
               labelId="role-label"
               id="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              displayEmpty
+              sx={{ height: "40px", mt: 1 }}
             >
-              <MenuItem value="">
+              <MenuItem disabled value="">
                 <em>Select role</em>
               </MenuItem>
               <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
             </Select>
+            <FormHelperText>{roleError}</FormHelperText>
           </FormControl>
           <TextField
             error={!!passErr}
             helperText={passErr}
             id="password"
             type={showPass ? "text" : "password"}
-            label="Password"
+            placeholder="Password"
             value={password}
             required
             onChange={(e) => setPassword(e.target.value)}
@@ -173,7 +180,7 @@ const Register = () => {
             helperText={confirmErr}
             id="confirmPassword"
             type={showPass ? "text" : "password"}
-            label="Confirm Password"
+            placeholder="Confirm Password"
             value={confirmPassword}
             required
             onChange={(e) => setConfirmPassword(e.target.value)}
