@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:3000",
+  baseURL: "https://83vr7x9yp1.execute-api.ap-southeast-2.amazonaws.com/Prod",
 });
 
 export async function refreshToken() {
@@ -12,7 +12,7 @@ export async function refreshToken() {
   try {
     const response = await api.post(
       "/auth/refresh",
-      {},
+      {}, 
       {
         headers: {
           Authorization: `Bearer ${rToken}`,
