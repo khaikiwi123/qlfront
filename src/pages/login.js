@@ -1,11 +1,10 @@
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Form, Input, Button, Typography } from "antd";
+import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import useLogin from "../hooks/useLogin";
 
-const Login = () => {
+const { Title } = Typography;
+
+const Login = (e) => {
   const {
     email,
     setEmail,
@@ -14,67 +13,57 @@ const Login = () => {
     errMsg,
     loading,
     handleSubmit,
-    togglePass,
-    showPass,
-  } = useLogin();
+  } = useLogin(e);
 
   const emailErrorMsg = errMsg === "Wrong password" ? "" : errMsg;
   const passwordErrorMsg = errMsg === "Wrong password" ? errMsg : "";
 
   return (
-    <>
-      <section>
-        <h1>Sign In</h1>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!emailErrorMsg}
-            helperText={emailErrorMsg}
+    <section>
+      <Title level={2}>Sign In</Title>
+      <Form onFinish={handleSubmit}>
+        <Form.Item
+          validateStatus={emailErrorMsg ? "error" : ""}
+          help={emailErrorMsg}
+        >
+          <Input
             id="email"
             type="email"
-            label="Email"
+            placeholder="Email"
             value={email}
             required
             onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
+            style={{ height: "40px", width: "280px" }}
           />
-          <TextField
-            error={!!passwordErrorMsg}
-            helperText={passwordErrorMsg}
+        </Form.Item>
+        <Form.Item
+          validateStatus={passwordErrorMsg ? "error" : ""}
+          help={passwordErrorMsg}
+        >
+          <Input.Password
             id="password"
-            type={showPass ? "text" : "password"}
-            label="Password"
+            placeholder="Password"
             value={password}
             required
             onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-              endAdornment: (
-                <IconButton
-                  aria-label="toggle password visibility"
-                  edge="end"
-                  onClick={togglePass}
-                >
-                  {showPass ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              ),
-            }}
-            style={{ width: "280px" }}
+            style={{ height: "40px", width: "280px" }}
+            iconRender={(visible) =>
+              visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+            }
           />
+        </Form.Item>
+        <Form.Item>
           <Button
-            color="inherit"
             style={{ height: "40px", width: "160px" }}
-            variant="outlined"
-            type="submit"
+            type="primary"
+            htmlType="submit"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Log in"}
           </Button>
-        </form>
-      </section>
-    </>
+        </Form.Item>
+      </Form>
+    </section>
   );
 };
 
