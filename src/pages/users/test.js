@@ -1,47 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Layout, Menu, Table } from 'antd';
-import {Button} from 'antd';
-import api from '@/api/api';
+import React, { useEffect, useState } from "react";
+import {
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
+import { Layout, Menu, Table } from "antd";
+import api from "@/api/api";
 const { Header, Content, Footer, Sider } = Layout;
-
 
 const App = () => {
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      filters: [
-        { text: 'Admin', value: 'admin' },
-        { text: 'User', value: 'user' },
-        { text: 'All', value: 'all' },
-      ],
-      onFilter: (value, record) => value === 'all' || record.role.indexOf(value) === 0,
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
     },
     {
-      title: 'Created Date',
-      dataIndex: 'createdDate',
-      key: 'createdDate',
+      title: "Created Date",
+      dataIndex: "createdDate",
+      key: "createdDate",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (text, record) => (
         <button
           onClick={() => toggleStatus(record._id, record.status)}
@@ -55,51 +52,39 @@ const App = () => {
             : "Inactive"}
         </button>
       ),
-      filters: [
-        { text: 'Active', value: 'true' },
-        { text: 'Inactive', value: 'false' },
-        { text: 'All', value: 'all' },
-      ],
-      onFilter: (value, record) => value === 'all' || String(record.status) === value,
-    }
+    },
   ];
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState({});
   const [currID, setCurrID] = useState("");
-  const [filters, setFilters] = useState({});
-
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 1,
   });
 
-  const fetchData = async (pagination) => {
+  const fetchData = async (params = {}) => {
     setLoading(true);
-    let { current: pageIndex, pageSize } = pagination;
-    let params = {};
-  
-    if (pageSize !== "All") {
-      params = {
-          pageNumber: pageIndex + 1,
-          pageSize: pageSize,
-      };
+    const { current, pageSize } = params;
+    let endpoint = "/users";
+    let actualPageSize = pageSize;
+
+    if (pageSize === "All") {
+      actualPageSize = total; // Use the total number of records when 'All' is selected
+      endpoint += `?pageNumber=${current}&pageSize=${actualPageSize}`;
+    } else if (pageSize && pageSize !== "All") {
+      endpoint += `?pageNumber=${current}&pageSize=${pageSize}`;
     }
-  
-    params = {
-      ...params,
-      ...filters,
-    };
-  
-    const res = await api.get("/users/", { params });
+
+    const res = await api.get(endpoint);
     setData(res.data.users);
     setTotal(res.data.total || 0);
     setLoading(false);
   };
   const toggleStatus = async (_id, currentStatus) => {
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
-  
+
     try {
       await api.put(`/users/${_id}`, { status: !currentStatus });
       setData((prevUsers) =>
@@ -110,14 +95,13 @@ const App = () => {
     } catch (error) {
       console.error(error);
     }
-  
+
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: false }));
   };
-  
 
   useEffect(() => {
-    fetchData(pagination, {});
-    setCurrID(localStorage.getItem("currID"))
+    fetchData(pagination);
+    setCurrID(localStorage.getItem("currID"));
   }, [pagination, total]);
   return (
     <Layout>
@@ -135,14 +119,17 @@ const App = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['4']}
-          items={[UserOutlined, VideoCameraOutlined, UploadOutlined, UserOutlined].map(
-            (icon, index) => ({
-              key: String(index + 1),
-              icon: React.createElement(icon),
-              label: `nav ${index + 1}`,
-            }),
-          )}
+          defaultSelectedKeys={["4"]}
+          items={[
+            UserOutlined,
+            VideoCameraOutlined,
+            UploadOutlined,
+            UserOutlined,
+          ].map((icon, index) => ({
+            key: String(index + 1),
+            icon: React.createElement(icon),
+            label: `nav ${index + 1}`,
+          }))}
         />
       </Sider>
       <Layout>
@@ -153,7 +140,7 @@ const App = () => {
         />
         <Content
           style={{
-            margin: '24px 16px 0',
+            margin: "24px 16px 0",
           }}
         >
           <div
@@ -162,45 +149,32 @@ const App = () => {
               minHeight: 360,
             }}
           >
-           <Table
-      columns={columns}
-      dataSource={data}
-      loading={loading}
-      rowKey="email"
-      pagination={{
-        ...pagination,
-        total: total,
-        pageSizeOptions: ['1', '2', 'All'],
-        showSizeChanger: true,
-        onChange: (current, size) => {
-          if (size === 'All') {
-            setPagination({ current: 1, pageSize: total });
-          } else if (size !== pagination.pageSize) {
-            setPagination({ current: 1, pageSize: parseInt(size, 10) });
-          } else {
-            setPagination(prev => ({ ...prev, current }));
-          }
-        },
-      }}
-      onChange={(pagination, newFilters, sorter, extra) => {
-        // Only update filters when they actually change, not on pagination changes
-        if (extra.action === 'filter') {
-          setFilters(Object.entries(newFilters).reduce((acc, [key, value]) => {
-            if (value && value[0] !== "all") {
-              acc[key] = value[0];
-            }
-            return acc;
-          }, {}));
-        }
-        
-        fetchData(pagination);
-      }}
-    />
+            <Table
+              columns={columns}
+              dataSource={data}
+              loading={loading}
+              rowKey="email"
+              pagination={{
+                ...pagination,
+                total: total,
+                pageSizeOptions: ["1", "2", "All"],
+                showSizeChanger: true,
+                onChange: (current, size) => {
+                  if (size === "All") {
+                    setPagination({ current: 1, pageSize: total });
+                  } else if (size !== pagination.pageSize) {
+                    setPagination({ current: 1, pageSize: parseInt(size, 10) });
+                  } else {
+                    setPagination((prev) => ({ ...prev, current }));
+                  }
+                },
+              }}
+            />
           </div>
         </Content>
         <Footer
           style={{
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           Ant Design ©2023 Created by Ant UED
