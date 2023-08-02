@@ -10,18 +10,16 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 
 const { Content } = Layout;
-const App = () => {
-  const [data, setData] = useState([]);
+
+const ProtectedPage = () => {
+  const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [loadingStatus, setLoadingStatus] = useState({});
-  const [currID, setCurrID] = useState("");
   const [role, setRole] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
-
   const { logOut } = useLogout();
   const {
     searchParams,
@@ -36,29 +34,11 @@ const App = () => {
     setRole(localStorage.getItem("role"));
   }, []);
 
-  const toggleStatus = async (_id, currentStatus) => {
-    setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
-
-    try {
-      await api.put(`/users/${_id}`, { status: !currentStatus });
-      setData((prevUsers) =>
-        prevUsers.map((user) =>
-          user._id === _id ? { ...user, status: !currentStatus } : user
-        )
-      );
-    } catch (error) {
-      console.error(error);
-    }
-
-    setLoadingStatus((prevState) => ({ ...prevState, [_id]: false }));
-  };
-
   const clearAllFilters = () => {
     setSearchParams([]);
   };
 
   useEffect(() => {
-    setCurrID(localStorage.getItem("currID"));
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
 
@@ -82,10 +62,10 @@ const App = () => {
     };
 
     api
-      .get("/users/", { params })
+      .get("/clients/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setData(res.data.users);
+        setClients(res.data.clients);
         setLoading(false);
       })
       .catch((error) => {
@@ -130,18 +110,18 @@ const App = () => {
 
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      ...getColumnSearchProps("name", handleSearch, handleReset),
-    },
-    {
       title: "Email",
       dataIndex: "email",
       key: "email",
       ...getColumnSearchProps("email", handleSearch, handleReset),
+    },
+    {
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
+      ...getColumnSearchProps("unit", handleSearch, handleReset),
       render: (text, record) => (
-        <Link href={`/users/${record._id}`}>
+        <Link href={`/clients/${record._id}`}>
           <Button
             type="link"
             color="neutral"
@@ -149,33 +129,25 @@ const App = () => {
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              Router.push(`/users/${record._id}`);
+              Router.push(`/clients/${record._id}`);
             }}
           >
-            {record.email}
+            {record.unit}
           </Button>
         </Link>
       ),
+    },
+    {
+      title: "Represented By",
+      dataIndex: "represent",
+      key: "represent",
+      ...getColumnSearchProps("represent", handleSearch, handleReset),
     },
     {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
       ...getColumnSearchProps("phone", handleSearch, handleReset),
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      filterMultiple: false,
-      filters: [
-        { text: "Admin", value: "admin" },
-        { text: "User", value: "user" },
-      ],
-      onFilter: (value, record) => record.role.indexOf(value) === 0,
-      filteredValue: searchParams.find((o) => o.id === "role")
-        ? [searchParams.find((o) => o.id === "role").value]
-        : [],
     },
     {
       title: "Created Date",
@@ -196,20 +168,11 @@ const App = () => {
         ? [searchParams.find((o) => o.id === "status").value]
         : [],
       render: (text, record) => (
-        <button
-          onClick={() => toggleStatus(record._id, record.status)}
-          disabled={loadingStatus[record._id] || record._id === currID}
-          title={record._id === currID ? "Can't deactivate current user" : ""}
-        >
-          {loadingStatus[record._id]
-            ? "Loading..."
-            : record.status
-            ? "Active"
-            : "Inactive"}
-        </button>
+        <div>{record.status ? "Active" : "Inactive"}</div>
       ),
     },
   ];
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
@@ -225,12 +188,12 @@ const App = () => {
                 marginBottom: "0px",
               }}
             >
-              <h1 style={{ fontSize: "2em" }}>User List</h1>
+              <h1 style={{ fontSize: "2em" }}>Client List</h1>
               <Button onClick={clearAllFilters}>Clear All Filters</Button>
             </div>
             <UserTable
               columns={columns}
-              data={data}
+              data={clients}
               total={total}
               loading={loading}
               pagination={pagination}
@@ -243,5 +206,4 @@ const App = () => {
     </Layout>
   );
 };
-
-export default App;
+export default ProtectedPage;

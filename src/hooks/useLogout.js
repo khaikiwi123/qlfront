@@ -7,7 +7,6 @@ const useLogout = () => {
   const [loading, setLoadingOut] = useState(false);
 
   const logOut = async (e) => {
-    e.preventDefault();
     setLoadingOut(true);
     const token = localStorage.getItem("refresh_token");
 
