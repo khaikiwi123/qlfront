@@ -1,22 +1,25 @@
-const generateAntPaginationProps = ({ total, pagination, setPagination }) => ({
-    pageSizeOptions: ['10', '50', 'All'],
-    total: total,
-    current: pagination.pageSize === "All" ? 0 : pagination.pageIndex + 1, // Ant Design uses 1-indexing for pages
-    pageSize: pagination.pageSize === "All" ? total : pagination.pageSize,
-    onChange: (page, pageSize) =>
-      setPagination((prev) => ({ ...prev, pageIndex: page - 1, pageSize })), // subtract 1 because Ant Design uses 1-indexing for pages
-    showSizeChanger: true,
-    onShowSizeChange: (current, size) =>
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: size === "All" ? 0 : prev.pageIndex,
-        pageSize: size === "All" ? "All" : parseInt(size, 10),
-      })),
-    showTotal: (total, range) =>
-      pagination.pageSize === "All"
-        ? `${total} of ${total}`
-        : `${range[0]}-${range[1]} of ${total}`,
-  });
-  
-  export default generateAntPaginationProps;
-  
+import React from "react";
+import { Pagination } from "antd";
+
+const UserPagination = ({ total, pagination, setPagination }) => {
+  return (
+    <Pagination
+      current={pagination.pageIndex}
+      pageSize={pagination.pageSize}
+      total={total}
+      pageSizeOptions={["1", "7"]}
+      showSizeChanger={true}
+      showLessItems={true}
+      showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+      onChange={(pageIndex, pageSize) => {
+        if (pageSize !== pagination.pageSize) {
+          setPagination({ pageIndex: 1, pageSize: pageSize });
+        } else {
+          setPagination({ ...pagination, pageIndex: pageIndex });
+        }
+      }}
+    />
+  );
+};
+
+export default UserPagination;

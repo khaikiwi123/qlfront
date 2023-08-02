@@ -1,49 +1,118 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { UserOutlined } from "@ant-design/icons";
-import { Layout, Menu, Table, Button, Input, Space } from "antd";
+import {
+  UserOutlined,
+  SearchOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
+  TeamOutlined,
+  IdcardOutlined,
+  UsergroupAddOutlined,
+} from "@ant-design/icons";
+import {
+  Layout,
+  Table,
+  Button,
+  Input,
+  Space,
+  Menu,
+  Dropdown,
+  Avatar,
+} from "antd";
 import api from "@/api/api";
-import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-const { Header, Content, Footer, Sider } = Layout;
-
+import useLogout from "@/hooks/useLogout";
+const { SubMenu } = Menu;
+const { Header, Content, Sider } = Layout;
 const App = () => {
   const [data, setData] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
   const [searchParams, setSearchParams] = useState([]);
-
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState({});
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [currID, setCurrID] = useState("");
+  const [role, setRole] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 1,
   });
-
   const searchInput = useRef(null);
-
+  const { logOut, loadingOut } = useLogout();
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
+  const menu = (
+    <Menu>
+      <Menu.Item key="0">
+        <Button type="text" onClick={() => Router.push("/profile")}>
+          <ProfileOutlined /> Profile
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="1">
+        <Button type="text" onClick={logOut} loading={loadingOut}>
+          <LogoutOutlined /> Logout
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchedColumn(dataIndex);
-    setSearchParams((prevFilters) => [
-      ...prevFilters,
-      {
-        id: dataIndex,
-        value: selectedKeys[0],
-      },
-    ]);
+    setSearchText(selectedKeys[0]);
+    setSearchParams((prevFilters) => {
+      const index = prevFilters.findIndex((o) => o.id === dataIndex);
+      if (index === -1) {
+        return [...prevFilters, { id: dataIndex, value: selectedKeys[0] }];
+      }
+      prevFilters[index].value = selectedKeys[0];
+      return [...prevFilters];
+    });
   };
 
   const handleReset = (clearFilters, confirm, dataIndex) => {
     clearFilters();
     confirm();
+    setSearchedColumn("");
     setSearchText("");
-    setSearchParams((prevFilters) =>
-      prevFilters.filter((filter) => filter.id !== dataIndex)
-    );
+    setSearchParams((prevFilters) => {
+      const newFilters = prevFilters.filter(
+        (filter) => filter.id !== dataIndex
+      );
+      return newFilters;
+    });
+  };
+  const toggleStatus = async (_id, currentStatus) => {
+    setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
+
+    try {
+      await api.put(`/users/${_id}`, { status: !currentStatus });
+      setData((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === _id ? { ...user, status: !currentStatus } : user
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
+
+    setLoadingStatus((prevState) => ({ ...prevState, [_id]: false }));
+  };
+  const clearAllFilters = () => {
+    setSearchText("");
+
+    setSearchParams([]);
+  };
+  const handleTableChange = (pagination, filters) => {
+    let newSearchParams = [];
+    for (let prop in filters) {
+      if (filters[prop] && filters[prop].length > 0) {
+        newSearchParams.push({ id: prop, value: filters[prop][0] });
+      }
+    }
+    setSearchParams(newSearchParams);
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -86,9 +155,9 @@ const App = () => {
             Search
           </Button>
           <Button
-            onClick={() =>
-              clearFilters && handleReset(clearFilters, confirm, dataIndex)
-            }
+            onClick={() => {
+              clearFilters && handleReset(clearFilters, confirm, dataIndex);
+            }}
             size="small"
             style={{
               width: 90,
@@ -175,23 +244,6 @@ const App = () => {
       });
   }, [pagination, searchParams]);
 
-  const toggleStatus = async (_id, currentStatus) => {
-    setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
-
-    try {
-      await api.put(`/users/${_id}`, { status: !currentStatus });
-      setData((prevUsers) =>
-        prevUsers.map((user) =>
-          user._id === _id ? { ...user, status: !currentStatus } : user
-        )
-      );
-    } catch (error) {
-      console.error(error);
-    }
-
-    setLoadingStatus((prevState) => ({ ...prevState, [_id]: false }));
-  };
-
   const columns = [
     {
       title: "Name",
@@ -231,6 +283,15 @@ const App = () => {
       title: "Role",
       dataIndex: "role",
       key: "role",
+      filterMultiple: false,
+      filters: [
+        { text: "Admin", value: "admin" },
+        { text: "User", value: "user" },
+      ],
+      onFilter: (value, record) => record.role.indexOf(value) === 0,
+      filteredValue: searchParams.find((o) => o.id === "role")
+        ? [searchParams.find((o) => o.id === "role").value]
+        : [],
     },
     {
       title: "Created Date",
@@ -241,6 +302,15 @@ const App = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      filterMultiple: false,
+      filters: [
+        { text: "Active", value: true },
+        { text: "Inactive", value: false },
+      ],
+      onFilter: (value, record) => record.status === value,
+      filteredValue: searchParams.find((o) => o.id === "status")
+        ? [searchParams.find((o) => o.id === "status").value]
+        : [],
       render: (text, record) => (
         <button
           onClick={() => toggleStatus(record._id, record.status)}
@@ -257,66 +327,100 @@ const App = () => {
     },
   ];
   return (
-    <Layout>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          console.log(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header
+        style={{
+          padding: 0,
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
         }}
       >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["4"]}
-          items={[UserOutlined].map((icon, index) => ({
-            key: String(index + 1),
-            icon: React.createElement(icon),
-            label: `nav ${index + 1}`,
-          }))}
-        />
-      </Sider>
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Avatar
+            style={{ backgroundColor: "#87d068" }}
+            icon={<UserOutlined />}
+          />
+        </Dropdown>
+      </Header>
       <Layout>
-        <Header
-          style={{
-            padding: 0,
-          }}
-        />
-        <Content
-          style={{
-            margin: "24px 16px 0",
-          }}
-        >
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-            }}
-          >
+        <Sider>
+          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+            {role === "user" && (
+              <SubMenu
+                key="sub1"
+                icon={<UsergroupAddOutlined />}
+                title="Clients"
+              >
+                <Menu.Item
+                  key="1"
+                  onClick={() => Router.push("/clients/potential")}
+                >
+                  Potential
+                </Menu.Item>
+                <Menu.Item
+                  key="2"
+                  onClick={() => Router.push("/clients/acquired")}
+                >
+                  Acquired
+                </Menu.Item>
+              </SubMenu>
+            )}
+            {role === "admin" && (
+              <>
+                <Menu.Item
+                  key="3"
+                  icon={<IdcardOutlined />}
+                  onClick={() => Router.push("/clients/all")}
+                >
+                  Clients
+                </Menu.Item>
+                <Menu.Item
+                  key="4"
+                  icon={<TeamOutlined />}
+                  onClick={() => Router.push("/users")}
+                >
+                  Users
+                </Menu.Item>
+              </>
+            )}
+          </Menu>
+        </Sider>
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "0px",
+              }}
+            >
+              <h1 style={{ fontSize: "2em" }}>User List</h1>
+              <Button onClick={clearAllFilters}>Clear All Filters</Button>
+            </div>
             <Table
               columns={columns}
               dataSource={data}
               loading={loading}
               rowKey="email"
+              onChange={handleTableChange}
               pagination={{
                 current: pagination.pageIndex,
                 pageSize: pagination.pageSize,
                 total: total,
                 pageSizeOptions: ["1", "7"],
                 showSizeChanger: true,
+                showLessItems: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
                 onChange: (pageIndex, pageSize) => {
                   if (pageSize !== pagination.pageSize) {
-                    // If the page size has changed, reset to the first page.
                     setPagination({
                       pageIndex: 1,
                       pageSize: pageSize,
                     });
                   } else {
-                    // Otherwise, just update the current page number.
                     setPagination({
                       ...pagination,
                       pageIndex: pageIndex,
@@ -327,13 +431,6 @@ const App = () => {
             />
           </div>
         </Content>
-        <Footer
-          style={{
-            textAlign: "center",
-          }}
-        >
-          Ant Design ©2023 Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );
