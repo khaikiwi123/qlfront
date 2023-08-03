@@ -17,6 +17,7 @@ const useColumnSearch = () => {
       return [...prevFilters];
     });
   };
+
   const handleReset = (clearFilters, confirm, dataIndex) => {
     clearFilters();
     confirm();
@@ -27,20 +28,7 @@ const useColumnSearch = () => {
       return newFilters;
     });
   };
-  const handleTableChange = (pagination, filters) => {
-    let newSearchParams = [...searchParams]; // keep old filters
-    for (let prop in filters) {
-      if (filters[prop] && filters[prop].length > 0) {
-        const index = newSearchParams.findIndex((o) => o.id === prop);
-        if (index === -1) {
-          newSearchParams.push({ id: prop, value: filters[prop][0] });
-        } else {
-          newSearchParams[index].value = filters[prop][0];
-        }
-      }
-    }
-    setSearchParams(newSearchParams);
-  };
+
   const getColumnSearchProps = (dataIndex, handleSearch, handleReset) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -69,9 +57,7 @@ const useColumnSearch = () => {
           Search
         </Button>
         <Button
-          onClick={() => {
-            clearFilters && handleReset(clearFilters, confirm, dataIndex);
-          }}
+          onClick={() => handleReset(clearFilters, confirm, dataIndex)}
           size="small"
           style={{ width: 90 }}
         >
@@ -94,7 +80,6 @@ const useColumnSearch = () => {
         setTimeout(() => searchInput.current.select());
       }
     },
-    render: (text) => text,
   });
 
   return {
@@ -103,7 +88,6 @@ const useColumnSearch = () => {
     handleSearch,
     handleReset,
     getColumnSearchProps,
-    handleTableChange,
   };
 };
 

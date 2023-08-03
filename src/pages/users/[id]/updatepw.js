@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "@/api/api";
-import Link from "next/link";
 import useCheckLogin from "@/hooks/useCheckLogin";
-import TextField from "@mui/material/TextField";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
+import { Input, Button, Form, Layout, Row, Col } from "antd";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+import Link from "next/link";
+const { Content } = Layout;
 
 const UpdateUserPW = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -12,12 +15,18 @@ const UpdateUserPW = () => {
   const [confirmErr, setConfirmErr] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loadingUpdate, setUpdate] = useState(false);
+  const [role, setRole] = useState("");
+
   useCheckLogin();
+
   const router = useRouter();
   const id = router.query.id;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
+
+  const handleSubmit = async () => {
     setNewPassErr("");
     setConfirmErr("");
     setUpdate(true);
@@ -32,7 +41,7 @@ const UpdateUserPW = () => {
     try {
       const response = await api.put(`/users/${id}`, data);
       console.log(response);
-      Router.push(`/users/${id}`);
+      router.push(`/users/${id}`);
     } catch (error) {
       console.error(error);
       const errMsg = error.response.data.error;
@@ -46,53 +55,70 @@ const UpdateUserPW = () => {
       setUpdate(false);
     }
   };
+
   const togglePass = () => {
     setShowPass(!showPass);
   };
 
   return (
-    <>
-      <div>
-        <h2>Update Password</h2>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!newPassErr}
-            helperText={newPassErr}
-            type={showPass ? "text" : "password"}
-            placeholder="New Password"
-            value={newPassword}
-            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,24}"
-            title="Password must be at least 8 and contain at least 1 lower case, 1 upper case, 1 special character and no space"
-            onChange={(e) => setNewPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!confirmErr}
-            helperText={confirmErr}
-            type={showPass ? "text" : "password"}
-            placeholder="Confirm New Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <button type="button" onClick={togglePass}>
-            {showPass ? "Hide" : "Show"}
-          </button>
-          <button disabled={loadingUpdate} type="submit">
-            {loadingUpdate ? "Updating..." : "Update"}
-          </button>
-          <Link href={`/users/${id}`}>
-            <button>Back to user&apos;s profile</button>
-          </Link>
-        </form>
-      </div>
-    </>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <Row justify="center">
+              <Col span={8}>
+                <h1>Update Password</h1>
+                <Form onFinish={handleSubmit} layout="vertical">
+                  <Form.Item
+                    label="New Password"
+                    validateStatus={newPassErr ? "error" : ""}
+                    help={newPassErr}
+                  >
+                    <Input.Password
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Confirm New Password"
+                    validateStatus={confirmErr ? "error" : ""}
+                    help={confirmErr}
+                  >
+                    <Input.Password
+                      placeholder="Confirm New Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="button" onClick={togglePass}>
+                      {showPass ? "Hide Password" : "Show Password"}
+                    </Button>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loadingUpdate}
+                    >
+                      Update
+                    </Button>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="default">
+                      <Link href={`/users/${id}`}>
+                        Back to user&apos;s profile
+                      </Link>
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Col>
+            </Row>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 

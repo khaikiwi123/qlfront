@@ -5,14 +5,32 @@ import {
   IdcardOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 const AppSider = ({ role }) => {
+  const router = useRouter(); // change here
+  let selectedKey;
+  switch (router.pathname) {
+    case "/clients/potential":
+      selectedKey = "1";
+      break;
+    case "/clients/acquired":
+      selectedKey = "2";
+      break;
+    case "/clients/all":
+      selectedKey = "3";
+      break;
+    case "/users":
+      selectedKey = "4";
+      break;
+    default:
+      selectedKey = "1";
+  }
   return (
     <Sider>
-      <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+      <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
         {role === "user" && (
           <SubMenu key="sub1" icon={<UsergroupAddOutlined />} title="Clients">
             <Menu.Item

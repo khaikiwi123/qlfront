@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/api/api";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import useCheckLogin from "@/hooks/useCheckLogin";
-import TextField from "@mui/material/TextField";
+import { Form, Input, Button, Layout, Row, Col } from "antd";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+import Link from "next/link";
+
+const { Content } = Layout;
 
 const Update = () => {
   const router = useRouter();
@@ -15,10 +19,15 @@ const Update = () => {
   const [unit, setUnit] = useState("");
   const [represent, setRep] = useState("");
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("");
 
   useCheckLogin();
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
     setEmailErr("");
     setPhoneErr("");
     setLoading(true);
@@ -52,59 +61,63 @@ const Update = () => {
   };
 
   return (
-    <>
-      <div>
-        <h1>Update Client</h1>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!emailErr}
-            helperText={emailErr}
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!phoneErr}
-            helperText={phoneErr}
-            placeholder="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            placeholder="Representer"
-            value={represent}
-            onChange={(e) => setRep(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            placeholder="Unit"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <button disabled={loading} type="submit">
-            {loading ? "Updating..." : "Update"}
-          </button>
-          <Link href={`/clients/${id}`}>
-            <button>Back to clients profile</button>
-          </Link>
-        </form>
-      </div>
-    </>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <Row justify="center">
+              <Col span={12}>
+                <h1>Update Client</h1>
+                <Form onFinish={handleSubmit} layout="vertical">
+                  <Form.Item
+                    label="Email"
+                    validateStatus={emailErr ? "error" : ""}
+                    help={emailErr}
+                  >
+                    <Input
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Phone"
+                    validateStatus={phoneErr ? "error" : ""}
+                    help={phoneErr}
+                  >
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Representer">
+                    <Input
+                      value={represent}
+                      onChange={(e) => setRep(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Unit">
+                    <Input
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                      Update
+                    </Button>
+                  </Form.Item>
+                </Form>
+                <Button type="primary">
+                  <Link href={`/clients/${id}`}>Back to clients profile</Link>
+                </Button>
+              </Col>
+            </Row>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 

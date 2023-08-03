@@ -1,56 +1,51 @@
 import { useState, useEffect } from "react";
-import api from "../../api/api";
+import api from "@/api/api";
 import Link from "next/link";
 import Router from "next/router";
-import useCheckLogin from "../../hooks/useCheckLogin";
-import TextField from "@mui/material/TextField";
+import useCheckLogin from "@/hooks/useCheckLogin";
+import { Form, Input, Button, Layout, message } from "antd";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+
+const { Content } = Layout;
 
 const Create = () => {
-  const [email, setEmail] = useState("");
-  const [emailErr, setEmailErr] = useState("");
-
-  const [phone, setPhone] = useState("");
-  const [phoneErr, setPhoneErr] = useState("");
-
-  const [unit, setUnit] = useState("");
-  const [unitErr, setUnitErr] = useState("");
-
-  const [represent, setRep] = useState("");
-  const [representErr, setRepErr] = useState("");
+  const [form] = Form.useForm();
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState("");
+  const [emailErr, setEmailErr] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
+
   useEffect(() => {
     setId(localStorage.getItem("currUser"));
     setRole(localStorage.getItem("role"));
   });
+
   useCheckLogin();
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const onFinish = async (values) => {
     setLoading(true);
     setEmailErr("");
     setPhoneErr("");
-    setUnitErr("");
-    setRepErr("");
+
     try {
       await api.post(`/clients`, {
-        email,
-        phone,
-        unit,
-        represent,
-        createdBy: id,
+        ...values,
+        createdBy: role === "admin" ? values.createdBy : id,
       });
-      Router.push("/clients/potential");
+
+      // Navigate to different paths based on the role
+      if (role === "user") {
+        Router.push("/clients/potential");
+      } else if (role === "admin") {
+        Router.push("/clients/all");
+      }
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
 
-      if (errorMsg === "Please fill out all the form") {
-        setEmailErr(email ? "" : "This field is required");
-        setPhoneErr(phone ? "" : "This field is required");
-        setUnitErr(unit ? "" : "This field is required");
-        setRepErr(represent ? "" : "This field is required");
-      } else if (
+      if (
         errorMsg === "Client's email is already in the system" ||
         errorMsg === "Email isn't valid"
       ) {
@@ -63,73 +58,125 @@ const Create = () => {
     }
   };
   return (
-    <>
-      <div>
-        <h1>Create client</h1>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!emailErr}
-            helperText={emailErr}
-            id="email"
-            type="email"
-            label="Email"
-            value={email}
-            required
-            onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div
+            style={{
+              padding: 24,
+              minHeight: 360,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!phoneErr}
-            helperText={phoneErr}
-            placeholder="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!representErr}
-            helperText={representErr}
-            placeholder="Representer"
-            value={represent}
-            onChange={(e) => setRep(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!unitErr}
-            helperText={unitErr}
-            placeholder="Unit"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <button disabled={loading} type="submit">
-            {loading ? "Creating..." : "Create"}
-          </button>
-          {role === "admin" && (
-            <Link href="/clients/all">
-              <button>Back to client list</button>
-            </Link>
-          )}
-          {role === "user" && (
-            <Link href="/clients/potential">
-              <button>Back to potential client list</button>
-            </Link>
-          )}
-        </form>
-      </div>
-    </>
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                maxWidth: "300px", // Set a maximum width for the form
+                width: "100%", // Make the form take up the full width of its container
+              }}
+            >
+              <h1 style={{ fontSize: "2em", textAlign: "center" }}>
+                Create Client
+              </h1>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                hideRequiredMark
+              >
+                <Form.Item
+                  label="Email"
+                  name="email"
+                  rules={[
+                    { required: true, message: "Please input your email!" },
+                  ]}
+                  help={emailErr}
+                  validateStatus={emailErr ? "error" : ""}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Phone"
+                  name="phone"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your phone number!",
+                    },
+                  ]}
+                  help={phoneErr}
+                  validateStatus={phoneErr ? "error" : ""}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Representer"
+                  name="represent"
+                  rules={[
+                    { required: true, message: "Please input your represent!" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Unit"
+                  name="unit"
+                  rules={[
+                    { required: true, message: "Please input your unit!" },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                {role === "admin" && (
+                  <Form.Item
+                    label="Assign to"
+                    name="createdBy"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the assigned personel",
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                )}
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    style={{ width: "100%" }}
+                  >
+                    Create
+                  </Button>
+                  {role === "admin" && (
+                    <Link href="/clients/all">
+                      <Button style={{ width: "100%", marginTop: "10px" }}>
+                        Back to client list
+                      </Button>
+                    </Link>
+                  )}
+                  {role === "user" && (
+                    <Link href="/clients/potential">
+                      <Button style={{ width: "100%", marginTop: "10px" }}>
+                        Back to potential client list
+                      </Button>
+                    </Link>
+                  )}
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 

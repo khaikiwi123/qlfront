@@ -1,213 +1,209 @@
-import { useState } from "react";
-import api from "../../api/api";
+import { useState, useEffect } from "react";
+import api from "@/api/api";
 import Link from "next/link";
 import Router from "next/router";
-import useCheckLogin from "../../hooks/useCheckLogin";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FormHelperText from "@mui/material/FormHelperText";
+import useCheckLogin from "@/hooks/useCheckLogin";
+import { Form, Input, Button, Layout, Select } from "antd";
+import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
 
-const Register = () => {
-  const [email, setEmail] = useState("");
-  const [emailErr, setEmailErr] = useState("");
-  const [name, setName] = useState("");
-  const [nameErr, setNameErr] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneErr, setPhoneErr] = useState("");
+const { Content } = Layout;
+const { Option } = Select;
+
+const Create = () => {
+  const [form] = Form.useForm();
   const [role, setRole] = useState("");
-  const [roleError, setRoleErr] = useState("");
-  const [password, setPassword] = useState("");
-  const [passErr, setPassErr] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [confirmErr, setConfirmErr] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  });
 
   useCheckLogin();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setEmailErr("");
-    setNameErr("");
-    setPhoneErr("");
-    setRoleErr("");
-    setPassErr("");
-    setConfirmErr("");
+  const onFinish = async (values) => {
     setLoading(true);
-    if (password !== confirmPassword) {
-      setConfirmErr("Passwords do not match!");
-      setLoading(false);
-      return;
-    }
+
     try {
-      await api.post(`/users/`, {
-        email,
-        name,
-        phone,
-        role,
-        password,
-      });
+      await api.post(`/users/`, { ...values });
       Router.push("/users");
     } catch (error) {
+      setLoading(false);
       console.error(error);
-      const errMsg = error.response.data.error;
-      if (errMsg === "Please fill out all the form") {
-        setEmailErr(email ? "" : "This field is required");
-        setNameErr(name ? "" : "This field is required");
-        setPhoneErr(phone ? "" : "This field is required");
-        setRoleErr(role ? "" : "This field is required");
-        setPassErr(password ? "" : "This field is required");
-        setConfirmErr(confirmPassword ? "" : "This field is required");
-      } else if (
-        errMsg === "User already existed, please login." ||
-        errMsg === "Email isn't valid"
-      ) {
-        setEmailErr(errMsg);
-      } else if (
-        errMsg === "Password is too long" ||
-        errMsg === "Password isn't strong enough"
-      ) {
-        setPassErr(errMsg);
-      } else if (errMsg === "Invalid role") {
-        setRoleErr("Please select Role");
+
+      const errorMsg = error.response.data.error; // Assuming error message comes like this from API
+
+      // Now check which error it is and set it on the right field
+      if (errorMsg.includes("User already existed")) {
+        form.setFields([
+          {
+            name: "email",
+            errors: ["User already existed, please login."],
+          },
+        ]);
+      } else if (errorMsg.includes("Email isn't valid")) {
+        form.setFields([
+          {
+            name: "email",
+            errors: ["Email isn't valid"],
+          },
+        ]);
+      } else if (errorMsg.includes("Password is too long")) {
+        form.setFields([
+          {
+            name: "password",
+            errors: ["Password is too long"],
+          },
+        ]);
+      } else if (errorMsg.includes("Password isn't strong enough")) {
+        form.setFields([
+          {
+            name: "password",
+            errors: ["Password isn't strong enough"],
+          },
+        ]);
       }
     }
-    setLoading(false);
-  };
-  const togglePass = () => {
-    setShowPass(!showPass);
   };
 
   return (
-    <>
-      <div>
-        <h1>Create User</h1>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!emailErr}
-            helperText={emailErr}
-            id="email"
-            type="email"
-            placeholder="Email"
-            value={email}
-            required
-            onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div
+            style={{
+              padding: 24,
+              minHeight: 360,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!nameErr}
-            helperText={nameErr}
-            id="name"
-            type="text"
-            placeholder="Name"
-            value={name}
-            required
-            onChange={(e) => setName(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!phoneErr}
-            helperText={phoneErr}
-            id="phone"
-            type="tel"
-            placeholder="Phone"
-            value={phone}
-            required
-            onChange={(e) => setPhone(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <FormControl
-            error={!!roleError}
-            style={{ width: "280px", marginTop: "-8px" }}
           >
-            <Select
-              labelId="role-label"
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              displayEmpty
-              sx={{ height: "40px", mt: 1 }}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                maxWidth: "300px",
+                width: "100%",
+              }}
             >
-              <MenuItem disabled value="">
-                <em>Select role</em>
-              </MenuItem>
-              <MenuItem value="user">User</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
-            </Select>
-            <FormHelperText>{roleError}</FormHelperText>
-          </FormControl>
-          <TextField
-            error={!!passErr}
-            helperText={passErr}
-            id="password"
-            type={showPass ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            required
-            onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-              endAdornment: (
-                <IconButton
-                  aria-label="toggle password visibility"
-                  edge="end"
-                  onClick={togglePass}
+              <h1 style={{ fontSize: "2em", textAlign: "center" }}>
+                Create User
+              </h1>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                hideRequiredMark
+              >
+                <Form.Item
+                  label="Email"
+                  name="email"
+                  rules={[
+                    { required: true, message: "Please input your email!" },
+                    { type: "email", message: "Email is not valid!" },
+                  ]}
                 >
-                  {showPass ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              ),
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!confirmErr}
-            helperText={confirmErr}
-            id="confirmPassword"
-            type={showPass ? "text" : "password"}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            required
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-              endAdornment: (
-                <IconButton
-                  aria-label="toggle password visibility"
-                  edge="end"
-                  onClick={togglePass}
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Name"
+                  name="name"
+                  rules={[
+                    { required: true, message: "Please input your name!" },
+                  ]}
                 >
-                  {showPass ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              ),
-            }}
-            style={{ width: "280px" }}
-          />
-          <Button variant="contained" disabled={loading} type="submit">
-            {loading ? "Creating..." : "Create"}
-          </Button>
-          <Link href="/users/">
-            <Button variant="contained">Back to users list</Button>
-          </Link>
-        </form>
-      </div>
-    </>
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Phone"
+                  name="phone"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your phone number!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  label="Role"
+                  name="role"
+                  rules={[{ required: true, message: "Please select a role!" }]}
+                >
+                  <Select placeholder="Select a role">
+                    <Option value="user">User</Option>
+                    <Option value="admin">Admin</Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  label="Password"
+                  name="password"
+                  rules={[
+                    { required: true, message: "Please input your password!" },
+                  ]}
+                >
+                  <Input.Password
+                    iconRender={(visible) =>
+                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                    }
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please confirm your password!",
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error(
+                            "The two passwords that you entered do not match!"
+                          )
+                        );
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password
+                    iconRender={(visible) =>
+                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                    }
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    style={{ width: "100%" }}
+                  >
+                    Create
+                  </Button>
+                  <Link href="/users/">
+                    <Button style={{ width: "100%", marginTop: "10px" }}>
+                      Back to users list
+                    </Button>
+                  </Link>
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
-export default Register;
+export default Create;

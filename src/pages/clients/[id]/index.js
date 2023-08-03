@@ -1,102 +1,111 @@
 import { useState, useEffect } from "react";
-import api from "../../../api/api";
+import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
+import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useLogout from "../../../hooks/useLogout";
-import useCheckLogin from "../../../hooks/useCheckLogin";
+import useLogout from "@/hooks/useLogout";
+import useCheckLogin from "@/hooks/useCheckLogin";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
 
-export default function client() {
-  const [client, setclient] = useState(null);
-  const [loadingDelete, setDelete] = useState(false);
-  const [loadingStatus, setStatus] = useState(false);
+const { Content } = Layout;
+const { Title, Text } = Typography;
+
+export default function Client() {
+  const [client, setClient] = useState(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
   const [role, setRole] = useState("");
 
   const router = useRouter();
   const id = router.query.id;
   useCheckLogin();
+
   useEffect(() => {
     setRole(localStorage.getItem("role"));
     api
       .get(`/clients/${id}`)
       .then((response) => {
-        setclient(response.data);
+        setClient(response.data);
       })
       .catch((err) => {
         console.error(err);
       });
   }, [id]);
+
   const onDelete = async (id) => {
-    setDelete(true);
+    setLoadingDelete(true);
     await api.delete(`/clients/${id}`);
 
-    router.push("/clients/potential");
+    if (role === "admin") {
+      router.push("/clients/all");
+    } else {
+      router.push("/clients/potential");
+    }
 
-    setDelete(false);
+    setLoadingDelete(false);
   };
+
   const onUpdate = async (id) => {
-    setStatus((prevState) => ({ ...prevState, [id]: true }));
+    setLoadingStatus(true);
 
     try {
       const currentStatus = client.status;
       await api.put(`/clients/${id}`, { status: !currentStatus });
-      setclient({ ...client, status: !currentStatus });
+      setClient({ ...client, status: !currentStatus });
     } catch (error) {
       console.error(error);
     }
 
-    setStatus((prevState) => ({ ...prevState, [id]: false }));
+    setLoadingStatus(false);
   };
-  const { logOut, loading } = useLogout();
 
   if (client === null) {
-    return <p>Loading...</p>;
+    return <Spin size="large" />;
   }
 
   return (
-    <div>
-      <h1>Profile</h1>
-      <p>Email: {client.email}</p>
-      <p>Phone: {client.phone}</p>
-      <p>Unit: {client.unit}</p>
-      <p>Representer: {client.represent}</p>
-      <p>
-        Status:
-        <button onClick={() => onUpdate(id)} disabled={loadingStatus[id]}>
-          {loadingStatus[id]
-            ? "Loading..."
-            : client.status
-            ? "Đã kí kết"
-            : "Đang chăm sóc"}
-        </button>
-      </p>
-      <p>Created At: {new Date(client.createdDate).toLocaleString()}</p>
-      <p>
-        <Link href={`/clients/${id}/updateinfo`}>
-          <button>Update client&apos;s information</button>
-        </Link>
-        <button disabled={loadingDelete} onClick={() => onDelete(id)}>
-          {loadingDelete ? "Deleting..." : "Delete"}
-        </button>
-      </p>
-      <Link href="/clients/potential">
-        <button>Potential Clients</button>
-      </Link>
-      {role === "admin" && (
-        <Link href="/clients/all">
-          <button>Clients List</button>
-        </Link>
-      )}
-      {role === "user" && (
-        <Link href="/clients/acquired">
-          <button>Acquired Clients</button>
-        </Link>
-      )}
-      <Link href="/home">
-        <button>Back to home</button>
-      </Link>
-      <button disabled={loading} onClick={logOut}>
-        {loading ? "Logging out..." : "Log out"}
-      </button>
-    </div>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <Title>Profile</Title>
+            <Text>Email: {client.email}</Text>
+            <br />
+            <Text>Phone: {client.phone}</Text>
+            <br />
+            <Text>Unit: {client.unit}</Text>
+            <br />
+            <Text>Representer: {client.represent}</Text>
+            <br />
+            <Text>Status:</Text>
+            <Button onClick={() => onUpdate(id)} loading={loadingStatus}>
+              {client.status ? "Đã kí kết" : "Đang chăm sóc"}
+            </Button>
+            <br />
+            <Text>
+              Created At: {new Date(client.createdDate).toLocaleString()}
+            </Text>
+            <br />
+            <Link href={`/clients/${id}/updateinfo`}>
+              <Button>Update client&apos;s information</Button>
+            </Link>
+            <Popconfirm
+              title="Are you sure to delete this client?"
+              onConfirm={() => onDelete(id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger loading={loadingDelete}>
+                {loadingDelete ? "Deleting..." : "Delete"}
+              </Button>
+            </Popconfirm>
+            <br />
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 }

@@ -1,51 +1,53 @@
-import React, { useEffect, useState, useMemo } from "react";
-import api from "../../api/api";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@mui/joy";
-import { useRouter } from "next/router";
-import useLogout from "../../hooks/useLogout";
-import { CustomTable } from "@/Utils/table";
-import generatePaginationProps from "@/Utils/pagination";
+import Router from "next/router";
+import { Layout, Button, Modal } from "antd";
+import api from "@/api/api";
+import useLogout from "@/hooks/useLogout";
+import useColumnSearch from "@/hooks/useColumnSearch";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+import UserTable from "@/components/table";
+import { PlusOutlined } from "@ant-design/icons";
+
+const { Content } = Layout;
 
 const ProtectedPage = () => {
-  const [clients, setclients] = useState([]);
-  const [verify, setVerify] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("");
+  const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
-    pageIndex: 0,
+    pageIndex: 1,
     pageSize: 10,
   });
-  const [columnFilters, setColumnFilters] = useState([]);
-
-  const router = useRouter();
-  const { logOut, loading } = useLogout();
+  const { logOut } = useLogout();
+  const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
+    useColumnSearch();
 
   useEffect(() => {
-    setIsLoading(true);
-    const loggedin = localStorage.getItem("logged_in");
-    if (loggedin !== "true") {
-      router.push("/login");
-      return;
-    }
+    setRole(localStorage.getItem("role"));
     const id = localStorage.getItem("currUser");
+    setLoading(true);
     const { pageIndex, pageSize } = pagination;
+
     let params = {};
     if (pageSize !== "All") {
       params = {
-        pageNumber: pageIndex + 1,
+        pageNumber: pageIndex,
         pageSize: pageSize,
+        userId: id,
       };
     }
-    const transformedFilters = columnFilters.reduce((acc, filter) => {
+
+    const transformedFilters = searchParams.reduce((acc, filter) => {
       if (filter.value !== "all") {
         acc[filter.id] = filter.value;
       }
       return acc;
     }, {});
-
     params = {
-      userId: id,
       status: "true",
       ...params,
       ...transformedFilters,
@@ -55,106 +57,147 @@ const ProtectedPage = () => {
       .get("/clients/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setclients(res.data.clients);
-        setIsLoading(false);
+        setClients(res.data.clients);
+        setLoading(false);
       })
       .catch((error) => {
-        setIsLoading(false);
-        if (error.response && error.response.status === 401) {
-          setVerify(false);
+        setLoading(false);
+        if (error.response) {
+          if (error.response.status === 401) {
+            Modal.error({
+              title: "Session expired",
+              content: "Please log in again",
+              onOk() {
+                logOut();
+              },
+            });
+          } else if (error.response.status === 403) {
+            Modal.confirm({
+              title: "Unauthorized Access",
+              content: "You do not have permission to view this page",
+              okText: "Go back to Home",
+              cancelText: "Logout",
+              onOk() {
+                Router.push("/home");
+              },
+              onCancel() {
+                logOut();
+              },
+            });
+          } else {
+            Modal.error({
+              title: "An error occurred",
+              content: error.response.data.message || "Please try again later",
+            });
+          }
+        } else {
+          Modal.error({
+            title: "An error occurred",
+            content: "Please try again later",
+          });
         }
         console.error(error);
       });
-  }, [pagination, columnFilters]);
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  }, [pagination, searchParams]);
 
-  const columns = useMemo(() => [
+  const columns = [
     {
-      accessorKey: "email",
-      header: "Email",
-      size: 150,
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      ...getColumnSearchProps("email", handleSearch, handleReset),
     },
     {
-      accessorKey: "unit",
-      header: "Unit",
-      size: 200,
-      Cell: (props) => (
-        <Link href={`/clients/${props.row.original._id}`}>
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
+      ...getColumnSearchProps("unit", handleSearch, handleReset),
+      render: (text, record) => (
+        <Link href={`/clients/${record._id}`}>
           <Button
+            type="link"
             color="neutral"
             size="sm"
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/clients/${props.row.original._id}`);
+              Router.push(`/clients/${record._id}`);
             }}
           >
-            {props.row.original.unit}
+            {record.unit}
           </Button>
         </Link>
       ),
     },
     {
-      accessorKey: "represent",
-      header: "Representer",
-      size: 200,
+      title: "Represented By",
+      dataIndex: "represent",
+      key: "represent",
+      ...getColumnSearchProps("represent", handleSearch, handleReset),
     },
     {
-      accessorKey: "phone",
-      header: "Phone",
-      size: 150,
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      ...getColumnSearchProps("phone", handleSearch, handleReset),
     },
     {
-      accessorKey: "createdDate",
-      header: "Created",
-      size: 150,
-      Cell: (props) => formatDate(props.row.original.createdDate),
-      enableColumnFilter: false,
+      title: "Created Date",
+      dataIndex: "createdDate",
+      key: "createdDate",
     },
-  ]);
+  ];
 
-  const paginationProps = generatePaginationProps({
-    total,
-    pagination,
-    setPagination,
-  });
   return (
-    <>
-      {verify ? (
-        <div className="App">
-          <h2 style={{ textAlign: "left" }}>Acquired Clients</h2>
-          <CustomTable
-            columns={columns}
-            data={clients}
-            totalCount={total}
-            isLoading={isLoading}
-            onColumnFiltersChange={setColumnFilters}
-            paginationProps={paginationProps}
-          />
-          <Link href="/clients/potential">
-            <button>Potential Clients</button>
-          </Link>
-          <Link href="/home">
-            <button>Home</button>
-          </Link>
-          <button disabled={loading} onClick={logOut}>
-            {loading ? "Logging out..." : "Log out"}
-          </button>
-        </div>
-      ) : (
-        <div>
-          <h1>SESSION EXPIRED</h1>
-          <p>Please log back in</p>
-          <button disabled={loading} onClick={logOut}>
-            {loading ? "Logging out..." : "Log out"}
-          </button>
-        </div>
-      )}
-    </>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "0px",
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: "2em",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                Accquired Client List
+                <PlusOutlined
+                  style={{ marginLeft: "10px", cursor: "pointer" }}
+                  onClick={() => setShowCreateButton(!showCreateButton)}
+                />
+                {showCreateButton && (
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => Router.push("/clients/create")}
+                  >
+                    Create
+                  </Button>
+                )}
+              </h1>
+            </div>
+            <UserTable
+              columns={columns}
+              data={clients}
+              total={total}
+              loading={loading}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
-
 export default ProtectedPage;

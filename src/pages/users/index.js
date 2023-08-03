@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal } from "antd";
+import { Layout, Button, Modal, Select } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 const App = () => {
@@ -17,20 +18,15 @@ const App = () => {
   const [loadingStatus, setLoadingStatus] = useState({});
   const [currID, setCurrID] = useState("");
   const [role, setRole] = useState("");
+  const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
 
   const { logOut } = useLogout();
-  const {
-    searchParams,
-    handleSearch,
-    handleReset,
-    getColumnSearchProps,
-    setSearchParams,
-    handleTableChange,
-  } = useColumnSearch();
+  const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
+    useColumnSearch();
 
   useEffect(() => {
     setRole(localStorage.getItem("role"));
@@ -51,10 +47,6 @@ const App = () => {
     }
 
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: false }));
-  };
-
-  const clearAllFilters = () => {
-    setSearchParams([]);
   };
 
   useEffect(() => {
@@ -167,15 +159,51 @@ const App = () => {
       title: "Role",
       dataIndex: "role",
       key: "role",
-      filterMultiple: false,
-      filters: [
-        { text: "Admin", value: "admin" },
-        { text: "User", value: "user" },
-      ],
-      onFilter: (value, record) => record.role.indexOf(value) === 0,
-      filteredValue: searchParams.find((o) => o.id === "role")
-        ? [searchParams.find((o) => o.id === "role").value]
-        : [],
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Select
+            style={{ width: 188, marginBottom: 8, display: "block" }}
+            placeholder="Select Role"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e ? [e] : [])}
+          >
+            <Select.Option value="">All</Select.Option>
+            <Select.Option value="admin">Admin</Select.Option>
+            <Select.Option value="user">User</Select.Option>
+          </Select>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, "role")}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters, confirm, "role")}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      ),
+      filterIcon: (filtered) => (
+        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      ),
+      onFilter: (value, record) =>
+        record["role"]
+          ? record["role"]
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
+          : "",
     },
     {
       title: "Created Date",
@@ -186,15 +214,45 @@ const App = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      filterMultiple: false,
-      filters: [
-        { text: "Active", value: true },
-        { text: "Inactive", value: false },
-      ],
-      onFilter: (value, record) => record.status === value,
-      filteredValue: searchParams.find((o) => o.id === "status")
-        ? [searchParams.find((o) => o.id === "status").value]
-        : [],
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Select
+            style={{ width: 188, marginBottom: 8, display: "block" }}
+            placeholder="Select Status"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
+          >
+            <Select.Option value="">All</Select.Option>
+            <Select.Option value="true">Active</Select.Option>
+            <Select.Option value="false">Inactive</Select.Option>
+          </Select>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, "status")}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters, confirm, "status")}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      ),
+      filterIcon: (filtered) => (
+        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      ),
+      onFilter: (value, record) => record["status"].toString() === value,
       render: (text, record) => (
         <button
           onClick={() => toggleStatus(record._id, record.status)}
@@ -225,8 +283,31 @@ const App = () => {
                 marginBottom: "0px",
               }}
             >
-              <h1 style={{ fontSize: "2em" }}>User List</h1>
-              <Button onClick={clearAllFilters}>Clear All Filters</Button>
+              <h1
+                style={{
+                  fontSize: "2em",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                User List
+                <PlusOutlined
+                  style={{ marginLeft: "10px", cursor: "pointer" }}
+                  onClick={() => setShowCreateButton(!showCreateButton)}
+                />
+                {showCreateButton && (
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => Router.push("/users/create")}
+                  >
+                    Create
+                  </Button>
+                )}
+              </h1>
+              <div>
+                <Button>Clear All Filters</Button>
+              </div>
             </div>
             <UserTable
               columns={columns}
@@ -234,7 +315,6 @@ const App = () => {
               total={total}
               loading={loading}
               pagination={pagination}
-              handleTableChange={handleTableChange}
               setPagination={setPagination}
             />
           </div>

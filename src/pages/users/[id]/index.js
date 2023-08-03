@@ -3,18 +3,24 @@ import api from "../../../api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useLogout from "../../../hooks/useLogout";
+import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+
+const { Content } = Layout;
+const { Title, Text } = Typography;
 
 export default function User() {
   const [user, setUser] = useState(null);
-  const [loadingDelete, setDelete] = useState(false);
-  const [currID, setCurr] = useState("");
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [currID, setCurrID] = useState("");
   const { logOut, loading } = useLogout();
 
   const router = useRouter();
   const id = router.query.id;
 
   useEffect(() => {
-    setCurr(localStorage.getItem("currID"));
+    setCurrID(localStorage.getItem("currID"));
 
     const loggedin = localStorage.getItem("logged_in");
     if (loggedin !== "true") {
@@ -30,51 +36,71 @@ export default function User() {
         console.error(err);
       });
   }, [id, router]);
+
   const onDelete = async (id) => {
-    setDelete(true);
-    const response = await api.delete(`/users/${id}`);
-    console.log(response);
-
+    setLoadingDelete(true);
+    await api.delete(`/users/${id}`);
     router.push("/users/");
-
-    setDelete(false);
+    setLoadingDelete(false);
   };
 
   if (user === null) {
-    return <p>Loading...</p>;
+    return <Spin size="large" />;
   }
 
   return (
-    <div>
-      <h1>Profile</h1>
-      <p>Name: {user.name}</p>
-      <p>Email: {user.email}</p>
-      <p>Role: {user.role}</p>
-      <p>Phone: {user.phone}</p>
-      <p>Created At: {new Date(user.createdDate).toLocaleString()}</p>
-      <p>Status: {user.status ? "Active" : "Inactive"}</p>
-      <p>
-        <Link href={`/users/${id}/updateinfo`}>
-          <button>Update user&apos;s information</button>
-        </Link>
-        <Link href={`/users/${id}/updatepw`}>
-          <button>Update user&apos;s password</button>
-        </Link>
-        {id !== currID && (
-          <button disabled={loadingDelete} onClick={() => onDelete(id)}>
-            {loadingDelete ? "Deleting..." : "Delete"}
-          </button>
-        )}
-      </p>
-      <Link href="/users">
-        <button>Back to users list</button>
-      </Link>
-      <Link href="/home">
-        <button>Back to home</button>
-      </Link>
-      <button disabled={loading} onClick={logOut}>
-        {loading ? "Logging out..." : "Log out"}
-      </button>
-    </div>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={user.role} />
+        <Content
+          style={{
+            margin: "24px 16px 0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+          }}
+        >
+          <Title>Profile</Title>
+          <Text>Name: {user.name}</Text>
+          <Text>Email: {user.email}</Text>
+          <Text>Role: {user.role}</Text>
+          <Text>Phone: {user.phone}</Text>
+          <Text>Created At: {new Date(user.createdDate).toLocaleString()}</Text>
+          <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
+          <Text>
+            <Link href={`/users/${id}/updateinfo`}>
+              <Button style={{ margin: "10px" }}>
+                Update user&apos;s information
+              </Button>
+            </Link>
+            <Link href={`/users/${id}/updatepw`}>
+              <Button style={{ margin: "10px" }}>
+                Update user&apos;s password
+              </Button>
+            </Link>
+            {id !== currID && (
+              <Popconfirm
+                title="Are you sure to delete this user?"
+                onConfirm={() => onDelete(id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  danger
+                  style={{ margin: "10px" }}
+                  loading={loadingDelete}
+                >
+                  Delete
+                </Button>
+              </Popconfirm>
+            )}
+          </Text>
+          <Link href="/users">
+            <Button style={{ margin: "10px" }}>Back to users list</Button>
+          </Link>
+        </Content>
+      </Layout>
+    </Layout>
   );
 }

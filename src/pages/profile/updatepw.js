@@ -1,34 +1,39 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import Link from "next/link";
-import useCheckLogin from "../../hooks/useCheckLogin";
-import TextField from "@mui/material/TextField";
 import Router from "next/router";
+import useCheckLogin from "../../hooks/useCheckLogin";
+import { Form, Input, Button, Layout, Alert, Row, Col } from "antd";
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+
+const { Content } = Layout;
 
 const UpdateUserPW = () => {
   const [id, setID] = useState("");
+  const [role, setRole] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPassErr, setNewPassErr] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [oldPassErr, setOldPassErr] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmErr, setConfirmErr] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [loadingUpdate, setUpdate] = useState(false);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
   useCheckLogin();
+
   useEffect(() => {
     setID(localStorage.getItem("currID"));
+    setRole(localStorage.getItem("role"));
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
     setNewPassErr("");
     setOldPassErr("");
     setConfirmErr("");
-    setUpdate(true);
+    setLoadingUpdate(true);
     if (newPassword.trim() !== confirmPassword.trim()) {
       setConfirmErr("Passwords do not match!");
-      setUpdate(false);
+      setLoadingUpdate(false);
     }
     const data = {
       newPassword,
@@ -55,68 +60,76 @@ const UpdateUserPW = () => {
         setOldPassErr(errMsg);
       }
     } finally {
-      setUpdate(false);
+      setLoadingUpdate(false);
     }
-  };
-  const togglePass = () => {
-    setShowPass(!showPass);
   };
 
   return (
-    <>
-      <div>
-        <h2>Update Password</h2>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            error={!!oldPassErr}
-            helperText={oldPassErr}
-            type={showPass ? "text" : "password"}
-            placeholder="Old Password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!newPassErr}
-            helperText={newPassErr}
-            type={showPass ? "text" : "password"}
-            placeholder="New Password"
-            value={newPassword}
-            pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,24}"
-            title="Password must be at least 8 and contain at least 1 lower case, 1 upper case, 1 special character and no space"
-            onChange={(e) => setNewPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <TextField
-            error={!!confirmErr}
-            helperText={confirmErr}
-            type={showPass ? "text" : "password"}
-            placeholder="Confirm New Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            InputProps={{
-              style: { height: "40px" },
-            }}
-            style={{ width: "280px" }}
-          />
-          <button type="button" onClick={togglePass}>
-            {showPass ? "Hide" : "Show"}
-          </button>
-          <button disabled={loadingUpdate} type="submit">
-            {loadingUpdate ? "Updating..." : "Update"}
-          </button>
-          <Link href={`/profile/`}>
-            <button>Back to profile</button>
-          </Link>
-        </form>
-      </div>
-    </>
+    <Layout style={{ minHeight: "100vh" }}>
+      <AppHeader />
+      <Layout>
+        <AppSider role={role} />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <div style={{ padding: 24, minHeight: 360 }}>
+            <Row justify="center">
+              <Col span={12}>
+                <h2>Update Password</h2>
+                <Form onFinish={handleSubmit} layout="vertical">
+                  <Form.Item
+                    label="Old Password"
+                    validateStatus={oldPassErr ? "error" : ""}
+                    help={oldPassErr}
+                  >
+                    <Input.Password
+                      placeholder="Old Password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      visibilityToggle={true}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="New Password"
+                    validateStatus={newPassErr ? "error" : ""}
+                    help={newPassErr}
+                  >
+                    <Input.Password
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      visibilityToggle={true}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Confirm New Password"
+                    validateStatus={confirmErr ? "error" : ""}
+                    help={confirmErr}
+                  >
+                    <Input.Password
+                      placeholder="Confirm New Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      visibilityToggle={true}
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loadingUpdate}
+                    >
+                      Update
+                    </Button>
+                  </Form.Item>
+                </Form>
+                <Link href={`/profile/`}>
+                  <Button>Back to profile</Button>
+                </Link>
+              </Col>
+            </Row>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
