@@ -240,7 +240,7 @@ const ProtectedPage = () => {
 
               <div style={{ display: "flex", alignItems: "center" }}>
                 <Input
-                  placeholder="Enter User Email"
+                  placeholder="Person Incharge Filter"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                   style={{ width: 200, marginRight: "10px" }}
