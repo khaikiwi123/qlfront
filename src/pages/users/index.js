@@ -9,6 +9,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import format from "date-fns/format";
 
 const { Content } = Layout;
 const App = () => {
@@ -209,6 +210,9 @@ const App = () => {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
+      render: (date) => {
+        return format(new Date(date), "dd/MM/yyyy");
+      },
     },
     {
       title: "Status",
@@ -269,58 +273,67 @@ const App = () => {
     },
   ];
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0px",
-              }}
-            >
-              <h1
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <div
                 style={{
-                  fontSize: "2em",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
+                  marginBottom: "0px",
                 }}
               >
-                User List
-                <PlusOutlined
-                  style={{ marginLeft: "10px", cursor: "pointer" }}
-                  onClick={() => setShowCreateButton(!showCreateButton)}
-                />
-                {showCreateButton && (
-                  <Button
-                    type="primary"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => Router.push("/users/create")}
-                  >
-                    Create
-                  </Button>
-                )}
-              </h1>
-              <div>
-                <Button>Clear All Filters</Button>
+                <h1
+                  style={{
+                    fontSize: "2em",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  User List
+                  <PlusOutlined
+                    style={{ marginLeft: "10px", cursor: "pointer" }}
+                    onClick={() => setShowCreateButton(!showCreateButton)}
+                  />
+                  {showCreateButton && (
+                    <Button
+                      type="primary"
+                      style={{ marginLeft: "10px" }}
+                      onClick={() => Router.push("/users/create")}
+                    >
+                      Create
+                    </Button>
+                  )}
+                </h1>
+                <div>
+                  <Button>Clear All Filters</Button>
+                </div>
               </div>
+              <UserTable
+                columns={columns}
+                data={data}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
             </div>
-            <UserTable
-              columns={columns}
-              data={data}
-              total={total}
-              loading={loading}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </div>
-        </Content>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

@@ -12,7 +12,7 @@ export async function refreshToken() {
   try {
     const response = await api.post(
       "/auth/refresh",
-      {}, 
+      {},
       {
         headers: {
           Authorization: `Bearer ${rToken}`,

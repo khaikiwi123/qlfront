@@ -10,7 +10,7 @@ import Router, { useRouter } from "next/router";
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 const AppSider = ({ role }) => {
-  const router = useRouter(); // change here
+  const router = useRouter();
   let selectedKey;
   switch (router.pathname) {
     case "/clients/potential":
@@ -29,7 +29,16 @@ const AppSider = ({ role }) => {
       selectedKey = "1";
   }
   return (
-    <Sider>
+    <Sider
+      width={200}
+      style={{
+        overflow: "auto",
+        height: "100vh",
+        position: "fixed",
+        left: 0,
+        zIndex: 2, // This will keep the Sider above the Header
+      }}
+    >
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
         {role === "user" && (
           <SubMenu key="sub1" icon={<UsergroupAddOutlined />} title="Clients">

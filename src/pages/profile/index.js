@@ -6,6 +6,7 @@ import useLogout from "../../hooks/useLogout";
 import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
+import format from "date-fns/format";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -54,7 +55,7 @@ export default function User() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
-      <Layout>
+      <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
         <AppSider role={role} />
         <Content
           style={{
@@ -70,7 +71,9 @@ export default function User() {
           <Text>Role: {user.role}</Text>
           <Text>Phone: {user.phone}</Text>
           <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
-          <Text>Created At: {new Date(user.createdDate).toLocaleString()}</Text>
+          <Text>
+            Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
+          </Text>
           <Text>
             <Link href="/profile/updateinfo">
               <Button style={{ margin: "10px" }}>

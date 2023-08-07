@@ -16,7 +16,7 @@ const Update = () => {
   const [emailErr, setEmailErr] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneErr, setPhoneErr] = useState("");
-  const [unit, setUnit] = useState("");
+  const [org, setOrg] = useState("");
   const [represent, setRep] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
@@ -34,7 +34,7 @@ const Update = () => {
     const data = {
       email,
       phone,
-      unit,
+      org,
       represent,
     };
     try {
@@ -44,16 +44,49 @@ const Update = () => {
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
-      if (
-        errorMsg === "Email already in use, please choose a different one." ||
-        errorMsg === "Email isn't valid"
-      ) {
+      const clientId = error.response.data.clientId;
+
+      if (errorMsg === "Email already in use, please choose a different one.") {
+        if (clientId) {
+          setEmailErr(
+            <>
+              {"Client existed. "}
+              <span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={() => {
+                  window.open(`/clients/${clientId}`, "_blank");
+                }}
+              >
+                View client's profile
+              </span>
+            </>
+          );
+        } else {
+          setEmailErr(errorMsg);
+        }
+      } else if (errorMsg === "Email isn't valid") {
         setEmailErr(errorMsg);
       } else if (
         errorMsg ===
         "Phone number already in use, please choose a different one."
       ) {
-        setPhoneErr(errorMsg);
+        if (clientId) {
+          setPhoneErr(
+            <>
+              {"Client existed. "}
+              <span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={() => {
+                  window.open(`/clients/${clientId}`, "_blank");
+                }}
+              >
+                View client's profile
+              </span>
+            </>
+          );
+        } else {
+          setPhoneErr(errorMsg);
+        }
       }
     } finally {
       setLoading(false);
@@ -97,10 +130,10 @@ const Update = () => {
                       onChange={(e) => setRep(e.target.value)}
                     />
                   </Form.Item>
-                  <Form.Item label="Unit">
+                  <Form.Item label="Organization">
                     <Input
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
+                      value={org}
+                      onChange={(e) => setOrg(e.target.value)}
                     />
                   </Form.Item>
                   <Form.Item>

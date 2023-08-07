@@ -9,8 +9,10 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { format } from "date-fns";
 
 const { Content } = Layout;
+const { Option } = Select;
 
 const ProtectedPage = () => {
   const [clients, setClients] = useState([]);
@@ -107,16 +109,22 @@ const ProtectedPage = () => {
 
   const columns = [
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      ...getColumnSearchProps("phone", handleSearch, handleReset),
+    },
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",
       ...getColumnSearchProps("email", handleSearch, handleReset),
     },
     {
-      title: "Unit",
-      dataIndex: "unit",
-      key: "unit",
-      ...getColumnSearchProps("unit", handleSearch, handleReset),
+      title: "Organization",
+      dataIndex: "org",
+      key: "org",
+      ...getColumnSearchProps("org", handleSearch, handleReset),
       render: (text, record) => (
         <Link href={`/clients/${record._id}`}>
           <Button
@@ -129,7 +137,7 @@ const ProtectedPage = () => {
               Router.push(`/clients/${record._id}`);
             }}
           >
-            {record.unit}
+            {record.org}
           </Button>
         </Link>
       ),
@@ -140,24 +148,43 @@ const ProtectedPage = () => {
       key: "represent",
       ...getColumnSearchProps("represent", handleSearch, handleReset),
     },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      ...getColumnSearchProps("phone", handleSearch, handleReset),
-    },
+
     {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
+      render: (date) => {
+        return format(new Date(date), "dd/MM/yyyy");
+      },
     },
+
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text, record) => (
-        <div>{record.status ? "Taken care of" : "Negotiating"}</div>
-      ),
+      render: (status) => {
+        let displayStatus;
+        switch (status) {
+          case "No contact":
+            displayStatus = "Chưa liên hệ";
+            break;
+          case "In contact":
+            displayStatus = "Đã liên hệ";
+            break;
+          case "Verified needs":
+            displayStatus = "Đã xác định nhu cầu";
+            break;
+          case "Consulted":
+            displayStatus = "Đã tư vấn";
+            break;
+          case "Acquired":
+            displayStatus = "Thành công";
+            break;
+          default:
+            displayStatus = "";
+        }
+        return <span>{displayStatus}</span>;
+      },
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -171,9 +198,11 @@ const ProtectedPage = () => {
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
           >
-            <Select.Option value="">All</Select.Option>
-            <Select.Option value="true">Taken care of</Select.Option>
-            <Select.Option value="false">Negotiating</Select.Option>
+            <Option value="No contact">Chưa liên hệ</Option>
+            <Option value="In contact">Đã liên hệ</Option>
+            <Option value="Verified needs">Đã xác định nhu cầu</Option>
+            <Option value="Consulted">Đã tư vấn</Option>
+            <Option value="Acquired">Thành công</Option>
           </Select>
           <Button
             type="primary"
@@ -201,75 +230,84 @@ const ProtectedPage = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0px",
-              }}
-            >
-              <h1
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <div
                 style={{
-                  fontSize: "2em",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
+                  marginBottom: "0px",
                 }}
               >
-                Client List
-                <PlusOutlined
-                  style={{ marginLeft: "10px", cursor: "pointer" }}
-                  onClick={() => setShowCreateButton(!showCreateButton)}
-                />
-                {showCreateButton && (
-                  <Button
-                    type="primary"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => Router.push("/clients/create")}
-                  >
-                    Create
-                  </Button>
-                )}
-              </h1>
-
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Input
-                  placeholder="Person Incharge Filter"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  style={{ width: 200, marginRight: "10px" }}
-                />
-                <Button onClick={() => setTrigger(!trigger)}>
-                  Search User
-                </Button>
-                <Button
-                  onClick={() => {
-                    setUserId("");
-                    setTrigger(!trigger);
+                <h1
+                  style={{
+                    fontSize: "2em",
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  Clear Filters
-                </Button>
+                  Client List
+                  <PlusOutlined
+                    style={{ marginLeft: "10px", cursor: "pointer" }}
+                    onClick={() => setShowCreateButton(!showCreateButton)}
+                  />
+                  {showCreateButton && (
+                    <Button
+                      type="primary"
+                      style={{ marginLeft: "10px" }}
+                      onClick={() => Router.push("/clients/create")}
+                    >
+                      Create
+                    </Button>
+                  )}
+                </h1>
+
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Input
+                    placeholder="Person In Filter"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    style={{ width: 200, marginRight: "10px" }}
+                  />
+                  <Button onClick={() => setTrigger(!trigger)}>
+                    Set Filter
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setUserId("");
+                      setTrigger(!trigger);
+                    }}
+                  >
+                    Clear Filter
+                  </Button>
+                </div>
               </div>
+              <UserTable
+                columns={columns}
+                data={clients}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
             </div>
-            <UserTable
-              columns={columns}
-              data={clients}
-              total={total}
-              loading={loading}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </div>
-        </Content>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 export default ProtectedPage;

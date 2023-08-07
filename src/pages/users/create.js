@@ -32,9 +32,7 @@ const Create = () => {
       setLoading(false);
       console.error(error);
 
-      const errorMsg = error.response.data.error; // Assuming error message comes like this from API
-
-      // Now check which error it is and set it on the right field
+      const errorMsg = error.response.data.error;
       if (errorMsg.includes("User already existed")) {
         form.setFields([
           {

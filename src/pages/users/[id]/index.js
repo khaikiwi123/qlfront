@@ -6,6 +6,7 @@ import useLogout from "../../../hooks/useLogout";
 import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
+import format from "date-fns/format";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -14,7 +15,6 @@ export default function User() {
   const [user, setUser] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [currID, setCurrID] = useState("");
-  const { logOut, loading } = useLogout();
 
   const router = useRouter();
   const id = router.query.id;
@@ -51,7 +51,7 @@ export default function User() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
-      <Layout>
+      <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
         <AppSider role={user.role} />
         <Content
           style={{
@@ -66,7 +66,9 @@ export default function User() {
           <Text>Email: {user.email}</Text>
           <Text>Role: {user.role}</Text>
           <Text>Phone: {user.phone}</Text>
-          <Text>Created At: {new Date(user.createdDate).toLocaleString()}</Text>
+          <Text>
+            Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
+          </Text>
           <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
           <Text>
             <Link href={`/users/${id}/updateinfo`}>

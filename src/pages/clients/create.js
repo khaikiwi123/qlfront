@@ -16,6 +16,7 @@ const Create = () => {
   const [id, setId] = useState("");
   const [emailErr, setEmailErr] = useState("");
   const [phoneErr, setPhoneErr] = useState("");
+  const [saleErr, setSaleErr] = useState("");
 
   useEffect(() => {
     setId(localStorage.getItem("currUser"));
@@ -28,14 +29,14 @@ const Create = () => {
     setLoading(true);
     setEmailErr("");
     setPhoneErr("");
+    setSaleErr("");
 
     try {
       await api.post(`/clients`, {
         ...values,
-        createdBy: role === "admin" ? values.createdBy : id,
+        inCharge: role === "admin" ? values.inCharge : id,
       });
 
-      // Navigate to different paths based on the role
       if (role === "user") {
         Router.push("/clients/potential");
       } else if (role === "admin") {
@@ -44,19 +45,54 @@ const Create = () => {
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
+      const clientId = error.response.data.clientId;
 
-      if (
-        errorMsg === "Client's email is already in the system" ||
-        errorMsg === "Email isn't valid"
-      ) {
+      if (errorMsg === "Client's email is already in the system") {
+        if (clientId) {
+          setEmailErr(
+            <>
+              {"Client existed. "}
+              <span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={() => {
+                  window.open(`/clients/${clientId}`, "_blank");
+                }}
+              >
+                View client's profile
+              </span>
+            </>
+          );
+        } else {
+          setEmailErr(errorMsg);
+        }
+      } else if (errorMsg === "Email isn't valid") {
         setEmailErr(errorMsg);
       } else if (errorMsg === "Client's number is already in the system") {
-        setPhoneErr(errorMsg);
+        if (clientId) {
+          setPhoneErr(
+            <>
+              {"Client existed. "}
+              <span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={() => {
+                  window.open(`/clients/${clientId}`, "_blank");
+                }}
+              >
+                View client's profile
+              </span>
+            </>
+          );
+        } else {
+          setPhoneErr(errorMsg);
+        }
+      } else if (errorMsg === "Sale user doesn't exist") {
+        setSaleErr(errorMsg);
       }
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
@@ -77,8 +113,8 @@ const Create = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                maxWidth: "300px", // Set a maximum width for the form
-                width: "100%", // Make the form take up the full width of its container
+                maxWidth: "300px",
+                width: "100%",
               }}
             >
               <h1 style={{ fontSize: "2em", textAlign: "center" }}>
@@ -125,10 +161,10 @@ const Create = () => {
                   <Input />
                 </Form.Item>
                 <Form.Item
-                  label="Unit"
-                  name="unit"
+                  label="Organization"
+                  name="org"
                   rules={[
-                    { required: true, message: "Please input your unit!" },
+                    { required: true, message: "Please input your org!" },
                   ]}
                 >
                   <Input />
@@ -136,13 +172,15 @@ const Create = () => {
                 {role === "admin" && (
                   <Form.Item
                     label="Assign to"
-                    name="createdBy"
+                    name="inCharge"
                     rules={[
                       {
                         required: true,
                         message: "Please input the assigned personel",
                       },
                     ]}
+                    help={saleErr}
+                    validateStatus={saleErr ? "error" : ""}
                   >
                     <Input />
                   </Form.Item>

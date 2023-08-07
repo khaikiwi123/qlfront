@@ -37,6 +37,10 @@ const AppHeader = () => {
   return (
     <Header
       style={{
+        position: "fixed",
+        left: 0, // Position it to the leftmost
+        width: "100%",
+        zIndex: 1, // Keep it under the Sider
         padding: 0,
         display: "flex",
         justifyContent: "flex-end",

@@ -38,6 +38,9 @@ const UserTable = ({
         }
       },
     }}
+    scroll={{
+      y: 360,
+    }}
   />
 );
 

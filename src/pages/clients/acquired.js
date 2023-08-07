@@ -9,6 +9,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined } from "@ant-design/icons";
+import format from "date-fns/format";
 
 const { Content } = Layout;
 
@@ -48,7 +49,6 @@ const ProtectedPage = () => {
       return acc;
     }, {});
     params = {
-      status: "true",
       ...params,
       ...transformedFilters,
     };
@@ -102,16 +102,22 @@ const ProtectedPage = () => {
 
   const columns = [
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      ...getColumnSearchProps("phone", handleSearch, handleReset),
+    },
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",
       ...getColumnSearchProps("email", handleSearch, handleReset),
     },
     {
-      title: "Unit",
-      dataIndex: "unit",
-      key: "unit",
-      ...getColumnSearchProps("unit", handleSearch, handleReset),
+      title: "Organization",
+      dataIndex: "org",
+      key: "org",
+      ...getColumnSearchProps("org", handleSearch, handleReset),
       render: (text, record) => (
         <Link href={`/clients/${record._id}`}>
           <Button
@@ -124,7 +130,7 @@ const ProtectedPage = () => {
               Router.push(`/clients/${record._id}`);
             }}
           >
-            {record.unit}
+            {record.org}
           </Button>
         </Link>
       ),
@@ -135,69 +141,76 @@ const ProtectedPage = () => {
       key: "represent",
       ...getColumnSearchProps("represent", handleSearch, handleReset),
     },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      ...getColumnSearchProps("phone", handleSearch, handleReset),
-    },
+
     {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
+      render: (date) => {
+        return format(new Date(date), "dd/MM/yyyy");
+      },
     },
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0px",
-              }}
-            >
-              <h1
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <div
                 style={{
-                  fontSize: "2em",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
+                  marginBottom: "0px",
                 }}
               >
-                Accquired Client List
-                <PlusOutlined
-                  style={{ marginLeft: "10px", cursor: "pointer" }}
-                  onClick={() => setShowCreateButton(!showCreateButton)}
-                />
-                {showCreateButton && (
-                  <Button
-                    type="primary"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => Router.push("/clients/create")}
-                  >
-                    Create
-                  </Button>
-                )}
-              </h1>
+                <h1
+                  style={{
+                    fontSize: "2em",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  Accquired Client List
+                  <PlusOutlined
+                    style={{ marginLeft: "10px", cursor: "pointer" }}
+                    onClick={() => setShowCreateButton(!showCreateButton)}
+                  />
+                  {showCreateButton && (
+                    <Button
+                      type="primary"
+                      style={{ marginLeft: "10px" }}
+                      onClick={() => Router.push("/clients/create")}
+                    >
+                      Create
+                    </Button>
+                  )}
+                </h1>
+              </div>
+              <UserTable
+                columns={columns}
+                data={clients}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
             </div>
-            <UserTable
-              columns={columns}
-              data={clients}
-              total={total}
-              loading={loading}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </div>
-        </Content>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 export default ProtectedPage;

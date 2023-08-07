@@ -15,7 +15,7 @@ const Update = () => {
   const [emailErr, setEmailErr] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneErr, setPhoneErr] = useState("");
-  const [unit, setUnit] = useState("");
+  const [org, setOrg] = useState("");
   const [represent, setRep] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
@@ -34,7 +34,7 @@ const Update = () => {
     const data = {
       email,
       phone,
-      unit,
+      org,
       represent,
     };
     try {
@@ -97,10 +97,10 @@ const Update = () => {
                       onChange={(e) => setRep(e.target.value)}
                     />
                   </Form.Item>
-                  <Form.Item label="Unit">
+                  <Form.Item label="Organization">
                     <Input
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
+                      value={org}
+                      onChange={(e) => setOrg(e.target.value)}
                     />
                   </Form.Item>
                   <Form.Item>
