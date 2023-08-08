@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/api";
 import Link from "next/link";
 import Router from "next/router";
-import useCheckLogin from "../../hooks/useCheckLogin";
-import { Form, Input, Button, Layout, Alert, Row, Col } from "antd";
+import { Form, Input, Button, Layout, Row, Col } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 
@@ -19,11 +18,15 @@ const UpdateUserPW = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmErr, setConfirmErr] = useState("");
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  useCheckLogin();
 
   useEffect(() => {
     setID(localStorage.getItem("currID"));
     setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   }, []);
 
   const handleSubmit = async (e) => {

@@ -4,18 +4,17 @@ import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { message, Select } from "antd";
-import useCheckLogin from "@/hooks/useCheckLogin";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import { EditOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
-
+import checkLogin from "@/Utils/checkLogin";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-export default function Client() {
-  const [client, setClient] = useState(null);
+export default function Lead() {
+  const [lead, setLead] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [role, setRole] = useState("");
@@ -23,16 +22,19 @@ export default function Client() {
 
   const router = useRouter();
   const id = router.query.id;
-  useCheckLogin();
 
   useEffect(() => {
     if (!router.isReady) return;
-
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
     setRole(localStorage.getItem("role"));
     api
-      .get(`/clients/${id}`)
+      .get(`/leads/${id}`)
       .then((response) => {
-        setClient(response.data);
+        setLead(response.data);
       })
       .catch((err) => {
         console.error(err);
@@ -41,9 +43,9 @@ export default function Client() {
 
         if (err.response?.data?.error === "Not authorized") {
           message.error(
-            `You are not authorized to view this client. ${
+            `You are not authorized to view this lead. ${
               inchargeEmail
-                ? `${inchargeEmail} is in charge of this client.`
+                ? `${inchargeEmail} is in charge of this lead.`
                 : "(It belonged to another salesperson)"
             }`
           );
@@ -55,10 +57,10 @@ export default function Client() {
 
   const onDelete = async (id) => {
     setLoadingDelete(true);
-    await api.delete(`/clients/${id}`);
+    await api.delete(`/leads/${id}`);
 
     if (role === "admin") {
-      router.push("/clients/all");
+      router.push("/clients/contact");
     } else {
       router.push("/clients/potential");
     }
@@ -69,15 +71,15 @@ export default function Client() {
   const onUpdateStatus = async (newStatus) => {
     setLoadingStatus(true);
     try {
-      await api.put(`/clients/${id}`, { status: newStatus });
-      setClient({ ...client, status: newStatus });
+      await api.put(`/leads/${id}`, { status: newStatus });
+      setLead({ ...lead, status: newStatus });
     } catch (error) {
       console.error(error);
     }
     setLoadingStatus(false);
   };
 
-  if (client === null) {
+  if (lead === null) {
     return <Spin size="large" />;
   }
 
@@ -98,10 +100,10 @@ export default function Client() {
             {editMode && (
               <>
                 <Link href={`/clients/${id}/updateinfo`}>
-                  <Button>Update client&apos;s information</Button>
+                  <Button>Update lead&apos;s information</Button>
                 </Link>
                 <Popconfirm
-                  title="Are you sure to delete this client?"
+                  title="Are you sure to delete this lead?"
                   onConfirm={() => onDelete(id)}
                   okText="Yes"
                   cancelText="No"
@@ -113,17 +115,17 @@ export default function Client() {
               </>
             )}
             <br />
-            <Text>Email: {client.email}</Text>
+            <Text>Email: {lead.email}</Text>
             <br />
-            <Text>Phone: {client.phone}</Text>
+            <Text>Phone: {lead.phone}</Text>
             <br />
-            <Text>Organization: {client.org}</Text>
+            <Text>Organization: {lead.org}</Text>
             <br />
-            <Text>Representer: {client.represent}</Text>
+            <Text>Representer: {lead.rep}</Text>
             <br />
             <Text>Status:</Text>
             <Select
-              value={client.status}
+              value={lead.status}
               onChange={onUpdateStatus}
               loading={loadingStatus}
               disabled={loadingStatus}
@@ -137,7 +139,7 @@ export default function Client() {
             </Select>
             <br />
             <Text>
-              Created At: {format(new Date(client.createdDate), "dd/MM/yyyy")}
+              Created At: {format(new Date(lead.createdDate), "dd/MM/yyyy")}
             </Text>
           </div>
         </Content>

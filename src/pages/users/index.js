@@ -29,10 +29,6 @@ const App = () => {
   const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
     useColumnSearch();
 
-  useEffect(() => {
-    setRole(localStorage.getItem("role"));
-  }, []);
-
   const toggleStatus = async (_id, currentStatus) => {
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
 
@@ -51,6 +47,12 @@ const App = () => {
   };
 
   useEffect(() => {
+    setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
     setCurrID(localStorage.getItem("currID"));
     setLoading(true);
     const { pageIndex, pageSize } = pagination;

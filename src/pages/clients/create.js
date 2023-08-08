@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import api from "@/api/api";
 import Link from "next/link";
 import Router from "next/router";
-import useCheckLogin from "@/hooks/useCheckLogin";
 import { Form, Input, Button, Layout, message } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
+import checkLogin from "@/Utils/checkLogin";
 
 const { Content } = Layout;
 
@@ -21,9 +21,13 @@ const Create = () => {
   useEffect(() => {
     setId(localStorage.getItem("currUser"));
     setRole(localStorage.getItem("role"));
+    setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   });
-
-  useCheckLogin();
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -32,7 +36,7 @@ const Create = () => {
     setSaleErr("");
 
     try {
-      await api.post(`/clients`, {
+      await api.post(`/s`, {
         ...values,
         inCharge: role === "admin" ? values.inCharge : id,
       });
@@ -40,53 +44,68 @@ const Create = () => {
       if (role === "user") {
         Router.push("/clients/potential");
       } else if (role === "admin") {
-        Router.push("/clients/all");
+        Router.push("/clients/contact");
       }
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
-      const clientId = error.response.data.clientId;
-
-      if (errorMsg === "Client's email is already in the system") {
-        if (clientId) {
+      const leadId = error.response.data.leadId;
+      const inChargeEmail = error.response.data.incharge;
+      const currUserEmail = localStorage.getItem("currUser");
+      if (
+        (errorMsg === "Lead's email is already in the system" ||
+          errorMsg === "Lead's number is already in the system") &&
+        role !== "admin" &&
+        currUserEmail !== inChargeEmail
+      ) {
+        const message = `${inChargeEmail} is in charge of this lead.`;
+        if (errorMsg === "Lead's email is already in the system") {
+          setEmailErr(message);
+        } else {
+          setPhoneErr(message);
+        }
+      } else {
+        if (errorMsg === "Lead's email is already in the system") {
           setEmailErr(
-            <>
-              {"Client existed. "}
-              <span
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  window.open(`/clients/${clientId}`, "_blank");
-                }}
-              >
-                View client's profile
-              </span>
-            </>
+            leadId ? (
+              <>
+                {"Lead existed. "}
+                <span
+                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => {
+                    window.open(`/clients/${leadId}`, "_blank");
+                  }}
+                >
+                  View lead's profile
+                </span>
+              </>
+            ) : (
+              errorMsg
+            )
           );
-        } else {
+        } else if (errorMsg === "Email isn't valid") {
           setEmailErr(errorMsg);
-        }
-      } else if (errorMsg === "Email isn't valid") {
-        setEmailErr(errorMsg);
-      } else if (errorMsg === "Client's number is already in the system") {
-        if (clientId) {
+        } else if (errorMsg === "Lead's number is already in the system") {
           setPhoneErr(
-            <>
-              {"Client existed. "}
-              <span
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  window.open(`/clients/${clientId}`, "_blank");
-                }}
-              >
-                View client's profile
-              </span>
-            </>
+            leadId ? (
+              <>
+                {"Lead existed. "}
+                <span
+                  style={{ textDecoration: "underline", cursor: "pointer" }}
+                  onClick={() => {
+                    window.open(`/clients/${leadId}`, "_blank");
+                  }}
+                >
+                  View lead's profile
+                </span>
+              </>
+            ) : (
+              errorMsg
+            )
           );
-        } else {
-          setPhoneErr(errorMsg);
+        } else if (errorMsg === "Sale user doesn't exist") {
+          setSaleErr(errorMsg);
         }
-      } else if (errorMsg === "Sale user doesn't exist") {
-        setSaleErr(errorMsg);
       }
     } finally {
       setLoading(false);
@@ -118,7 +137,7 @@ const Create = () => {
               }}
             >
               <h1 style={{ fontSize: "2em", textAlign: "center" }}>
-                Create Client
+                Create Lead
               </h1>
               <Form
                 form={form}
@@ -153,9 +172,9 @@ const Create = () => {
                 </Form.Item>
                 <Form.Item
                   label="Representer"
-                  name="represent"
+                  name="rep"
                   rules={[
-                    { required: true, message: "Please input your represent!" },
+                    { required: true, message: "Please input your rep!" },
                   ]}
                 >
                   <Input />
@@ -195,7 +214,7 @@ const Create = () => {
                     Create
                   </Button>
                   {role === "admin" && (
-                    <Link href="/clients/all">
+                    <Link href="/clients/contact">
                       <Button style={{ width: "100%", marginTop: "10px" }}>
                         Back to client list
                       </Button>

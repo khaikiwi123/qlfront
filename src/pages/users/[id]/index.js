@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import api from "../../../api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import useLogout from "../../../hooks/useLogout";
 import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import format from "date-fns/format";
+import checkLogin from "@/Utils/checkLogin";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -20,13 +20,12 @@ export default function User() {
   const id = router.query.id;
 
   useEffect(() => {
-    setCurrID(localStorage.getItem("currID"));
-
-    const loggedin = localStorage.getItem("logged_in");
-    if (loggedin !== "true") {
-      router.push("/login");
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
       return;
     }
+    setCurrID(localStorage.getItem("currID"));
     api
       .get(`/users/${id}`)
       .then((response) => {

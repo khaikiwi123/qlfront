@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, Input } from "antd";
+import { Layout, Button, Modal } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
@@ -10,11 +10,12 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined } from "@ant-design/icons";
 import format from "date-fns/format";
+import checkLogin from "@/Utils/checkLogin";
 
 const { Content } = Layout;
 
 const ProtectedPage = () => {
-  const [clients, setClients] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
@@ -28,6 +29,11 @@ const ProtectedPage = () => {
     useColumnSearch();
 
   useEffect(() => {
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
     setRole(localStorage.getItem("role"));
     const id = localStorage.getItem("currUser");
     setLoading(true);
@@ -38,7 +44,7 @@ const ProtectedPage = () => {
       params = {
         pageNumber: pageIndex,
         pageSize: pageSize,
-        userId: id,
+        inCharge: id,
       };
     }
 
@@ -55,10 +61,10 @@ const ProtectedPage = () => {
     };
 
     api
-      .get("/clients/", { params })
+      .get("/leads/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setClients(res.data.clients);
+        setLeads(res.data.leads);
         setLoading(false);
       })
       .catch((error) => {
@@ -132,10 +138,10 @@ const ProtectedPage = () => {
       ),
     },
     {
-      title: "Represented By",
-      dataIndex: "represent",
-      key: "represent",
-      ...getColumnSearchProps("represent", handleSearch, handleReset),
+      title: "Representative",
+      dataIndex: "rep",
+      key: "rep",
+      ...getColumnSearchProps("rep", handleSearch, handleReset),
     },
 
     {
@@ -178,7 +184,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Potential Client List
+                  Potential Lead List
                   <PlusOutlined
                     style={{ marginLeft: "10px", cursor: "pointer" }}
                     onClick={() => setShowCreateButton(!showCreateButton)}
@@ -196,7 +202,7 @@ const ProtectedPage = () => {
               </div>
               <UserTable
                 columns={columns}
-                data={clients}
+                data={leads}
                 total={total}
                 loading={loading}
                 pagination={pagination}

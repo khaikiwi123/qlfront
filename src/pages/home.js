@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography, Layout } from "antd";
 import Link from "next/link";
 import useLogout from "../hooks/useLogout";
-import useCheckLogin from "../hooks/useCheckLogin";
-
+import checkLogin from "@/Utils/checkLogin";
 const { Title } = Typography;
 const { Content, Footer } = Layout;
 
 const Home = () => {
   const [role, setRole] = useState("");
   const { logOut, loading } = useLogout();
-  useCheckLogin();
+
   useEffect(() => {
     setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   }, []);
   return (
     <Layout
@@ -25,7 +29,10 @@ const Home = () => {
       <Content style={{ textAlign: "center" }}>
         <Title>HOME</Title>
         {role === "admin" && (
-          <LinkSection href="/clients/all" buttonText="Go to all client list" />
+          <LinkSection
+            href="/clients/contact"
+            buttonText="Go to contact client list"
+          />
         )}
         {role === "user" && (
           <LinkSection

@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import api from "@/api/api";
 import Link from "next/link";
 import Router from "next/router";
-import useCheckLogin from "@/hooks/useCheckLogin";
 import { Form, Input, Button, Layout, Select } from "antd";
 import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
+import checkLogin from "@/Utils/checkLogin";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -18,9 +18,12 @@ const Create = () => {
 
   useEffect(() => {
     setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   });
-
-  useCheckLogin();
 
   const onFinish = async (values) => {
     setLoading(true);

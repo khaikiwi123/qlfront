@@ -19,7 +19,7 @@ const AppSider = ({ role }) => {
     case "/clients/acquired":
       selectedKey = "2";
       break;
-    case "/clients/all":
+    case "/clients/contact":
       selectedKey = "3";
       break;
     case "/users":
@@ -58,7 +58,7 @@ const AppSider = ({ role }) => {
             <Menu.Item
               key="3"
               icon={<IdcardOutlined />}
-              onClick={() => Router.push("/clients/all")}
+              onClick={() => Router.push("/clients/contact")}
             >
               Clients
             </Menu.Item>

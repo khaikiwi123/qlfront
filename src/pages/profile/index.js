@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../api/api";
 import Link from "next/link";
-import Router from "next/router";
+import checkLogin from "@/Utils/checkLogin";
 import useLogout from "../../hooks/useLogout";
 import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
 import AppHeader from "@/components/header";
@@ -19,12 +19,13 @@ export default function User() {
 
   useEffect(() => {
     const id = localStorage.getItem("currID");
-    const loggedin = localStorage.getItem("logged_in");
-    setRole(localStorage.getItem("role"));
-    if (loggedin !== "true") {
-      Router.push("/login");
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
       return;
     }
+    setRole(localStorage.getItem("role"));
+
     api
       .get(`/users/${id}`)
       .then((response) => {

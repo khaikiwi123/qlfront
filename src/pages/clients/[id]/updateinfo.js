@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import api from "@/api/api";
 import { useRouter } from "next/router";
-import useCheckLogin from "@/hooks/useCheckLogin";
 import { Form, Input, Button, Layout, Row, Col } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import Link from "next/link";
-
+import checkLogin from "@/Utils/checkLogin";
 const { Content } = Layout;
 
 const Update = () => {
@@ -17,14 +16,17 @@ const Update = () => {
   const [phone, setPhone] = useState("");
   const [phoneErr, setPhoneErr] = useState("");
   const [org, setOrg] = useState("");
-  const [represent, setRep] = useState("");
+  const [rep, setRep] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
 
-  useCheckLogin();
-
   useEffect(() => {
     setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -35,57 +37,84 @@ const Update = () => {
       email,
       phone,
       org,
-      represent,
+      rep,
     };
     try {
-      const response = await api.put(`/clients/${id}`, data);
+      const response = await api.put(`/leads/${id}`, data);
       console.log(response);
       router.push(`/clients/${id}`);
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
-      const clientId = error.response.data.clientId;
+      const leadId = error.response.data.leadId;
+      const inChargeEmail = error.response.data.incharge;
+      const currUserEmail = localStorage.getItem("currUser");
 
-      if (errorMsg === "Email already in use, please choose a different one.") {
-        if (clientId) {
-          setEmailErr(
-            <>
-              {"Client existed. "}
-              <span
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  window.open(`/clients/${clientId}`, "_blank");
-                }}
-              >
-                View client's profile
-              </span>
-            </>
-          );
-        } else {
-          setEmailErr(errorMsg);
-        }
-      } else if (errorMsg === "Email isn't valid") {
-        setEmailErr(errorMsg);
-      } else if (
-        errorMsg ===
-        "Phone number already in use, please choose a different one."
+      if (
+        (errorMsg === "Email already in use, please choose a different one." ||
+          errorMsg ===
+            "Phone number already in use, please choose a different one.") &&
+        role !== "admin" &&
+        currUserEmail !== inChargeEmail
       ) {
-        if (clientId) {
-          setPhoneErr(
-            <>
-              {"Client existed. "}
-              <span
-                style={{ textDecoration: "underline", cursor: "pointer" }}
-                onClick={() => {
-                  window.open(`/clients/${clientId}`, "_blank");
-                }}
-              >
-                View client's profile
-              </span>
-            </>
-          );
+        const message = `${inChargeEmail} is in charge of this lead.`;
+        if (
+          errorMsg === "Email already in use, please choose a different one."
+        ) {
+          setEmailErr(message);
         } else {
-          setPhoneErr(errorMsg);
+          setPhoneErr(message);
+        }
+      } else {
+        if (
+          errorMsg === "Email already in use, please choose a different one."
+        ) {
+          if (leadId) {
+            setEmailErr(
+              <>
+                {"Lead existed. "}
+                <span
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    window.open(`/clients/${leadId}`, "_blank");
+                  }}
+                >
+                  View client's profile
+                </span>
+              </>
+            );
+          } else {
+            setEmailErr(errorMsg);
+          }
+        } else if (errorMsg === "Email isn't valid") {
+          setEmailErr(errorMsg);
+        } else if (
+          errorMsg ===
+          "Phone number already in use, please choose a different one."
+        ) {
+          if (leadId) {
+            setPhoneErr(
+              <>
+                {"Lead existed. "}
+                <span
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    window.open(`/clients/${leadId}`, "_blank");
+                  }}
+                >
+                  View lead's profile
+                </span>
+              </>
+            );
+          } else {
+            setPhoneErr(errorMsg);
+          }
         }
       }
     } finally {
@@ -102,7 +131,7 @@ const Update = () => {
           <div style={{ padding: 24, minHeight: 360 }}>
             <Row justify="center">
               <Col span={12}>
-                <h1>Update Client</h1>
+                <h1>Update Lead</h1>
                 <Form onFinish={handleSubmit} layout="vertical">
                   <Form.Item
                     label="Email"
@@ -124,9 +153,9 @@ const Update = () => {
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </Form.Item>
-                  <Form.Item label="Representer">
+                  <Form.Item label="Representative">
                     <Input
-                      value={represent}
+                      value={rep}
                       onChange={(e) => setRep(e.target.value)}
                     />
                   </Form.Item>

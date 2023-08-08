@@ -10,12 +10,13 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
+import checkLogin from "@/Utils/checkLogin";
 
 const { Content } = Layout;
 const { Option } = Select;
 
 const ProtectedPage = () => {
-  const [clients, setClients] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [trigger, setTrigger] = useState(false);
@@ -31,11 +32,14 @@ const ProtectedPage = () => {
     useColumnSearch();
 
   useEffect(() => {
-    setRole(localStorage.getItem("role"));
-  }, []);
-
-  useEffect(() => {
     setLoading(true);
+    setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
+
     const { pageIndex, pageSize } = pagination;
 
     let params = {};
@@ -57,14 +61,14 @@ const ProtectedPage = () => {
       ...transformedFilters,
     };
     if (userId !== "") {
-      params.userId = userId;
+      params.inCharge = userId;
     }
 
     api
-      .get("/clients/", { params })
+      .get("/leads/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setClients(res.data.clients);
+        setLeads(res.data.leads);
         setLoading(false);
       })
       .catch((error) => {
@@ -143,10 +147,10 @@ const ProtectedPage = () => {
       ),
     },
     {
-      title: "Represented By",
-      dataIndex: "represent",
-      key: "represent",
-      ...getColumnSearchProps("represent", handleSearch, handleReset),
+      title: "Representative",
+      dataIndex: "rep",
+      key: "rep",
+      ...getColumnSearchProps("rep", handleSearch, handleReset),
     },
 
     {
@@ -259,7 +263,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Client List
+                  Lead Contacts
                   <PlusOutlined
                     style={{ marginLeft: "10px", cursor: "pointer" }}
                     onClick={() => setShowCreateButton(!showCreateButton)}
@@ -277,7 +281,7 @@ const ProtectedPage = () => {
 
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <Input
-                    placeholder="Person In Filter"
+                    placeholder="Person In Charge Filter"
                     value={userId}
                     onChange={(e) => setUserId(e.target.value)}
                     style={{ width: 200, marginRight: "10px" }}
@@ -297,7 +301,7 @@ const ProtectedPage = () => {
               </div>
               <UserTable
                 columns={columns}
-                data={clients}
+                data={leads}
                 total={total}
                 loading={loading}
                 pagination={pagination}

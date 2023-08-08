@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "@/api/api";
-import useCheckLogin from "@/hooks/useCheckLogin";
 import { useRouter } from "next/router";
 import { Input, Button, Form, Layout, Row, Col } from "antd";
 import AppHeader from "@/components/header";
@@ -16,13 +15,16 @@ const UpdateInfo = () => {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
 
-  useCheckLogin();
-
   const router = useRouter();
   const id = router.query.id;
 
   useEffect(() => {
     setRole(localStorage.getItem("role"));
+    const loggedIn = localStorage.getItem("logged_in");
+    if (loggedIn !== "true") {
+      checkLogin();
+      return;
+    }
   }, []);
 
   const handleSubmit = async () => {
