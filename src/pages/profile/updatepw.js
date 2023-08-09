@@ -68,71 +68,80 @@ const UpdateUserPW = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <Row justify="center">
-              <Col span={12}>
-                <h2>Update Password</h2>
-                <Form onFinish={handleSubmit} layout="vertical">
-                  <Form.Item
-                    label="Old Password"
-                    validateStatus={oldPassErr ? "error" : ""}
-                    help={oldPassErr}
-                  >
-                    <Input.Password
-                      placeholder="Old Password"
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      visibilityToggle={true}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="New Password"
-                    validateStatus={newPassErr ? "error" : ""}
-                    help={newPassErr}
-                  >
-                    <Input.Password
-                      placeholder="New Password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      visibilityToggle={true}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="Confirm New Password"
-                    validateStatus={confirmErr ? "error" : ""}
-                    help={confirmErr}
-                  >
-                    <Input.Password
-                      placeholder="Confirm New Password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      visibilityToggle={true}
-                    />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={loadingUpdate}
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <Row justify="center">
+                <Col span={12}>
+                  <h2>Update Password</h2>
+                  <Form onFinish={handleSubmit} layout="vertical">
+                    <Form.Item
+                      label="Old Password"
+                      validateStatus={oldPassErr ? "error" : ""}
+                      help={oldPassErr}
                     >
-                      Update
-                    </Button>
-                  </Form.Item>
-                </Form>
-                <Link href={`/profile/`}>
-                  <Button>Back to profile</Button>
-                </Link>
-              </Col>
-            </Row>
-          </div>
-        </Content>
+                      <Input.Password
+                        placeholder="Old Password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        visibilityToggle={true}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="New Password"
+                      validateStatus={newPassErr ? "error" : ""}
+                      help={newPassErr}
+                    >
+                      <Input.Password
+                        placeholder="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        visibilityToggle={true}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Confirm New Password"
+                      validateStatus={confirmErr ? "error" : ""}
+                      help={confirmErr}
+                    >
+                      <Input.Password
+                        placeholder="Confirm New Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        visibilityToggle={true}
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loadingUpdate}
+                      >
+                        Update
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                  <Link href={`/profile/`}>
+                    <Button>Back to profile</Button>
+                  </Link>
+                </Col>
+              </Row>
+            </div>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

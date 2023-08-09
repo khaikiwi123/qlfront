@@ -12,6 +12,7 @@ const UpdateInfo = () => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [emailErr, setEmailErr] = useState("");
+  const [phoneErr, setPhoneErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
 
@@ -29,6 +30,7 @@ const UpdateInfo = () => {
 
   const handleSubmit = async () => {
     setEmailErr("");
+    setPhoneErr("");
     setLoading(true);
     const data = {
       name,
@@ -43,11 +45,11 @@ const UpdateInfo = () => {
     } catch (error) {
       console.error(error);
       const errorMsg = error.response.data.error;
-      if (
-        errorMsg === "Email already in use, please choose a different one." ||
-        errorMsg === "Email isn't valid"
-      ) {
+      if (errorMsg === "Email existed" || errorMsg === "Email isn't valid") {
         setEmailErr(errorMsg);
+      }
+      if (errorMsg === "Phone existed") {
+        setPhoneErr(errorMsg);
       }
     } finally {
       setLoading(false);
@@ -55,60 +57,78 @@ const UpdateInfo = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <Row justify="center">
-              <Col span={8}>
-                <h1>Update</h1>
-                <Form onFinish={handleSubmit} layout="vertical">
-                  <Form.Item label="Name">
-                    <Input
-                      placeholder="Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="Email"
-                    validateStatus={emailErr ? "error" : ""}
-                    help={emailErr}
-                  >
-                    <Input
-                      placeholder="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item label="Phone">
-                    <Input
-                      placeholder="Phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                      Update
-                    </Button>
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="default">
-                      <Link href={`/users/${id}`}>
-                        Back to user&apos;s profile
-                      </Link>
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </Col>
-            </Row>
-          </div>
-        </Content>
+    <>
+      {" "}
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <Row justify="center">
+                <Col span={8}>
+                  <h1>Update</h1>
+                  <Form onFinish={handleSubmit} layout="vertical">
+                    <Form.Item label="Name">
+                      <Input
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Email"
+                      validateStatus={emailErr ? "error" : ""}
+                      help={emailErr}
+                    >
+                      <Input
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Phone"
+                      validateStatus={phoneErr ? "error" : ""}
+                      help={phoneErr}
+                    >
+                      <Input
+                        placeholder="Phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                      >
+                        Update
+                      </Button>
+                    </Form.Item>
+                    <Form.Item>
+                      <Button type="default">
+                        <Link href={`/users/${id}`}>
+                          Back to user&apos;s profile
+                        </Link>
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </Col>
+              </Row>
+            </div>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

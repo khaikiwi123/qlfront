@@ -54,41 +54,51 @@ export default function User() {
   }
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
-        <AppSider role={role} />
-        <Content
-          style={{
-            margin: "24px 16px 0",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-          }}
-        >
-          <Title>Profile</Title>
-          <Text>Name: {user.name}</Text>
-          <Text>Email: {user.email}</Text>
-          <Text>Role: {user.role}</Text>
-          <Text>Phone: {user.phone}</Text>
-          <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
-          <Text>
-            Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
-          </Text>
-          <Text>
-            <Link href="/profile/updateinfo">
-              <Button style={{ margin: "10px" }}>
-                Update your information
-              </Button>
-            </Link>
-          </Text>
-          <Text>
-            <Link href="/profile/updatepw">
-              <Button style={{ margin: "10px" }}>Update your password</Button>
-            </Link>
-          </Text>
-        </Content>
+    <>
+      {" "}
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content
+            style={{
+              margin: "24px 16px 0",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "start",
+            }}
+          >
+            <Title>Profile</Title>
+            <Text>Name: {user.name}</Text>
+            <Text>Email: {user.email}</Text>
+            <Text>Role: {user.role}</Text>
+            <Text>Phone: {user.phone}</Text>
+            <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
+            <Text>
+              Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
+            </Text>
+            <Text>
+              <Link href="/profile/updateinfo">
+                <Button style={{ margin: "10px" }}>
+                  Update your information
+                </Button>
+              </Link>
+            </Text>
+            <Text>
+              <Link href="/profile/updatepw">
+                <Button style={{ margin: "10px" }}>Update your password</Button>
+              </Link>
+            </Text>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 }

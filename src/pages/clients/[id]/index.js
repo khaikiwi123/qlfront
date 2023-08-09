@@ -84,66 +84,75 @@ export default function Lead() {
   }
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <Title>
-              Profile
-              <EditOutlined
-                onClick={() => setEditMode(!editMode)}
-                style={{ marginLeft: "10px", fontSize: "16px" }}
-              />
-            </Title>
-            {editMode && (
-              <>
-                <Link href={`/clients/${id}/updateinfo`}>
-                  <Button>Update lead&apos;s information</Button>
-                </Link>
-                <Popconfirm
-                  title="Are you sure to delete this lead?"
-                  onConfirm={() => onDelete(id)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button danger loading={loadingDelete}>
-                    {loadingDelete ? "Deleting..." : "Delete"}
-                  </Button>
-                </Popconfirm>
-              </>
-            )}
-            <br />
-            <Text>Email: {lead.email}</Text>
-            <br />
-            <Text>Phone: {lead.phone}</Text>
-            <br />
-            <Text>Organization: {lead.org}</Text>
-            <br />
-            <Text>Representer: {lead.rep}</Text>
-            <br />
-            <Text>Status:</Text>
-            <Select
-              value={lead.status}
-              onChange={onUpdateStatus}
-              loading={loadingStatus}
-              disabled={loadingStatus}
-              style={{ width: 200 }}
-            >
-              <Option value="No contact">Chưa liên hệ</Option>
-              <Option value="In contact">Đã liên hệ</Option>
-              <Option value="Verified needs">Đã xác định nhu cầu</Option>
-              <Option value="Consulted">Đã tư vấn</Option>
-              <Option value="Acquired">Thành công</Option>
-            </Select>
-            <br />
-            <Text>
-              Created At: {format(new Date(lead.createdDate), "dd/MM/yyyy")}
-            </Text>
-          </div>
-        </Content>
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <Title>
+                Profile
+                <EditOutlined
+                  onClick={() => setEditMode(!editMode)}
+                  style={{ marginLeft: "10px", fontSize: "16px" }}
+                />
+              </Title>
+              {editMode && (
+                <>
+                  <Link href={`/clients/${id}/updateinfo`}>
+                    <Button>Update lead&apos;s information</Button>
+                  </Link>
+                  <Popconfirm
+                    title="Are you sure to delete this lead?"
+                    onConfirm={() => onDelete(id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button danger loading={loadingDelete}>
+                      {loadingDelete ? "Deleting..." : "Delete"}
+                    </Button>
+                  </Popconfirm>
+                </>
+              )}
+              <br />
+              <Text>Email: {lead.email}</Text>
+              <br />
+              <Text>Phone: {lead.phone}</Text>
+              <br />
+              <Text>Organization: {lead.org}</Text>
+              <br />
+              <Text>Representer: {lead.rep}</Text>
+              <br />
+              <Text>Status:</Text>
+              <Select
+                value={lead.status}
+                onChange={onUpdateStatus}
+                loading={loadingStatus}
+                disabled={loadingStatus}
+                style={{ width: 200 }}
+              >
+                <Option value="No contact">Chưa liên hệ</Option>
+                <Option value="In contact">Đã liên hệ</Option>
+                <Option value="Verified needs">Đã xác định nhu cầu</Option>
+                <Option value="Consulted">Đã tư vấn</Option>
+                <Option value="Acquired">Thành công</Option>
+              </Select>
+              <br />
+              <Text>
+                Created At: {format(new Date(lead.createdDate), "dd/MM/yyyy")}
+              </Text>
+            </div>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 }

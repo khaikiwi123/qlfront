@@ -53,19 +53,18 @@ const Create = () => {
       const inChargeEmail = error.response.data.incharge;
       const currUserEmail = localStorage.getItem("currUser");
       if (
-        (errorMsg === "Lead's email is already in the system" ||
-          errorMsg === "Lead's number is already in the system") &&
+        (errorMsg === "Email existed" || errorMsg === "Phone existed") &&
         role !== "admin" &&
         currUserEmail !== inChargeEmail
       ) {
         const message = `${inChargeEmail} is in charge of this lead.`;
-        if (errorMsg === "Lead's email is already in the system") {
+        if (errorMsg === "Email existed") {
           setEmailErr(message);
         } else {
           setPhoneErr(message);
         }
       } else {
-        if (errorMsg === "Lead's email is already in the system") {
+        if (errorMsg === "Email existed") {
           setEmailErr(
             leadId ? (
               <>
@@ -85,7 +84,7 @@ const Create = () => {
           );
         } else if (errorMsg === "Email isn't valid") {
           setEmailErr(errorMsg);
-        } else if (errorMsg === "Lead's number is already in the system") {
+        } else if (errorMsg === "Phone existed") {
           setPhoneErr(
             leadId ? (
               <>
@@ -113,127 +112,136 @@ const Create = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div
-            style={{
-              padding: 24,
-              minHeight: 360,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
             <div
               style={{
+                padding: 24,
+                minHeight: 360,
                 display: "flex",
-                flexDirection: "column",
+                justifyContent: "center",
                 alignItems: "center",
-                maxWidth: "300px",
-                width: "100%",
               }}
             >
-              <h1 style={{ fontSize: "2em", textAlign: "center" }}>
-                Create Lead
-              </h1>
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                hideRequiredMark
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  maxWidth: "300px",
+                  width: "100%",
+                }}
               >
-                <Form.Item
-                  label="Email"
-                  name="email"
-                  rules={[
-                    { required: true, message: "Please input your email!" },
-                  ]}
-                  help={emailErr}
-                  validateStatus={emailErr ? "error" : ""}
+                <h1 style={{ fontSize: "2em", textAlign: "center" }}>
+                  Create Lead
+                </h1>
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={onFinish}
+                  hideRequiredMark
                 >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Phone"
-                  name="phone"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your phone number!",
-                    },
-                  ]}
-                  help={phoneErr}
-                  validateStatus={phoneErr ? "error" : ""}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Representer"
-                  name="rep"
-                  rules={[
-                    { required: true, message: "Please input your rep!" },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Organization"
-                  name="org"
-                  rules={[
-                    { required: true, message: "Please input your org!" },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-                {role === "admin" && (
                   <Form.Item
-                    label="Assign to"
-                    name="inCharge"
+                    label="Email"
+                    name="email"
                     rules={[
-                      {
-                        required: true,
-                        message: "Please input the assigned personel",
-                      },
+                      { required: true, message: "Please input your email!" },
                     ]}
-                    help={saleErr}
-                    validateStatus={saleErr ? "error" : ""}
+                    help={emailErr}
+                    validateStatus={emailErr ? "error" : ""}
                   >
                     <Input />
                   </Form.Item>
-                )}
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={loading}
-                    style={{ width: "100%" }}
+                  <Form.Item
+                    label="Phone"
+                    name="phone"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your phone number!",
+                      },
+                    ]}
+                    help={phoneErr}
+                    validateStatus={phoneErr ? "error" : ""}
                   >
-                    Create
-                  </Button>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    label="Representer"
+                    name="rep"
+                    rules={[
+                      { required: true, message: "Please input your rep!" },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    label="Organization"
+                    name="org"
+                    rules={[
+                      { required: true, message: "Please input your org!" },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
                   {role === "admin" && (
-                    <Link href="/clients/contact">
-                      <Button style={{ width: "100%", marginTop: "10px" }}>
-                        Back to client list
-                      </Button>
-                    </Link>
+                    <Form.Item
+                      label="Assign to"
+                      name="inCharge"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input the assigned personel",
+                        },
+                      ]}
+                      help={saleErr}
+                      validateStatus={saleErr ? "error" : ""}
+                    >
+                      <Input />
+                    </Form.Item>
                   )}
-                  {role === "user" && (
-                    <Link href="/clients/potential">
-                      <Button style={{ width: "100%", marginTop: "10px" }}>
-                        Back to potential client list
-                      </Button>
-                    </Link>
-                  )}
-                </Form.Item>
-              </Form>
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      style={{ width: "100%" }}
+                    >
+                      Create
+                    </Button>
+                    {role === "admin" && (
+                      <Link href="/clients/contact">
+                        <Button style={{ width: "100%", marginTop: "10px" }}>
+                          Back to client list
+                        </Button>
+                      </Link>
+                    )}
+                    {role === "user" && (
+                      <Link href="/clients/potential">
+                        <Button style={{ width: "100%", marginTop: "10px" }}>
+                          Back to potential client list
+                        </Button>
+                      </Link>
+                    )}
+                  </Form.Item>
+                </Form>
+              </div>
             </div>
-          </div>
-        </Content>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

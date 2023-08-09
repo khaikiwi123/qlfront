@@ -31,7 +31,7 @@ const Home = () => {
         {role === "admin" && (
           <LinkSection
             href="/clients/contact"
-            buttonText="Go to contact client list"
+            buttonText="Go to contact lead list"
           />
         )}
         {role === "user" && (

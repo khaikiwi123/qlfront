@@ -51,24 +51,18 @@ const Update = () => {
       const currUserEmail = localStorage.getItem("currUser");
 
       if (
-        (errorMsg === "Email already in use, please choose a different one." ||
-          errorMsg ===
-            "Phone number already in use, please choose a different one.") &&
+        (errorMsg === "Email existed" || errorMsg === "Phone existed") &&
         role !== "admin" &&
         currUserEmail !== inChargeEmail
       ) {
         const message = `${inChargeEmail} is in charge of this lead.`;
-        if (
-          errorMsg === "Email already in use, please choose a different one."
-        ) {
+        if (errorMsg === "Email existed") {
           setEmailErr(message);
         } else {
           setPhoneErr(message);
         }
       } else {
-        if (
-          errorMsg === "Email already in use, please choose a different one."
-        ) {
+        if (errorMsg === "Email existed") {
           if (leadId) {
             setEmailErr(
               <>
@@ -91,10 +85,7 @@ const Update = () => {
           }
         } else if (errorMsg === "Email isn't valid") {
           setEmailErr(errorMsg);
-        } else if (
-          errorMsg ===
-          "Phone number already in use, please choose a different one."
-        ) {
+        } else if (errorMsg === "Phone existed") {
           if (leadId) {
             setPhoneErr(
               <>
@@ -123,63 +114,76 @@ const Update = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <AppHeader />
-      <Layout>
-        <AppSider role={role} />
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div style={{ padding: 24, minHeight: 360 }}>
-            <Row justify="center">
-              <Col span={12}>
-                <h1>Update Lead</h1>
-                <Form onFinish={handleSubmit} layout="vertical">
-                  <Form.Item
-                    label="Email"
-                    validateStatus={emailErr ? "error" : ""}
-                    help={emailErr}
-                  >
-                    <Input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="Phone"
-                    validateStatus={phoneErr ? "error" : ""}
-                    help={phoneErr}
-                  >
-                    <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item label="Representative">
-                    <Input
-                      value={rep}
-                      onChange={(e) => setRep(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item label="Organization">
-                    <Input
-                      value={org}
-                      onChange={(e) => setOrg(e.target.value)}
-                    />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                      Update
-                    </Button>
-                  </Form.Item>
-                </Form>
-                <Button type="primary">
-                  <Link href={`/clients/${id}`}>Back to clients profile</Link>
-                </Button>
-              </Col>
-            </Row>
-          </div>
-        </Content>
+    <>
+      <style jsx global>{`
+        body,
+        html {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
+      <Layout style={{ minHeight: "100vh" }}>
+        <AppHeader />
+        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+          <AppSider role={role} />
+          <Content style={{ margin: "24px 16px 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <Row justify="center">
+                <Col span={12}>
+                  <h1>Update Lead</h1>
+                  <Form onFinish={handleSubmit} layout="vertical">
+                    <Form.Item
+                      label="Email"
+                      validateStatus={emailErr ? "error" : ""}
+                      help={emailErr}
+                    >
+                      <Input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Phone"
+                      validateStatus={phoneErr ? "error" : ""}
+                      help={phoneErr}
+                    >
+                      <Input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Representative">
+                      <Input
+                        value={rep}
+                        onChange={(e) => setRep(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Organization">
+                      <Input
+                        value={org}
+                        onChange={(e) => setOrg(e.target.value)}
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                      >
+                        Update
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                  <Button type="primary">
+                    <Link href={`/clients/${id}`}>Back to clients profile</Link>
+                  </Button>
+                </Col>
+              </Row>
+            </div>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

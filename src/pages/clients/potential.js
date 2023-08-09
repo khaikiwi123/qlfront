@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal } from "antd";
+import { Layout, Button, Modal, Select, Input } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
-
 const { Content } = Layout;
+const { Option } = Select;
 
 const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
+  const [userId, setUserId] = useState("");
+  const [trigger, setTrigger] = useState(false);
   const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -35,6 +37,7 @@ const ProtectedPage = () => {
       return;
     }
     setRole(localStorage.getItem("role"));
+    const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
@@ -44,8 +47,10 @@ const ProtectedPage = () => {
       params = {
         pageNumber: pageIndex,
         pageSize: pageSize,
-        inCharge: id,
       };
+      if (currRole !== "admin") {
+        params.inCharge = id;
+      }
     }
 
     const transformedFilters = searchParams.reduce((acc, filter) => {
@@ -55,10 +60,12 @@ const ProtectedPage = () => {
       return acc;
     }, {});
     params = {
-      status: "No contact",
       ...params,
       ...transformedFilters,
     };
+    if (userId !== "") {
+      params.inCharge = userId;
+    }
 
     api
       .get("/leads/", { params })
@@ -100,7 +107,7 @@ const ProtectedPage = () => {
         }
         console.error(error);
       });
-  }, [pagination, searchParams]);
+  }, [pagination, searchParams, trigger]);
 
   const columns = [
     {
@@ -152,6 +159,75 @@ const ProtectedPage = () => {
         return format(new Date(date), "dd/MM/yyyy");
       },
     },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        let displayStatus;
+        switch (status) {
+          case "No contact":
+            displayStatus = "Chưa liên hệ";
+            break;
+          case "In contact":
+            displayStatus = "Đã liên hệ";
+            break;
+          case "Verified needs":
+            displayStatus = "Đã xác định nhu cầu";
+            break;
+          case "Consulted":
+            displayStatus = "Đã tư vấn";
+            break;
+          case "Acquired":
+            displayStatus = "Thành công";
+            break;
+          default:
+            displayStatus = "";
+        }
+        return <span>{displayStatus}</span>;
+      },
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Select
+            style={{ width: 188, marginBottom: 8, display: "block" }}
+            placeholder="Select Status"
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
+          >
+            <Option value="No contact">Chưa liên hệ</Option>
+            <Option value="In contact">Đã liên hệ</Option>
+            <Option value="Verified needs">Đã xác định nhu cầu</Option>
+            <Option value="Consulted">Đã tư vấn</Option>
+            <Option value="Acquired">Thành công</Option>
+          </Select>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, "status")}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters, confirm, "status")}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      ),
+      filterIcon: (filtered) => (
+        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      ),
+      onFilter: (value, record) => record["status"].toString() === value,
+    },
   ];
 
   return (
@@ -199,6 +275,29 @@ const ProtectedPage = () => {
                     </Button>
                   )}
                 </h1>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {role === "admin" && (
+                    <>
+                      <Input
+                        placeholder="Person In Charge Filter"
+                        value={userId}
+                        onChange={(e) => setUserId(e.target.value)}
+                        style={{ width: 200, marginRight: "10px" }}
+                      />
+                      <Button onClick={() => setTrigger(!trigger)}>
+                        Set Filter
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setUserId("");
+                          setTrigger(!trigger);
+                        }}
+                      >
+                        Clear Filter
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <UserTable
                 columns={columns}
