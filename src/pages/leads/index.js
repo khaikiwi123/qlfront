@@ -8,10 +8,10 @@ import useColumnSearch from "@/hooks/useColumnSearch";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
-import { format } from "date-fns";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
-
+import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 const { Option } = Select;
 
@@ -19,9 +19,9 @@ const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [trigger, setTrigger] = useState(false);
   const [role, setRole] = useState("");
   const [userId, setUserId] = useState("");
+  const [trigger, setTrigger] = useState(false);
   const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -32,14 +32,15 @@ const ProtectedPage = () => {
     useColumnSearch();
 
   useEffect(() => {
-    setLoading(true);
-    setRole(localStorage.getItem("role"));
     const loggedIn = localStorage.getItem("logged_in");
     if (loggedIn !== "true") {
       checkLogin();
       return;
     }
-
+    setRole(localStorage.getItem("role"));
+    const currRole = localStorage.getItem("role");
+    const id = localStorage.getItem("currUser");
+    setLoading(true);
     const { pageIndex, pageSize } = pagination;
 
     let params = {};
@@ -48,6 +49,9 @@ const ProtectedPage = () => {
         pageNumber: pageIndex,
         pageSize: pageSize,
       };
+      if (currRole !== "admin") {
+        params.inCharge = id;
+      }
     }
 
     const transformedFilters = searchParams.reduce((acc, filter) => {
@@ -95,11 +99,6 @@ const ProtectedPage = () => {
                 logOut();
               },
             });
-          } else {
-            Modal.error({
-              title: "An error occurred",
-              content: error.response.data.message || "Please try again later",
-            });
           }
         } else {
           Modal.error({
@@ -130,7 +129,7 @@ const ProtectedPage = () => {
       key: "org",
       ...getColumnSearchProps("org", handleSearch, handleReset),
       render: (text, record) => (
-        <Link href={`/clients/${record._id}`}>
+        <Link href={`/leads/${record._id}`}>
           <Button
             type="link"
             color="neutral"
@@ -138,7 +137,7 @@ const ProtectedPage = () => {
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              Router.push(`/clients/${record._id}`);
+              Router.push(`/leads/${record._id}`);
             }}
           >
             {record.org}
@@ -161,7 +160,6 @@ const ProtectedPage = () => {
         return format(new Date(date), "dd/MM/yyyy");
       },
     },
-
     {
       title: "Status",
       dataIndex: "status",
@@ -181,7 +179,7 @@ const ProtectedPage = () => {
           case "Consulted":
             displayStatus = "Đã tư vấn";
             break;
-          case "Acquired":
+          case "Sucess":
             displayStatus = "Thành công";
             break;
           default:
@@ -206,7 +204,7 @@ const ProtectedPage = () => {
             <Option value="In contact">Đã liên hệ</Option>
             <Option value="Verified needs">Đã xác định nhu cầu</Option>
             <Option value="Consulted">Đã tư vấn</Option>
-            <Option value="Acquired">Thành công</Option>
+            <Option value="Success">Thành công</Option>
           </Select>
           <Button
             type="primary"
@@ -246,8 +244,11 @@ const ProtectedPage = () => {
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
-          <Content>
+          <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
+              <AppCrumbs
+                paths={[{ name: "Home", href: "/home" }, { name: "Leads" }]}
+              />
               <div
                 style={{
                   display: "flex",
@@ -263,7 +264,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Lead Contacts
+                  Potential Lead List
                   <PlusOutlined
                     style={{ marginLeft: "10px", cursor: "pointer" }}
                     onClick={() => setShowCreateButton(!showCreateButton)}
@@ -272,31 +273,34 @@ const ProtectedPage = () => {
                     <Button
                       type="primary"
                       style={{ marginLeft: "10px" }}
-                      onClick={() => Router.push("/clients/create")}
+                      onClick={() => Router.push("/leads/create")}
                     >
                       Create
                     </Button>
                   )}
                 </h1>
-
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <Input
-                    placeholder="Person In Charge Filter"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    style={{ width: 200, marginRight: "10px" }}
-                  />
-                  <Button onClick={() => setTrigger(!trigger)}>
-                    Set Filter
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setUserId("");
-                      setTrigger(!trigger);
-                    }}
-                  >
-                    Clear Filter
-                  </Button>
+                  {role === "admin" && (
+                    <>
+                      <Input
+                        placeholder="Person In Charge Filter"
+                        value={userId}
+                        onChange={(e) => setUserId(e.target.value)}
+                        style={{ width: 200, marginRight: "10px" }}
+                      />
+                      <Button onClick={() => setTrigger(!trigger)}>
+                        Set Filter
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setUserId("");
+                          setTrigger(!trigger);
+                        }}
+                      >
+                        Clear Filter
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
               <UserTable

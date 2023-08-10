@@ -6,6 +6,8 @@ import { Form, Input, Button, Layout, message } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
+import { handleApiError } from "@/api/error";
+import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 
@@ -36,76 +38,18 @@ const Create = () => {
     setSaleErr("");
 
     try {
-      await api.post(`/s`, {
+      await api.post(`/leads`, {
         ...values,
         inCharge: role === "admin" ? values.inCharge : id,
       });
 
-      if (role === "user") {
-        Router.push("/clients/potential");
-      } else if (role === "admin") {
-        Router.push("/clients/contact");
-      }
+      Router.push("/leads");
     } catch (error) {
       console.error(error);
-      const errorMsg = error.response.data.error;
-      const leadId = error.response.data.leadId;
-      const inChargeEmail = error.response.data.incharge;
-      const currUserEmail = localStorage.getItem("currUser");
-      if (
-        (errorMsg === "Email existed" || errorMsg === "Phone existed") &&
-        role !== "admin" &&
-        currUserEmail !== inChargeEmail
-      ) {
-        const message = `${inChargeEmail} is in charge of this lead.`;
-        if (errorMsg === "Email existed") {
-          setEmailErr(message);
-        } else {
-          setPhoneErr(message);
-        }
-      } else {
-        if (errorMsg === "Email existed") {
-          setEmailErr(
-            leadId ? (
-              <>
-                {"Lead existed. "}
-                <span
-                  style={{ textDecoration: "underline", cursor: "pointer" }}
-                  onClick={() => {
-                    window.open(`/clients/${leadId}`, "_blank");
-                  }}
-                >
-                  View lead's profile
-                </span>
-              </>
-            ) : (
-              errorMsg
-            )
-          );
-        } else if (errorMsg === "Email isn't valid") {
-          setEmailErr(errorMsg);
-        } else if (errorMsg === "Phone existed") {
-          setPhoneErr(
-            leadId ? (
-              <>
-                {"Lead existed. "}
-                <span
-                  style={{ textDecoration: "underline", cursor: "pointer" }}
-                  onClick={() => {
-                    window.open(`/clients/${leadId}`, "_blank");
-                  }}
-                >
-                  View lead's profile
-                </span>
-              </>
-            ) : (
-              errorMsg
-            )
-          );
-        } else if (errorMsg === "Sale user doesn't exist") {
-          setSaleErr(errorMsg);
-        }
-      }
+      const { emailError, phoneError, saleError } = handleApiError(error, role);
+      setEmailErr(emailError);
+      setPhoneErr(phoneError);
+      setSaleErr(saleError);
     } finally {
       setLoading(false);
     }
@@ -134,6 +78,13 @@ const Create = () => {
                 alignItems: "center",
               }}
             >
+              <AppCrumbs
+                paths={[
+                  { name: "Home", href: "/home" },
+                  { name: "Leads", href: "/leads" },
+                  { name: "Create" },
+                ]}
+              />
               <div
                 style={{
                   display: "flex",
@@ -220,20 +171,12 @@ const Create = () => {
                     >
                       Create
                     </Button>
-                    {role === "admin" && (
-                      <Link href="/clients/contact">
-                        <Button style={{ width: "100%", marginTop: "10px" }}>
-                          Back to client list
-                        </Button>
-                      </Link>
-                    )}
-                    {role === "user" && (
-                      <Link href="/clients/potential">
-                        <Button style={{ width: "100%", marginTop: "10px" }}>
-                          Back to potential client list
-                        </Button>
-                      </Link>
-                    )}
+
+                    <Link href="/leads">
+                      <Button style={{ width: "100%", marginTop: "10px" }}>
+                        Back to leads list
+                      </Button>
+                    </Link>
                   </Form.Item>
                 </Form>
               </div>

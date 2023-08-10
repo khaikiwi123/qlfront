@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Layout, Button, Typography, Spin, Modal } from "antd";
+import {
+  Layout,
+  Button,
+  Typography,
+  Spin,
+  Popconfirm,
+  Modal,
+  Breadcrumb,
+} from "antd";
 import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -14,8 +22,9 @@ const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-export default function Client() {
-  const [client, setClient] = useState(null);
+export default function Lead() {
+  const [lead, setLead] = useState(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [showModal, setModal] = useState(false);
   const [role, setRole] = useState("");
@@ -33,9 +42,9 @@ export default function Client() {
     }
     setRole(localStorage.getItem("role"));
     api
-      .get(`/clients/${id}`)
+      .get(`/leads/${id}`)
       .then((response) => {
-        setClient(response.data);
+        setLead(response.data);
       })
       .catch((err) => {
         console.error(err);
@@ -44,42 +53,51 @@ export default function Client() {
 
         if (err.response?.data?.error === "Not authorized") {
           message.error(
-            `You are not authorized to view this client. ${
+            `You are not authorized to view this lead. ${
               inchargeEmail
-                ? `${inchargeEmail} is in charge of this client.`
+                ? `${inchargeEmail} is in charge of this lead.`
                 : "(It belonged to another salesperson)"
             }`
           );
 
-          router.push("/clients/");
+          router.push("/leads");
         }
       });
   }, [id, router]);
 
+  const onDelete = async (id) => {
+    setLoadingDelete(true);
+    await api.delete(`/leads/${id}`);
+
+    router.push("/leads");
+
+    setLoadingDelete(false);
+  };
+
   const onUpdateStatus = async (newStatus) => {
-    if (newStatus === "Failed") {
+    if (newStatus === "Success") {
       setModal(true);
       return;
     }
     setLoadingStatus(true);
     try {
-      await api.put(`/clients/${id}`, { status: newStatus });
-      setClient({ ...client, status: newStatus });
+      await api.put(`/leads/${id}`, { status: newStatus });
+      setLead({ ...lead, status: newStatus });
     } catch (error) {
       console.error(error);
     }
     setLoadingStatus(false);
   };
 
-  if (client === null) {
+  if (lead === null) {
     return <Spin size="large" />;
   }
   const handleConfirmSuccess = async () => {
     setLoadingStatus(true);
     try {
-      await api.put(`/clients/${id}`, { status: "Failed" });
-      setClient({ ...client, status: "Failed" });
-      router.push("/leads");
+      await api.put(`/leads/${id}`, { status: "Success" });
+      setLead({ ...lead, status: "Success" });
+      router.push("/clients");
     } catch (error) {
       console.error(error);
     }
@@ -107,7 +125,7 @@ export default function Client() {
               <AppCrumbs
                 paths={[
                   { name: "Home", href: "/" },
-                  { name: "Clients", href: "/clients" },
+                  { name: "Leads", href: "/leads" },
                   { name: "Profile" },
                 ]}
               />
@@ -120,34 +138,47 @@ export default function Client() {
               </Title>
               {editMode && (
                 <>
-                  <Link href={`/clients/${id}/updateinfo`}>
-                    <Button>Update client&apos;s information</Button>
+                  <Link href={`/leads/${id}/updateinfo`}>
+                    <Button>Update lead&apos;s information</Button>
                   </Link>
+                  <Popconfirm
+                    title="Are you sure to delete this lead?"
+                    onConfirm={() => onDelete(id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button danger loading={loadingDelete}>
+                      {loadingDelete ? "Deleting..." : "Delete"}
+                    </Button>
+                  </Popconfirm>
                 </>
               )}
               <br />
-              <Text>Email: {client.email}</Text>
+              <Text>Email: {lead.email}</Text>
               <br />
-              <Text>Phone: {client.phone}</Text>
+              <Text>Phone: {lead.phone}</Text>
               <br />
-              <Text>Organization: {client.org}</Text>
+              <Text>Organization: {lead.org}</Text>
               <br />
-              <Text>Representer: {client.rep}</Text>
+              <Text>Representer: {lead.rep}</Text>
               <br />
               <Text>Status:</Text>
               <Select
-                value={client.status}
+                value={lead.status}
                 onChange={onUpdateStatus}
                 loading={loadingStatus}
                 disabled={loadingStatus}
                 style={{ width: 200 }}
               >
+                <Option value="No contact">Chưa liên hệ</Option>
+                <Option value="In contact">Đã liên hệ</Option>
+                <Option value="Verified needs">Đã xác định nhu cầu</Option>
+                <Option value="Consulted">Đã tư vấn</Option>
                 <Option value="Success">Thành công</Option>
-                <Option value="Failed">Thất bại</Option>
               </Select>
               <br />
               <Text>
-                Created At: {format(new Date(client.createdDate), "dd/MM/yyyy")}
+                Created At: {format(new Date(lead.createdDate), "dd/MM/yyyy")}
               </Text>
             </div>
           </Content>
@@ -159,7 +190,7 @@ export default function Client() {
         onOk={handleConfirmSuccess}
         onCancel={handleCancelSuccess}
       >
-        <p>Are you sure you want to set this client's status to "Failed"?</p>
+        <p>Are you sure you want to set this lead's status to "Success"?</p>
       </Modal>
     </>
   );

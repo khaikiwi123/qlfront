@@ -6,6 +6,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import Link from "next/link";
 import checkLogin from "@/Utils/checkLogin";
+import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 
 const UpdateUserPW = () => {
@@ -74,6 +75,14 @@ const UpdateUserPW = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
+              <AppCrumbs
+                paths={[
+                  { name: "Home", href: "/home" },
+                  { name: "Users", href: "/users" },
+                  { name: "Profile", href: `/users/${id}` },
+                  { name: "Update password" },
+                ]}
+              />
               <Row justify="center">
                 <Col span={8}>
                   <h1>Update Password</h1>

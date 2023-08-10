@@ -28,24 +28,11 @@ const Home = () => {
     >
       <Content style={{ textAlign: "center" }}>
         <Title>HOME</Title>
-        {role === "admin" && (
-          <LinkSection
-            href="/clients/contact"
-            buttonText="Go to contact lead list"
-          />
-        )}
-        {role === "user" && (
-          <LinkSection
-            href="/clients/potential"
-            buttonText="Go to potential clients list"
-          />
-        )}
-        {role === "user" && (
-          <LinkSection
-            href="/clients/acquired"
-            buttonText="Go to acquired clients list"
-          />
-        )}
+
+        <LinkSection href="/leads" buttonText="Go to leads list" />
+
+        <LinkSection href="/clients" buttonText="Go to  clients list" />
+
         {role === "admin" && (
           <LinkSection href="/users" buttonText="Go to users list" />
         )}

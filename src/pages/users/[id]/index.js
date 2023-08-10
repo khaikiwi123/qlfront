@@ -7,6 +7,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
+import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -68,6 +69,13 @@ export default function User() {
               alignItems: "start",
             }}
           >
+            <AppCrumbs
+              paths={[
+                { name: "Home", href: "/home" },
+                { name: "Users", href: "/users" },
+                { name: "Profile" },
+              ]}
+            />
             <Title>Profile</Title>
             <Text>Name: {user.name}</Text>
             <Text>Email: {user.email}</Text>

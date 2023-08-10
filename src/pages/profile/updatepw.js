@@ -5,6 +5,7 @@ import Router from "next/router";
 import { Form, Input, Button, Layout, Row, Col } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
+import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 
@@ -82,6 +83,13 @@ const UpdateUserPW = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
+              <AppCrumbs
+                paths={[
+                  { name: "Home", href: "/home" },
+                  { name: "Profile", href: "/profile" },
+                  { name: "Update password" },
+                ]}
+              />
               <Row justify="center">
                 <Col span={12}>
                   <h2>Update Password</h2>

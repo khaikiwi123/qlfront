@@ -6,10 +6,9 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import Link from "next/link";
 import checkLogin from "@/Utils/checkLogin";
-import { handleApiError } from "@/api/error";
 import AppCrumbs from "@/components/breadcrumbs";
-
 const { Content } = Layout;
+import { handleApiError } from "@/api/error";
 
 const Update = () => {
   const router = useRouter();
@@ -43,9 +42,9 @@ const Update = () => {
       rep,
     };
     try {
-      const response = await api.put(`/clients/${id}`, data);
+      const response = await api.put(`/leads/${id}`, data);
       console.log(response);
-      router.push(`/clients/${id}`);
+      router.push(`/leads/${id}`);
     } catch (error) {
       console.error(error);
       const { emailError, phoneError } = handleApiError(error, role);
@@ -76,12 +75,12 @@ const Update = () => {
                   <AppCrumbs
                     paths={[
                       { name: "Home", href: "/home" },
-                      { name: "Clients", href: "/clients" },
-                      { name: "Profile", href: `/clients/${id}` },
+                      { name: "Leads", href: "/leads" },
+                      { name: "Profile", href: `/leads/${id}` },
                       { name: "Update" },
                     ]}
                   />
-                  <h1>Update Client</h1>
+                  <h1>Update Lead</h1>
                   <Form onFinish={handleSubmit} layout="vertical">
                     <Form.Item
                       label="Email"
@@ -126,7 +125,7 @@ const Update = () => {
                     </Form.Item>
                   </Form>
                   <Button type="primary">
-                    <Link href={`/clients/${id}`}>Back to clients profile</Link>
+                    <Link href={`/leads/${id}`}>Back to lead's profile</Link>
                   </Button>
                 </Col>
               </Row>

@@ -7,6 +7,7 @@ import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
+import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -90,6 +91,13 @@ const Create = () => {
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
+            <AppCrumbs
+              paths={[
+                { name: "Home", href: "/home" },
+                { name: "Users", href: "/users" },
+                { name: "Create" },
+              ]}
+            />
             <div
               style={{
                 padding: 24,

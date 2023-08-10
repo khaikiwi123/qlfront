@@ -10,6 +10,7 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import format from "date-fns/format";
+import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 const App = () => {
@@ -288,6 +289,9 @@ const App = () => {
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
+            <AppCrumbs
+              paths={[{ name: "Home", href: "/home" }, { name: "Users" }]}
+            />
             <div style={{ padding: 24, minHeight: 360 }}>
               <div
                 style={{

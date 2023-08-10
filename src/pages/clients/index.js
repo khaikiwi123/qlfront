@@ -1,27 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, Input } from "antd";
+import { Layout, Button, Modal } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
+import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
-const { Option } = Select;
 
 const ProtectedPage = () => {
-  const [leads, setLeads] = useState([]);
+  const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
-  const [userId, setUserId] = useState("");
-  const [trigger, setTrigger] = useState(false);
-  const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
@@ -63,15 +59,12 @@ const ProtectedPage = () => {
       ...params,
       ...transformedFilters,
     };
-    if (userId !== "") {
-      params.inCharge = userId;
-    }
 
     api
-      .get("/leads/", { params })
+      .get("/clients/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setLeads(res.data.leads);
+        setClients(res.data.clients);
         setLoading(false);
       })
       .catch((error) => {
@@ -98,6 +91,11 @@ const ProtectedPage = () => {
                 logOut();
               },
             });
+          } else {
+            Modal.error({
+              title: "An error occurred",
+              content: error.response.data.message || "Please try again later",
+            });
           }
         } else {
           Modal.error({
@@ -107,7 +105,7 @@ const ProtectedPage = () => {
         }
         console.error(error);
       });
-  }, [pagination, searchParams, trigger]);
+  }, [pagination, searchParams]);
 
   const columns = [
     {
@@ -159,75 +157,6 @@ const ProtectedPage = () => {
         return format(new Date(date), "dd/MM/yyyy");
       },
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        let displayStatus;
-        switch (status) {
-          case "No contact":
-            displayStatus = "Chưa liên hệ";
-            break;
-          case "In contact":
-            displayStatus = "Đã liên hệ";
-            break;
-          case "Verified needs":
-            displayStatus = "Đã xác định nhu cầu";
-            break;
-          case "Consulted":
-            displayStatus = "Đã tư vấn";
-            break;
-          case "Acquired":
-            displayStatus = "Thành công";
-            break;
-          default:
-            displayStatus = "";
-        }
-        return <span>{displayStatus}</span>;
-      },
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: 188, marginBottom: 8, display: "block" }}
-            placeholder="Select Status"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
-          >
-            <Option value="No contact">Chưa liên hệ</Option>
-            <Option value="In contact">Đã liên hệ</Option>
-            <Option value="Verified needs">Đã xác định nhu cầu</Option>
-            <Option value="Consulted">Đã tư vấn</Option>
-            <Option value="Acquired">Thành công</Option>
-          </Select>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "status")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "status")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
-      ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-      ),
-      onFilter: (value, record) => record["status"].toString() === value,
-    },
   ];
 
   return (
@@ -245,6 +174,9 @@ const ProtectedPage = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
+              <AppCrumbs
+                paths={[{ name: "Home", href: "/home" }, { name: "Clients" }]}
+              />
               <div
                 style={{
                   display: "flex",
@@ -260,48 +192,12 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Potential Lead List
-                  <PlusOutlined
-                    style={{ marginLeft: "10px", cursor: "pointer" }}
-                    onClick={() => setShowCreateButton(!showCreateButton)}
-                  />
-                  {showCreateButton && (
-                    <Button
-                      type="primary"
-                      style={{ marginLeft: "10px" }}
-                      onClick={() => Router.push("/clients/create")}
-                    >
-                      Create
-                    </Button>
-                  )}
+                  Accquired Clients List
                 </h1>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {role === "admin" && (
-                    <>
-                      <Input
-                        placeholder="Person In Charge Filter"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        style={{ width: 200, marginRight: "10px" }}
-                      />
-                      <Button onClick={() => setTrigger(!trigger)}>
-                        Set Filter
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setUserId("");
-                          setTrigger(!trigger);
-                        }}
-                      >
-                        Clear Filter
-                      </Button>
-                    </>
-                  )}
-                </div>
               </div>
               <UserTable
                 columns={columns}
-                data={leads}
+                data={clients}
                 total={total}
                 loading={loading}
                 pagination={pagination}
