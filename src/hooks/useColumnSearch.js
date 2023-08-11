@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
 import { Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { useRouter } from "next/router";
 
 const useColumnSearch = () => {
   const [searchParams, setSearchParams] = useState([]);
   const searchInput = useRef(null);
+  const router = useRouter();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -27,6 +29,14 @@ const useColumnSearch = () => {
       );
       return newFilters;
     });
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, [dataIndex]: undefined },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   const getColumnSearchProps = (dataIndex, handleSearch, handleReset) => ({
@@ -88,6 +98,7 @@ const useColumnSearch = () => {
     handleSearch,
     handleReset,
     getColumnSearchProps,
+    setSearchParams,
   };
 };
 

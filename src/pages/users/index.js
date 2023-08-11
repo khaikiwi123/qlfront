@@ -99,10 +99,10 @@ const App = () => {
             Modal.confirm({
               title: "Unauthorized Access",
               content: "You do not have permission to view this page",
-              okText: "Go back to Home",
+              okText: "Go back",
               cancelText: "Logout",
               onOk() {
-                Router.push("/home");
+                Router.push("/leads");
               },
               onCancel() {
                 logOut();
@@ -289,9 +289,7 @@ const App = () => {
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
-            <AppCrumbs
-              paths={[{ name: "Home", href: "/home" }, { name: "Users" }]}
-            />
+            <AppCrumbs paths={[{ name: "Users" }]} />
             <div style={{ padding: 24, minHeight: 360 }}>
               <div
                 style={{

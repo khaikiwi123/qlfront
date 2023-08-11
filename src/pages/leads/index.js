@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, Input } from "antd";
+import { Layout, Button, Modal, Select, Input, Tooltip } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
@@ -90,10 +90,10 @@ const ProtectedPage = () => {
             Modal.confirm({
               title: "Unauthorized Access",
               content: "You do not have permission to view this page",
-              okText: "Go back to Home",
+              okText: "Go back",
               cancelText: "Logout",
               onOk() {
-                Router.push("/home");
+                Router.push("/leads");
               },
               onCancel() {
                 logOut();
@@ -110,7 +110,7 @@ const ProtectedPage = () => {
       });
   }, [pagination, searchParams, trigger]);
 
-  const columns = [
+  const baseColumns = [
     {
       title: "Phone",
       dataIndex: "phone",
@@ -122,7 +122,16 @@ const ProtectedPage = () => {
       dataIndex: "email",
       key: "email",
       ...getColumnSearchProps("email", handleSearch, handleReset),
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (email) => (
+        <Tooltip placement="topLeft" title={email}>
+          {email}
+        </Tooltip>
+      ),
     },
+
     {
       title: "Organization",
       dataIndex: "org",
@@ -179,7 +188,7 @@ const ProtectedPage = () => {
           case "Consulted":
             displayStatus = "Đã tư vấn";
             break;
-          case "Sucess":
+          case "Success":
             displayStatus = "Thành công";
             break;
           default:
@@ -230,6 +239,16 @@ const ProtectedPage = () => {
       onFilter: (value, record) => record["status"].toString() === value,
     },
   ];
+  if (role === "admin") {
+    baseColumns.push({
+      title: "In Charge",
+      dataIndex: "inCharge",
+      key: "inCharge",
+      ...getColumnSearchProps("inCharge", handleSearch, handleReset),
+    });
+  }
+
+  const columns = baseColumns;
 
   return (
     <>
@@ -246,9 +265,7 @@ const ProtectedPage = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
-              <AppCrumbs
-                paths={[{ name: "Home", href: "/home" }, { name: "Leads" }]}
-              />
+              <AppCrumbs paths={[{ name: "Leads" }]} />
               <div
                 style={{
                   display: "flex",

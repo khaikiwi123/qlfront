@@ -76,9 +76,7 @@ export default function User() {
               alignItems: "start",
             }}
           >
-            <AppCrumbs
-              paths={[{ name: "Home", href: "/home" }, { name: "Profile" }]}
-            />
+            <AppCrumbs paths={[{ name: "Profile" }]} />
             <Title>Profile</Title>
             <Text>Name: {user.name}</Text>
             <Text>Email: {user.email}</Text>

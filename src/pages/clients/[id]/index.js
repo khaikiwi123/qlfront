@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Layout, Button, Typography, Spin, Modal } from "antd";
+import { Layout, Button, Typography, Spin, Modal, Avatar } from "antd";
 import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -106,7 +106,6 @@ export default function Client() {
             <div style={{ padding: 24, minHeight: 360 }}>
               <AppCrumbs
                 paths={[
-                  { name: "Home", href: "/" },
                   { name: "Clients", href: "/clients" },
                   { name: "Profile" },
                 ]}
@@ -118,37 +117,53 @@ export default function Client() {
                   style={{ marginLeft: "10px", fontSize: "16px" }}
                 />
               </Title>
-              {editMode && (
-                <>
-                  <Link href={`/clients/${id}/updateinfo`}>
-                    <Button>Update client&apos;s information</Button>
-                  </Link>
-                </>
-              )}
-              <br />
-              <Text>Email: {client.email}</Text>
-              <br />
-              <Text>Phone: {client.phone}</Text>
-              <br />
-              <Text>Organization: {client.org}</Text>
-              <br />
-              <Text>Representer: {client.rep}</Text>
-              <br />
-              <Text>Status:</Text>
-              <Select
-                value={client.status}
-                onChange={onUpdateStatus}
-                loading={loadingStatus}
-                disabled={loadingStatus}
-                style={{ width: 200 }}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "start",
+                }}
               >
-                <Option value="Success">Thành công</Option>
-                <Option value="Failed">Thất bại</Option>
-              </Select>
-              <br />
-              <Text>
-                Created At: {format(new Date(client.createdDate), "dd/MM/yyyy")}
-              </Text>
+                <Avatar
+                  size={200}
+                  src={client.avatar}
+                  style={{ marginRight: "20px" }}
+                />{" "}
+                <div style={{ flexGrow: 1 }}>
+                  {editMode && (
+                    <>
+                      <Link href={`/clients/${id}/updateinfo`}>
+                        <Button>Update client&apos;s information</Button>
+                      </Link>
+                    </>
+                  )}
+                  <br />
+                  <Text>Email: {client.email}</Text>
+                  <br />
+                  <Text>Phone: {client.phone}</Text>
+                  <br />
+                  <Text>Organization: {client.org}</Text>
+                  <br />
+                  <Text>Representer: {client.rep}</Text>
+                  <br />
+                  <Text>Status:</Text>
+                  <Select
+                    value={client.status}
+                    onChange={onUpdateStatus}
+                    loading={loadingStatus}
+                    disabled={loadingStatus}
+                    style={{ width: 200 }}
+                  >
+                    <Option value="Success">Thành công</Option>
+                    <Option value="Failed">Thất bại</Option>
+                  </Select>
+                  <br />
+                  <Text>
+                    Created At:{" "}
+                    {format(new Date(client.createdDate), "dd/MM/yyyy")}
+                  </Text>
+                </div>
+              </div>
             </div>
           </Content>
         </Layout>

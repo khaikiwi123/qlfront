@@ -70,11 +70,7 @@ export default function User() {
             }}
           >
             <AppCrumbs
-              paths={[
-                { name: "Home", href: "/home" },
-                { name: "Users", href: "/users" },
-                { name: "Profile" },
-              ]}
+              paths={[{ name: "Users", href: "/users" }, { name: "Profile" }]}
             />
             <Title>Profile</Title>
             <Text>Name: {user.name}</Text>

@@ -75,7 +75,6 @@ const UpdateInfo = () => {
             <div style={{ padding: 24, minHeight: 360 }}>
               <AppCrumbs
                 paths={[
-                  { name: "Home", href: "/home" },
                   { name: "Profile", href: "/profile" },
                   { name: "Update info" },
                 ]}

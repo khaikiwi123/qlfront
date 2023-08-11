@@ -75,7 +75,6 @@ const Update = () => {
                 <Col span={12}>
                   <AppCrumbs
                     paths={[
-                      { name: "Home", href: "/home" },
                       { name: "Clients", href: "/clients" },
                       { name: "Profile", href: `/clients/${id}` },
                       { name: "Update" },

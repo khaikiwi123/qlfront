@@ -79,11 +79,7 @@ const Create = () => {
               }}
             >
               <AppCrumbs
-                paths={[
-                  { name: "Home", href: "/home" },
-                  { name: "Leads", href: "/leads" },
-                  { name: "Create" },
-                ]}
+                paths={[{ name: "Leads", href: "/leads" }, { name: "Create" }]}
               />
               <div
                 style={{

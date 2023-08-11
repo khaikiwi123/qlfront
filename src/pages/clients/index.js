@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { Layout, Button, Modal } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
@@ -14,6 +14,7 @@ import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 
 const ProtectedPage = () => {
+  const router = useRouter();
   const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -23,15 +24,27 @@ const ProtectedPage = () => {
     pageSize: 10,
   });
   const { logOut } = useLogout();
-  const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
-    useColumnSearch();
+  const {
+    searchParams,
+    handleSearch,
+    handleReset,
+    getColumnSearchProps,
+    setSearchParams,
+  } = useColumnSearch();
 
+  useEffect(() => {
+    const email = router.query.email;
+    if (email) {
+      setSearchParams((prev) => [...prev, { id: "email", value: email }]);
+    }
+  }, [router.query]);
   useEffect(() => {
     const loggedIn = localStorage.getItem("logged_in");
     if (loggedIn !== "true") {
       checkLogin();
       return;
     }
+
     setRole(localStorage.getItem("role"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
@@ -82,10 +95,10 @@ const ProtectedPage = () => {
             Modal.confirm({
               title: "Unauthorized Access",
               content: "You do not have permission to view this page",
-              okText: "Go back to Home",
+              okText: "Go back to lead",
               cancelText: "Logout",
               onOk() {
-                Router.push("/home");
+                router.push("/leads");
               },
               onCancel() {
                 logOut();
@@ -107,7 +120,7 @@ const ProtectedPage = () => {
       });
   }, [pagination, searchParams]);
 
-  const columns = [
+  let baseColumns = [
     {
       title: "Phone",
       dataIndex: "phone",
@@ -134,7 +147,7 @@ const ProtectedPage = () => {
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              Router.push(`/clients/${record._id}`);
+              router.push(`/clients/${record._id}`);
             }}
           >
             {record.org}
@@ -158,7 +171,16 @@ const ProtectedPage = () => {
       },
     },
   ];
+  if (role === "admin") {
+    baseColumns.push({
+      title: "In Charge",
+      dataIndex: "inCharge",
+      key: "inCharge",
+      ...getColumnSearchProps("inCharge", handleSearch, handleReset),
+    });
+  }
 
+  const columns = baseColumns;
   return (
     <>
       <style jsx global>{`
@@ -174,9 +196,7 @@ const ProtectedPage = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
-              <AppCrumbs
-                paths={[{ name: "Home", href: "/home" }, { name: "Clients" }]}
-              />
+              <AppCrumbs paths={[{ name: "Clients" }]} />
               <div
                 style={{
                   display: "flex",

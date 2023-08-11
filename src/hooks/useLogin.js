@@ -11,11 +11,14 @@ const useLogin = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const aToken = localStorage.getItem("access_token");
-    const rToken = localStorage.getItem("refresh_token");
-
-    if (aToken && rToken) {
-      router.push("/home");
+    const loggedIn = localStorage.getItem("logged_in");
+    const role = localStorage.getItem("role");
+    if (loggedIn === "true") {
+      if (role === "admin") {
+        router.push("/users");
+      } else {
+        router.push("/leads");
+      }
     }
   }, []);
 
@@ -43,7 +46,11 @@ const useLogin = () => {
 
       console.log(response.data);
       setUserData(response.data);
-      router.push("/home");
+      if (response.data.role === "admin") {
+        router.push("/users");
+      } else if (response.data.role === "user") {
+        router.push("/leads");
+      }
     } catch (error) {
       console.error(error);
       setErrMsg(error.response.data.error);

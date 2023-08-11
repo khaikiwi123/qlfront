@@ -92,11 +92,7 @@ const Create = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <AppCrumbs
-              paths={[
-                { name: "Home", href: "/home" },
-                { name: "Users", href: "/users" },
-                { name: "Create" },
-              ]}
+              paths={[{ name: "Users", href: "/users" }, { name: "Create" }]}
             />
             <div
               style={{
