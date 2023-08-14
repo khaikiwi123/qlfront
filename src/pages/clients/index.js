@@ -17,6 +17,7 @@ const ProtectedPage = () => {
   const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isSet, setIsSet] = useState(false);
   const [role, setRole] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -33,17 +34,14 @@ const ProtectedPage = () => {
   } = useColumnSearch();
 
   useEffect(() => {
-    const email = router.query.email;
-    if (email) {
-      setSearchParams((prev) => [...prev, { id: "email", value: email }]);
-    }
-  }, [router.query]);
-  useEffect(() => {
     const loggedIn = localStorage.getItem("logged_in");
     if (loggedIn !== "true") {
       checkLogin();
       return;
     }
+    if (!router.isReady) return;
+
+    const email = router.query.email;
 
     setRole(localStorage.getItem("role"));
     const currRole = localStorage.getItem("role");
@@ -60,6 +58,10 @@ const ProtectedPage = () => {
       if (currRole !== "admin") {
         params.inCharge = id;
       }
+    }
+    if (email && !isSet) {
+      params.email = email;
+      setIsSet(true);
     }
 
     const transformedFilters = searchParams.reduce((acc, filter) => {
@@ -118,7 +120,7 @@ const ProtectedPage = () => {
         }
         console.error(error);
       });
-  }, [pagination, searchParams]);
+  }, [pagination, searchParams, router.isReady]);
 
   let baseColumns = [
     {
