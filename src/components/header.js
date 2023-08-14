@@ -32,9 +32,9 @@ const AppHeader = () => {
     <Header
       style={{
         position: "fixed",
-        left: 0, // Position it to the leftmost
+        left: 0,
         width: "100%",
-        zIndex: 1, // Keep it under the Sider
+        zIndex: 1,
         padding: 0,
         display: "flex",
         justifyContent: "flex-end",

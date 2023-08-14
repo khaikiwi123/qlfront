@@ -27,8 +27,13 @@ const App = () => {
   });
 
   const { logOut } = useLogout();
-  const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
-    useColumnSearch();
+  const {
+    searchParams,
+    handleSearch,
+    handleReset,
+    getColumnSearchProps,
+    clearAllFilters,
+  } = useColumnSearch();
 
   const toggleStatus = async (_id, currentStatus) => {
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
@@ -322,10 +327,11 @@ const App = () => {
                   )}
                 </h1>
                 <div>
-                  <Button>Clear All Filters</Button>
+                  <Button onClick={clearAllFilters}>Clear All Filters</Button>
                 </div>
               </div>
               <UserTable
+                key={Date.now()}
                 columns={columns}
                 data={data}
                 total={total}

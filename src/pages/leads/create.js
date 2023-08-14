@@ -69,6 +69,9 @@ const Create = () => {
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
+            <AppCrumbs
+              paths={[{ name: "Leads", href: "/leads" }, { name: "Create" }]}
+            />
             <div
               style={{
                 padding: 24,
@@ -78,9 +81,6 @@ const Create = () => {
                 alignItems: "center",
               }}
             >
-              <AppCrumbs
-                paths={[{ name: "Leads", href: "/leads" }, { name: "Create" }]}
-              />
               <div
                 style={{
                   display: "flex",

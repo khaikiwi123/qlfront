@@ -10,7 +10,6 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
-import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 
 const ProtectedPage = () => {
@@ -30,6 +29,7 @@ const ProtectedPage = () => {
     handleReset,
     getColumnSearchProps,
     setSearchParams,
+    clearAllFilters,
   } = useColumnSearch();
 
   useEffect(() => {
@@ -131,6 +131,7 @@ const ProtectedPage = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      filteredValue: router.query.email ? [router.query.email] : null,
       ...getColumnSearchProps("email", handleSearch, handleReset),
     },
     {
@@ -196,7 +197,6 @@ const ProtectedPage = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
-              <AppCrumbs paths={[{ name: "Clients" }]} />
               <div
                 style={{
                   display: "flex",
@@ -214,8 +214,12 @@ const ProtectedPage = () => {
                 >
                   Accquired Clients List
                 </h1>
+                <div>
+                  <Button onClick={clearAllFilters}>Clear All Filters</Button>
+                </div>
               </div>
               <UserTable
+                key={Date.now()}
                 columns={columns}
                 data={clients}
                 total={total}

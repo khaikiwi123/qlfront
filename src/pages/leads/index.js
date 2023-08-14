@@ -9,9 +9,8 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import format from "date-fns/format";
+import { format, formatDistanceToNow } from "date-fns";
 import checkLogin from "@/Utils/checkLogin";
-import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 const { Option } = Select;
 
@@ -20,16 +19,19 @@ const ProtectedPage = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
-  const [userId, setUserId] = useState("");
-  const [trigger, setTrigger] = useState(false);
   const [showCreateButton, setShowCreateButton] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
   const { logOut } = useLogout();
-  const { searchParams, handleSearch, handleReset, getColumnSearchProps } =
-    useColumnSearch();
+  const {
+    searchParams,
+    handleSearch,
+    handleReset,
+    getColumnSearchProps,
+    clearAllFilters,
+  } = useColumnSearch();
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("logged_in");
@@ -64,9 +66,6 @@ const ProtectedPage = () => {
       ...params,
       ...transformedFilters,
     };
-    if (userId !== "") {
-      params.inCharge = userId;
-    }
 
     api
       .get("/leads/", { params })
@@ -108,7 +107,7 @@ const ProtectedPage = () => {
         }
         console.error(error);
       });
-  }, [pagination, searchParams, trigger]);
+  }, [pagination, searchParams]);
 
   const baseColumns = [
     {
@@ -173,7 +172,7 @@ const ProtectedPage = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
+      render: (status, record) => {
         let displayStatus;
         switch (status) {
           case "No contact":
@@ -194,6 +193,16 @@ const ProtectedPage = () => {
           default:
             displayStatus = "";
         }
+        const lastUpdated = record.statusUpdate
+          ? `Last updated ${formatDistanceToNow(new Date(record.statusUpdate), {
+              addSuffix: true,
+            })}`
+          : "";
+        return (
+          <Tooltip title={lastUpdated}>
+            <span>{displayStatus}</span>
+          </Tooltip>
+        );
         return <span>{displayStatus}</span>;
       },
       filterDropdown: ({
@@ -265,7 +274,6 @@ const ProtectedPage = () => {
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
-              <AppCrumbs paths={[{ name: "Leads" }]} />
               <div
                 style={{
                   display: "flex",
@@ -297,30 +305,11 @@ const ProtectedPage = () => {
                   )}
                 </h1>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  {role === "admin" && (
-                    <>
-                      <Input
-                        placeholder="Person In Charge Filter"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        style={{ width: 200, marginRight: "10px" }}
-                      />
-                      <Button onClick={() => setTrigger(!trigger)}>
-                        Set Filter
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setUserId("");
-                          setTrigger(!trigger);
-                        }}
-                      >
-                        Clear Filter
-                      </Button>
-                    </>
-                  )}
+                  <Button onClick={clearAllFilters}>Clear All Filters</Button>
                 </div>
               </div>
               <UserTable
+                key={Date.now()}
                 columns={columns}
                 data={leads}
                 total={total}

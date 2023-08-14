@@ -29,14 +29,20 @@ const useColumnSearch = () => {
       );
       return newFilters;
     });
+    const newQuery = { ...router.query };
+    delete newQuery[dataIndex];
     router.push(
       {
         pathname: router.pathname,
-        query: { ...router.query, [dataIndex]: undefined },
+        query: newQuery,
       },
       undefined,
       { shallow: true }
     );
+  };
+  const clearAllFilters = () => {
+    setSearchParams([]);
+    router.push(router.pathname, undefined, { shallow: true });
   };
 
   const getColumnSearchProps = (dataIndex, handleSearch, handleReset) => ({
@@ -99,6 +105,7 @@ const useColumnSearch = () => {
     handleReset,
     getColumnSearchProps,
     setSearchParams,
+    clearAllFilters,
   };
 };
 
