@@ -11,7 +11,7 @@ import {
 import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { message } from "antd";
+import { message, Timeline } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
@@ -29,8 +29,17 @@ export default function Lead() {
   const [role, setRole] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
+  const [changeLog, setChangeLogs] = useState([]);
   const router = useRouter();
   const id = router.query.id;
+  const fetchChangeLogs = async () => {
+    try {
+      const response = await api.get(`/leads/${id}/log`);
+      setChangeLogs(response.data.changelog);
+    } catch (error) {
+      console.error("Failed to fetch change logs:", error);
+    }
+  };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -61,7 +70,7 @@ export default function Lead() {
 
           router.push("/leads");
         }
-      });
+      }, fetchChangeLogs());
   }, [id, router]);
 
   const onDelete = async (id) => {
@@ -105,10 +114,18 @@ export default function Lead() {
         await onUpdateStatus(pendingStatus);
       }
       setPendingStatus("");
+      fetchChangeLogs();
     } catch (error) {
       console.error(error);
     }
     setModal(false);
+  };
+  const statusTranslations = {
+    "Not Contacted": "Chưa liên hệ",
+    "In contact": "Đã liên hệ",
+    "Verified needs": "Đã xác định nhu cầu",
+    Consulted: "Đã tư vấn",
+    Successful: "Thành công",
   };
 
   const statusToIndex = {
@@ -139,6 +156,17 @@ export default function Lead() {
         .info-container {
           flex: 2;
         }
+        .steps-container {
+          margin-top: -100px;
+        }
+        .ant-timeline.ant-timeline-label
+          .ant-timeline-item-left
+          .ant-timeline-item-content {
+          inset-inline-start: calc(50% - 4px);
+          width: auto;
+          text-align: start;
+        }
+
         .custom-steps.ant-steps.ant-steps-navigation .ant-steps-item::after {
           display: inline-block;
           width: 15px;
@@ -154,8 +182,8 @@ export default function Lead() {
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
-          <Content style={{ margin: "24px 16px 0" }}>
-            <div style={{ padding: 24, minHeight: 360, display: "flex" }}>
+          <Content style={{ margin: "0 16px 0" }}>
+            <div style={{ minHeight: 360, display: "flex" }}>
               <AppCrumbs
                 paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
               />
@@ -196,7 +224,7 @@ export default function Lead() {
                 <br />
                 <Text>Organization: {lead.org}</Text>
                 <br />
-                <Text>Representer: {lead.rep}</Text>
+                <Text>Representative: {lead.rep}</Text>
                 <br />
 
                 <Text>
@@ -205,7 +233,7 @@ export default function Lead() {
               </div>
             </div>
 
-            <div>
+            <div className="steps-container">
               <Steps
                 type="navigation"
                 size="small"
@@ -219,6 +247,35 @@ export default function Lead() {
                 <Step title="Đã tư vấn" />
                 <Step title="Thành công" />
               </Steps>
+            </div>
+            <h3 style={{ textAlign: "left" }}>History</h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                maxHeight: "200px",
+                overflowY: "auto",
+                border: "1px solid #d9d9d9",
+                borderRadius: "4px",
+                padding: "8px",
+              }}
+            >
+              <Timeline
+                style={{ textAlign: "left", marginTop: 0 }}
+                mode="left"
+                reverse="true"
+              >
+                {changeLog.map((log) => (
+                  <Timeline.Item
+                    label={format(new Date(log.updatedAt), "dd/MM/yyyy HH:mm")}
+                  >
+                    {log.changedBy} đã thay đổi trạng thái từ{" "}
+                    {statusTranslations[log.oldValue] || log.oldValue} sang{" "}
+                    {statusTranslations[log.newValue] || log.newValue}
+                  </Timeline.Item>
+                ))}
+              </Timeline>
             </div>
           </Content>
         </Layout>

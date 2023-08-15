@@ -125,7 +125,7 @@ const Create = () => {
                     <Input />
                   </Form.Item>
                   <Form.Item
-                    label="Representer"
+                    label="Representative"
                     name="rep"
                     rules={[
                       { required: true, message: "Please input your rep!" },

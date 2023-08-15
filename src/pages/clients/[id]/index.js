@@ -144,7 +144,7 @@ export default function Client() {
                   <br />
                   <Text>Organization: {client.org}</Text>
                   <br />
-                  <Text>Representer: {client.rep}</Text>
+                  <Text>Representative: {client.rep}</Text>
                   <br />
                   <Text>Status:</Text>
                   <Select

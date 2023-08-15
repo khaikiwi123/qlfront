@@ -158,16 +158,21 @@ const App = () => {
         </Link>
       ),
     },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      ...getColumnSearchProps("phone", handleSearch, handleReset),
-    },
+
     {
       title: "Role",
       dataIndex: "role",
       key: "role",
+      render: (text) => {
+        switch (text) {
+          case "admin":
+            return "Admin";
+          case "user":
+            return "N.V Sale";
+          default:
+            return text;
+        }
+      },
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -215,6 +220,12 @@ const App = () => {
           : "",
     },
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      ...getColumnSearchProps("phone", handleSearch, handleReset),
+    },
+    {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
@@ -239,9 +250,8 @@ const App = () => {
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
           >
-            <Select.Option value="">All</Select.Option>
-            <Select.Option value="true">Active</Select.Option>
-            <Select.Option value="false">Inactive</Select.Option>
+            <Select.Option value="true">Đang hoạt động</Select.Option>
+            <Select.Option value="false">Đã bị khóa</Select.Option>
           </Select>
           <Button
             type="primary"
@@ -274,8 +284,8 @@ const App = () => {
           {loadingStatus[record._id]
             ? "Loading..."
             : record.status
-            ? "Active"
-            : "Inactive"}
+            ? "Đang hoạt động"
+            : "Đã bị khóa"}
         </button>
       ),
     },
@@ -294,7 +304,6 @@ const App = () => {
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
-            <AppCrumbs paths={[{ name: "Users" }]} />
             <div style={{ padding: 24, minHeight: 360 }}>
               <div
                 style={{

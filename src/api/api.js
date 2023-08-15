@@ -32,6 +32,21 @@ export async function refreshToken() {
   }
 }
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 api.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem("access_token");
@@ -56,15 +71,35 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
       if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        try {
-          const access_token = await refreshToken();
-          originalRequest.headers["Authorization"] = "Bearer " + access_token;
-          return api(originalRequest);
-        } catch (refreshError) {
-          console.error("Failed to refresh token:", refreshError);
-          return Promise.reject(refreshError);
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers["Authorization"] = "Bearer " + token;
+              return api(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
         }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        return new Promise((resolve, reject) => {
+          refreshToken()
+            .then((token) => {
+              originalRequest.headers["Authorization"] = "Bearer " + token;
+              processQueue(null, token);
+              resolve(api(originalRequest));
+            })
+            .catch((err) => {
+              processQueue(err, null);
+              reject(err);
+            })
+            .then(() => {
+              isRefreshing = false;
+            });
+        });
       }
     }
     return Promise.reject(error);

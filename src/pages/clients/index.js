@@ -29,7 +29,6 @@ const ProtectedPage = () => {
     handleSearch,
     handleReset,
     getColumnSearchProps,
-    setSearchParams,
     clearAllFilters,
   } = useColumnSearch();
 

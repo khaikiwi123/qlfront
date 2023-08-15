@@ -203,7 +203,6 @@ const ProtectedPage = () => {
             <span>{displayStatus}</span>
           </Tooltip>
         );
-        return <span>{displayStatus}</span>;
       },
       filterDropdown: ({
         setSelectedKeys,
