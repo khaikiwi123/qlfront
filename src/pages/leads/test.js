@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, DatePicker, Tooltip } from "antd";
+import { Layout, Button, Modal, DatePicker, Tooltip } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
@@ -9,11 +8,9 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { format, formatDistanceToNow } from "date-fns";
+import moment from "moment";
 import checkLogin from "@/Utils/checkLogin";
 const { Content } = Layout;
-const { Option } = Select;
-
 const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
@@ -130,68 +127,14 @@ const ProtectedPage = () => {
         : null,
       ...getColumnSearchProps("phone", handleSearch, handleReset),
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      fixed: "left",
-      filteredValue: searchParams.find((filter) => filter.id === "email")?.value
-        ? [searchParams.find((filter) => filter.id === "email").value]
-        : null,
-      ...getColumnSearchProps("email", handleSearch, handleReset),
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (email) => (
-        <Tooltip placement="topLeft" title={email}>
-          {email}
-        </Tooltip>
-      ),
-    },
-
-    {
-      title: "Organization",
-      dataIndex: "org",
-      key: "org",
-      filteredValue: searchParams.find((filter) => filter.id === "org")?.value
-        ? [searchParams.find((filter) => filter.id === "org").value]
-        : null,
-      ...getColumnSearchProps("org", handleSearch, handleReset),
-      render: (text, record) => (
-        <Link href={`/leads/${record._id}`}>
-          <Button
-            type="link"
-            color="neutral"
-            size="sm"
-            variant="plain"
-            onClick={(e) => {
-              e.preventDefault();
-              Router.push(`/leads/${record._id}`);
-            }}
-          >
-            {record.org}
-          </Button>
-        </Link>
-      ),
-    },
-    {
-      title: "Representative",
-      dataIndex: "rep",
-      key: "rep",
-      filteredValue: searchParams.find((filter) => filter.id === "rep")?.value
-        ? [searchParams.find((filter) => filter.id === "rep").value]
-        : null,
-      ...getColumnSearchProps("rep", handleSearch, handleReset),
-    },
 
     {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
-        return format(new Date(date), "dd/MM/yyyy");
+        return moment(date).format("DD/MM/YYYY");
       },
-
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -203,10 +146,10 @@ const ProtectedPage = () => {
             style={{ marginBottom: 8, display: "block" }}
             onChange={(dates) => {
               const formattedStart = dates[0]
-                ? format(dates[0].toDate(), "dd/M/yyyy")
+                ? dates[0].format("DD/MM/YYYY")
                 : null;
               const formattedEnd = dates[1]
-                ? format(dates[1].toDate(), "dd/M/yyyy")
+                ? dates[1].format("DD/MM/YYYY")
                 : null;
               setSelectedKeys([
                 { startDate: formattedStart, endDate: formattedEnd },
@@ -231,97 +174,13 @@ const ProtectedPage = () => {
           </Button>
         </div>
       ),
-
       onFilter: (value, record) => {
         if (!value || value.length !== 2) return true;
-        const startDate = new Date(value[0]);
-        const endDate = new Date(value[1]);
-        const createdDate = new Date(record.createdDate);
-        return createdDate >= startDate && createdDate <= endDate;
+        const startDate = moment(value[0]);
+        const endDate = moment(value[1]);
+        const createdDate = moment(record.createdDate);
+        return createdDate.isBetween(startDate, endDate, null, "[]");
       },
-    },
-
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      filteredValue: searchParams.find((filter) => filter.id === "status")
-        ?.value
-        ? [searchParams.find((filter) => filter.id === "status").value]
-        : null,
-      render: (status, record) => {
-        let displayStatus;
-        switch (status) {
-          case "No contact":
-            displayStatus = "Chưa liên hệ";
-            break;
-          case "In contact":
-            displayStatus = "Đã liên hệ";
-            break;
-          case "Verified needs":
-            displayStatus = "Đã xác định nhu cầu";
-            break;
-          case "Consulted":
-            displayStatus = "Đã tư vấn";
-            break;
-          case "Success":
-            displayStatus = "Thành công";
-            break;
-          default:
-            displayStatus = "";
-        }
-        const lastUpdated = record.statusUpdate
-          ? `Last updated ${formatDistanceToNow(new Date(record.statusUpdate), {
-              addSuffix: true,
-            })}`
-          : "";
-        return (
-          <Tooltip title={lastUpdated}>
-            <span>{displayStatus}</span>
-          </Tooltip>
-        );
-      },
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: 188, marginBottom: 8, display: "block" }}
-            placeholder="Select Status"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
-          >
-            <Option value="No contact">Chưa liên hệ</Option>
-            <Option value="In contact">Đã liên hệ</Option>
-            <Option value="Verified needs">Đã xác định nhu cầu</Option>
-            <Option value="Consulted">Đã tư vấn</Option>
-            <Option value="Success">Thành công</Option>
-          </Select>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "status")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "status")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
-      ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-      ),
-      onFilter: (value, record) => record["status"].toString() === value,
     },
   ];
   if (role === "admin") {
