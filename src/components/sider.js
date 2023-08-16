@@ -38,7 +38,7 @@ const AppSider = ({ role }) => {
             Leads
           </Menu.Item>
           <Menu.Item key="2" onClick={() => Router.push("/clients")}>
-            Success
+            Clients
           </Menu.Item>
         </SubMenu>
 

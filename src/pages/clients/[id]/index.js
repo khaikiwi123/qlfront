@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Layout, Button, Typography, Spin, Modal, Avatar } from "antd";
+import { Layout, Button, Typography, Spin, Avatar } from "antd";
 import api from "@/api/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { message, Select } from "antd";
+import { message } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import { EditOutlined } from "@ant-design/icons";
@@ -12,12 +12,10 @@ import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 export default function Client() {
   const [client, setClient] = useState(null);
-  const [loadingStatus, setLoadingStatus] = useState(false);
-  const [showModal, setModal] = useState(false);
+
   const [role, setRole] = useState("");
   const [editMode, setEditMode] = useState(false);
 
@@ -56,48 +54,11 @@ export default function Client() {
       });
   }, [id, router]);
 
-  const onUpdateStatus = async (newStatus) => {
-    if (newStatus === "Failed") {
-      setModal(true);
-      return;
-    }
-    setLoadingStatus(true);
-    try {
-      await api.put(`/clients/${id}`, { status: newStatus });
-      setClient({ ...client, status: newStatus });
-    } catch (error) {
-      console.error(error);
-    }
-    setLoadingStatus(false);
-  };
-
   if (client === null) {
     return <Spin size="large" />;
   }
-  const handleConfirmSuccess = async () => {
-    setLoadingStatus(true);
-    try {
-      await api.put(`/clients/${id}`, { status: "Failed" });
-      setClient({ ...client, status: "Failed" });
-      router.push("/leads");
-    } catch (error) {
-      console.error(error);
-    }
-    setLoadingStatus(false);
-  };
-
-  const handleCancelSuccess = () => {
-    setModal(false);
-  };
   return (
     <>
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
@@ -146,18 +107,7 @@ export default function Client() {
                   <br />
                   <Text>Representative: {client.rep}</Text>
                   <br />
-                  <Text>Status:</Text>
-                  <Select
-                    value={client.status}
-                    onChange={onUpdateStatus}
-                    loading={loadingStatus}
-                    disabled={loadingStatus}
-                    style={{ width: 200 }}
-                  >
-                    <Option value="Success">Thành công</Option>
-                    <Option value="Failed">Thất bại</Option>
-                  </Select>
-                  <br />
+
                   <Text>
                     Created At:{" "}
                     {format(new Date(client.createdDate), "dd/MM/yyyy")}
@@ -168,14 +118,6 @@ export default function Client() {
           </Content>
         </Layout>
       </Layout>
-      <Modal
-        title="Confirm Status Change"
-        visible={showModal}
-        onOk={handleConfirmSuccess}
-        onCancel={handleCancelSuccess}
-      >
-        <p>Are you sure you want to set this client's status to "Failed"?</p>
-      </Modal>
     </>
   );
 }

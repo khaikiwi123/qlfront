@@ -126,19 +126,31 @@ const ProtectedPage = () => {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
+      fixed: "left",
+      filteredValue: searchParams.find((filter) => filter.id === "phone")?.value
+        ? [searchParams.find((filter) => filter.id === "phone").value]
+        : null,
       ...getColumnSearchProps("phone", handleSearch, handleReset),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      filteredValue: router.query.email ? [router.query.email] : null,
+      fixed: "left",
+      filteredValue: searchParams.find((filter) => filter.id === "email")?.value
+        ? [searchParams.find((filter) => filter.id === "email").value]
+        : router.query.email
+        ? [router.query.email]
+        : null,
       ...getColumnSearchProps("email", handleSearch, handleReset),
     },
     {
       title: "Organization",
       dataIndex: "org",
       key: "org",
+      filteredValue: searchParams.find((filter) => filter.id === "org")?.value
+        ? [searchParams.find((filter) => filter.id === "org").value]
+        : null,
       ...getColumnSearchProps("org", handleSearch, handleReset),
       render: (text, record) => (
         <Link href={`/clients/${record._id}`}>
@@ -161,6 +173,9 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
+      filteredValue: searchParams.find((filter) => filter.id === "rep")?.value
+        ? [searchParams.find((filter) => filter.id === "rep").value]
+        : null,
       ...getColumnSearchProps("rep", handleSearch, handleReset),
     },
 
@@ -185,13 +200,6 @@ const ProtectedPage = () => {
   const columns = baseColumns;
   return (
     <>
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
@@ -213,7 +221,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Accquired Clients List
+                  Accquired Clients
                 </h1>
                 <div>
                   <Button onClick={clearAllFilters}>Clear All Filters</Button>

@@ -54,6 +54,9 @@ export const handleApiError = (error, role) => {
       case "Email isn't valid":
         emailError = errorMsg;
         break;
+      case "Phone isn't valid":
+        phoneError = errorMsg;
+        break;
       case "Sale user doesn't exist":
         saleError = errorMsg;
         break;

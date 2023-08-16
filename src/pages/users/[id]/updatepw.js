@@ -62,13 +62,6 @@ const UpdateUserPW = () => {
   return (
     <>
       {" "}
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>

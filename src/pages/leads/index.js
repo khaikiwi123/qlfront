@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, Input, Tooltip } from "antd";
+import { Layout, Button, Modal, Select, DatePicker, Tooltip } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import useColumnSearch from "@/hooks/useColumnSearch";
@@ -57,11 +57,21 @@ const ProtectedPage = () => {
     }
 
     const transformedFilters = searchParams.reduce((acc, filter) => {
-      if (filter.value !== "all") {
+      if (filter.id === "createdDate") {
+        if (filter.value) {
+          if (filter.value.startDate) {
+            acc.startDate = filter.value.startDate;
+          }
+          if (filter.value.endDate) {
+            acc.endDate = filter.value.endDate;
+          }
+        }
+      } else if (filter.value !== "all") {
         acc[filter.id] = filter.value;
       }
       return acc;
     }, {});
+
     params = {
       ...params,
       ...transformedFilters,
@@ -114,12 +124,20 @@ const ProtectedPage = () => {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
+      fixed: "left",
+      filteredValue: searchParams.find((filter) => filter.id === "phone")?.value
+        ? [searchParams.find((filter) => filter.id === "phone").value]
+        : null,
       ...getColumnSearchProps("phone", handleSearch, handleReset),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      fixed: "left",
+      filteredValue: searchParams.find((filter) => filter.id === "email")?.value
+        ? [searchParams.find((filter) => filter.id === "email").value]
+        : null,
       ...getColumnSearchProps("email", handleSearch, handleReset),
       ellipsis: {
         showTitle: false,
@@ -135,6 +153,9 @@ const ProtectedPage = () => {
       title: "Organization",
       dataIndex: "org",
       key: "org",
+      filteredValue: searchParams.find((filter) => filter.id === "org")?.value
+        ? [searchParams.find((filter) => filter.id === "org").value]
+        : null,
       ...getColumnSearchProps("org", handleSearch, handleReset),
       render: (text, record) => (
         <Link href={`/leads/${record._id}`}>
@@ -157,6 +178,9 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
+      filteredValue: searchParams.find((filter) => filter.id === "rep")?.value
+        ? [searchParams.find((filter) => filter.id === "rep").value]
+        : null,
       ...getColumnSearchProps("rep", handleSearch, handleReset),
     },
 
@@ -167,7 +191,56 @@ const ProtectedPage = () => {
       render: (date) => {
         return format(new Date(date), "dd/MM/yyyy");
       },
+
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <DatePicker.RangePicker
+            style={{ marginBottom: 8, display: "block" }}
+            onChange={(dates) => {
+              const formattedStart = dates[0]
+                ? format(dates[0].toDate(), "dd/M/yyyy")
+                : null;
+              const formattedEnd = dates[1]
+                ? format(dates[1].toDate(), "dd/M/yyyy")
+                : null;
+              setSelectedKeys([
+                { startDate: formattedStart, endDate: formattedEnd },
+              ]);
+            }}
+          />
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, "createdDate")}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters, confirm, "createdDate")}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      ),
+
+      onFilter: (value, record) => {
+        if (!value || value.length !== 2) return true;
+        const startDate = new Date(value[0]);
+        const endDate = new Date(value[1]);
+        const createdDate = new Date(record.createdDate);
+        return createdDate >= startDate && createdDate <= endDate;
+      },
     },
+
     {
       title: "Status",
       dataIndex: "status",
@@ -260,13 +333,6 @@ const ProtectedPage = () => {
 
   return (
     <>
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
@@ -288,7 +354,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Potential Lead List
+                  Leads Contact
                   <PlusOutlined
                     style={{ marginLeft: "10px", cursor: "pointer" }}
                     onClick={() => setShowCreateButton(!showCreateButton)}

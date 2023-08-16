@@ -10,7 +10,6 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import format from "date-fns/format";
-import AppCrumbs from "@/components/breadcrumbs";
 
 const { Content } = Layout;
 const App = () => {
@@ -292,13 +291,6 @@ const App = () => {
   ];
   return (
     <>
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>

@@ -121,11 +121,11 @@ export default function Lead() {
     setModal(false);
   };
   const statusTranslations = {
-    "Not Contacted": "Chưa liên hệ",
+    "No contact": "Chưa liên hệ",
     "In contact": "Đã liên hệ",
     "Verified needs": "Đã xác định nhu cầu",
     Consulted: "Đã tư vấn",
-    Successful: "Thành công",
+    Success: "Thành công",
   };
 
   const statusToIndex = {
@@ -139,45 +139,6 @@ export default function Lead() {
 
   return (
     <>
-      <style jsx global>{`
-        body,
-        html {
-          margin: 0;
-          padding: 0;
-        }
-
-        .avatar-container {
-          flex: 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .info-container {
-          flex: 2;
-        }
-        .steps-container {
-          margin-top: -100px;
-        }
-        .ant-timeline.ant-timeline-label
-          .ant-timeline-item-left
-          .ant-timeline-item-content {
-          inset-inline-start: calc(50% - 4px);
-          width: auto;
-          text-align: start;
-        }
-
-        .custom-steps.ant-steps.ant-steps-navigation .ant-steps-item::after {
-          display: inline-block;
-          width: 15px;
-          height: 15px;
-          border-top: 2px solid #001d66;
-          border-bottom: none;
-          border-inline-start: none;
-          border-inline-end: 2px solid #001d66;
-          transform: translateY(-50%) translateX(-50%) rotate(45deg);
-        }
-      `}</style>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
@@ -261,21 +222,28 @@ export default function Lead() {
                 padding: "8px",
               }}
             >
-              <Timeline
-                style={{ textAlign: "left", marginTop: 0 }}
-                mode="left"
-                reverse="true"
-              >
-                {changeLog.map((log) => (
-                  <Timeline.Item
-                    label={format(new Date(log.updatedAt), "dd/MM/yyyy HH:mm")}
-                  >
-                    {log.changedBy} đã thay đổi trạng thái từ{" "}
-                    {statusTranslations[log.oldValue] || log.oldValue} sang{" "}
-                    {statusTranslations[log.newValue] || log.newValue}
-                  </Timeline.Item>
-                ))}
-              </Timeline>
+              {changeLog.length > 0 ? (
+                <Timeline
+                  style={{ textAlign: "left", marginTop: 0 }}
+                  mode="left"
+                  reverse="true"
+                >
+                  {changeLog.map((log) => (
+                    <Timeline.Item
+                      label={format(
+                        new Date(log.updatedAt),
+                        "dd/MM/yyyy HH:mm"
+                      )}
+                    >
+                      {log.changedBy} đã thay đổi trạng thái từ{" "}
+                      {statusTranslations[log.oldValue] || log.oldValue} sang{" "}
+                      {statusTranslations[log.newValue] || log.newValue}
+                    </Timeline.Item>
+                  ))}
+                </Timeline>
+              ) : (
+                <p>History is empty</p>
+              )}
             </div>
           </Content>
         </Layout>
@@ -290,7 +258,8 @@ export default function Lead() {
         }}
       >
         <p>
-          Are you sure you want to set this lead's status to "{pendingStatus}"?
+          Are you sure you want to set this lead's status to "
+          {statusTranslations[pendingStatus]}"?
         </p>
       </Modal>
     </>
