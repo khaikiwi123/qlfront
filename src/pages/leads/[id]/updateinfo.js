@@ -9,6 +9,8 @@ import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 import { handleApiError } from "@/api/error";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
 
 const Update = () => {
   const router = useRouter();
@@ -22,6 +24,7 @@ const Update = () => {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
 
+  const { logOut } = useLogout();
   useEffect(() => {
     setRole(localStorage.getItem("role"));
     const loggedIn = localStorage.getItem("logged_in");
@@ -47,6 +50,7 @@ const Update = () => {
       router.push(`/leads/${id}`);
     } catch (error) {
       console.error(error);
+      authErr(error, logOut);
       const { emailError, phoneError } = handleApiError(error, role);
       setEmailErr(emailError);
       setPhoneErr(phoneError);

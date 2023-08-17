@@ -6,6 +6,9 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import Link from "next/link";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
+
 const { Content } = Layout;
 
 const UpdateInfo = () => {
@@ -18,6 +21,7 @@ const UpdateInfo = () => {
   const [role, setRole] = useState("");
   const [id, setId] = useState("");
 
+  const { logOut } = useLogout();
   const router = useRouter();
   useEffect(() => {
     setRole(localStorage.getItem("role"));
@@ -45,6 +49,7 @@ const UpdateInfo = () => {
       router.push(`/profile`);
     } catch (error) {
       console.error(error);
+      authErr(error, logOut);
       const errorMsg = error.response.data.error;
       if (errorMsg === "Email existed" || errorMsg === "Email isn't valid") {
         setEmailErr(errorMsg);

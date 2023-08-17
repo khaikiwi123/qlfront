@@ -8,6 +8,8 @@ import AppSider from "@/components/sider";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -17,6 +19,7 @@ export default function User() {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [currID, setCurrID] = useState("");
 
+  const { logOut } = useLogout();
   const router = useRouter();
   const id = router.query.id;
 
@@ -34,6 +37,7 @@ export default function User() {
       })
       .catch((err) => {
         console.error(err);
+        authErr(err, logOut);
       });
   }, [id, router]);
 
@@ -45,7 +49,18 @@ export default function User() {
   };
 
   if (user === null) {
-    return <Spin size="large" />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
   }
 
   return (

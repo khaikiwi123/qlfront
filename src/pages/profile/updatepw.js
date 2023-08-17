@@ -6,6 +6,8 @@ import { Form, Input, Button, Layout, Row, Col } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
 
 const { Content } = Layout;
 
@@ -20,6 +22,7 @@ const UpdateUserPW = () => {
   const [confirmErr, setConfirmErr] = useState("");
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
+  const { logOut } = useLogout();
   useEffect(() => {
     setID(localStorage.getItem("currID"));
     setRole(localStorage.getItem("role"));
@@ -50,6 +53,7 @@ const UpdateUserPW = () => {
       Router.push("/profile");
     } catch (error) {
       console.error(error);
+      authErr(error, logOut);
       const errMsg = error.response.data.error;
       if (errMsg === "Please fill out all the form.") {
         setOldPassErr(oldPassword ? "" : "This field is required");

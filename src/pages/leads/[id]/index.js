@@ -18,6 +18,8 @@ import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
 import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -32,6 +34,8 @@ export default function Lead() {
   const [changeLog, setChangeLogs] = useState([]);
   const router = useRouter();
   const id = router.query.id;
+  const { logOut } = useLogout();
+
   const fetchChangeLogs = async () => {
     try {
       const response = await api.get(`/leads/${id}/log`);
@@ -56,7 +60,7 @@ export default function Lead() {
       })
       .catch((err) => {
         console.error(err);
-
+        authErr(err, logOut);
         const inchargeEmail = err.response?.data?.incharge;
 
         if (err.response?.data?.error === "Not authorized") {
@@ -96,7 +100,18 @@ export default function Lead() {
   };
 
   if (lead === null) {
-    return <Spin size="large" />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
   }
   const onChangeStatusStep = (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);

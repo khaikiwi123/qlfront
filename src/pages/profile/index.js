@@ -8,15 +8,15 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import format from "date-fns/format";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 export default function User() {
   const [user, setUser] = useState(null);
-  const [hasError, setHasError] = useState(false);
   const [role, setRole] = useState("");
-  const { logOut, loading } = useLogout();
+  const { logOut } = useLogout();
 
   useEffect(() => {
     const id = localStorage.getItem("currID");
@@ -34,24 +34,23 @@ export default function User() {
       })
       .catch((err) => {
         console.error(err);
-        setHasError(true);
+        authErr(err, logOut);
       });
   }, []);
 
-  if (hasError) {
+  if (user === null) {
     return (
-      <div>
-        <Title>SESSION EXPIRED</Title>
-        <Text>Please log back in</Text>
-        <Button disabled={loading} onClick={logOut} loading={loading}>
-          Log out
-        </Button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
       </div>
     );
-  }
-
-  if (user === null) {
-    return <Spin size="large" />;
   }
 
   return (

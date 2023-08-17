@@ -9,6 +9,8 @@ import AppSider from "@/components/sider";
 import { EditOutlined } from "@ant-design/icons";
 import { format } from "date-fns";
 import checkLogin from "@/Utils/checkLogin";
+import useLogout from "@/hooks/useLogout";
+import authErr from "@/api/authErr";
 import AppCrumbs from "@/components/breadcrumbs";
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -19,6 +21,7 @@ export default function Client() {
   const [role, setRole] = useState("");
   const [editMode, setEditMode] = useState(false);
 
+  const { logOut } = useLogout();
   const router = useRouter();
   const id = router.query.id;
 
@@ -37,7 +40,7 @@ export default function Client() {
       })
       .catch((err) => {
         console.error(err);
-
+        authErr(err, logOut);
         const inchargeEmail = err.response?.data?.incharge;
 
         if (err.response?.data?.error === "Not authorized") {
@@ -55,8 +58,20 @@ export default function Client() {
   }, [id, router]);
 
   if (client === null) {
-    return <Spin size="large" />;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
   }
+
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>

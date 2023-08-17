@@ -82,7 +82,9 @@ const useColumnSearch = () => {
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      <SearchOutlined
+        style={{ color: filtered ? "#1890ff" : undefined, marginRight: "5px" }}
+      />
     ),
     onFilter: (value, record) =>
       record[dataIndex]

@@ -9,10 +9,13 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { format, formatDistanceToNow } from "date-fns";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import checkLogin from "@/Utils/checkLogin";
+import authErr from "@/api/authErr";
 const { Content } = Layout;
 const { Option } = Select;
+dayjs.extend(relativeTime);
 
 const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
@@ -25,6 +28,7 @@ const ProtectedPage = () => {
     pageSize: 10,
   });
   const { logOut } = useLogout();
+  const dateFormat = "DD/MM/YYYY";
   const {
     searchParams,
     handleSearch,
@@ -66,7 +70,7 @@ const ProtectedPage = () => {
             acc.endDate = filter.value.endDate;
           }
         }
-      } else if (filter.value !== "all") {
+      } else {
         acc[filter.id] = filter.value;
       }
       return acc;
@@ -86,36 +90,7 @@ const ProtectedPage = () => {
       })
       .catch((error) => {
         setLoading(false);
-        if (error.response) {
-          if (error.response.status === 401) {
-            Modal.error({
-              title: "Session expired",
-              content: "Please log in again",
-              onOk() {
-                logOut();
-              },
-            });
-          } else if (error.response.status === 403) {
-            Modal.confirm({
-              title: "Unauthorized Access",
-              content: "You do not have permission to view this page",
-              okText: "Go back",
-              cancelText: "Logout",
-              onOk() {
-                Router.push("/leads");
-              },
-              onCancel() {
-                logOut();
-              },
-            });
-          }
-        } else {
-          Modal.error({
-            title: "An error occurred",
-            content: "Please try again later",
-          });
-        }
-        console.error(error);
+        authErr(error, logOut);
       });
   }, [pagination, searchParams]);
 
@@ -125,6 +100,7 @@ const ProtectedPage = () => {
       dataIndex: "phone",
       key: "phone",
       fixed: "left",
+      ellipsis: true,
       filteredValue: searchParams.find((filter) => filter.id === "phone")?.value
         ? [searchParams.find((filter) => filter.id === "phone").value]
         : null,
@@ -139,9 +115,7 @@ const ProtectedPage = () => {
         ? [searchParams.find((filter) => filter.id === "email").value]
         : null,
       ...getColumnSearchProps("email", handleSearch, handleReset),
-      ellipsis: {
-        showTitle: false,
-      },
+      ellipsis: true,
       render: (email) => (
         <Tooltip placement="topLeft" title={email}>
           {email}
@@ -189,9 +163,9 @@ const ProtectedPage = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
-        return format(new Date(date), "dd/MM/yyyy");
+        return dayjs(date).format("DD/MM/YYYY");
       },
-
+      //maybe move this part out
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
@@ -201,12 +175,14 @@ const ProtectedPage = () => {
         <div style={{ padding: 8 }}>
           <DatePicker.RangePicker
             style={{ marginBottom: 8, display: "block" }}
+            format={dateFormat}
+            allowEmpty={[true, true]}
             onChange={(dates) => {
               const formattedStart = dates[0]
-                ? format(dates[0].toDate(), "dd/M/yyyy")
+                ? dates[0].format("DD/MM/YYYY")
                 : null;
               const formattedEnd = dates[1]
-                ? format(dates[1].toDate(), "dd/M/yyyy")
+                ? dates[1].format("DD/MM/YYYY")
                 : null;
               setSelectedKeys([
                 { startDate: formattedStart, endDate: formattedEnd },
@@ -218,7 +194,7 @@ const ProtectedPage = () => {
             onClick={() => handleSearch(selectedKeys, confirm, "createdDate")}
             icon={<SearchOutlined />}
             size="small"
-            style={{ width: 90, marginRight: 8 }}
+            style={{ width: 90, marginRight: 10 }}
           >
             Search
           </Button>
@@ -271,9 +247,7 @@ const ProtectedPage = () => {
             displayStatus = "";
         }
         const lastUpdated = record.statusUpdate
-          ? `Last updated ${formatDistanceToNow(new Date(record.statusUpdate), {
-              addSuffix: true,
-            })}`
+          ? `Last updated ${dayjs(record.statusUpdate).fromNow()}`
           : "";
         return (
           <Tooltip title={lastUpdated}>
@@ -281,6 +255,7 @@ const ProtectedPage = () => {
           </Tooltip>
         );
       },
+      //maybe also this
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,

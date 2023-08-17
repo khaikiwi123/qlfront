@@ -10,6 +10,7 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
+import authErr from "@/api/authErr";
 const { Content } = Layout;
 
 const ProtectedPage = () => {
@@ -83,41 +84,7 @@ const ProtectedPage = () => {
       })
       .catch((error) => {
         setLoading(false);
-        if (error.response) {
-          if (error.response.status === 401) {
-            Modal.error({
-              title: "Session expired",
-              content: "Please log in again",
-              onOk() {
-                logOut();
-              },
-            });
-          } else if (error.response.status === 403) {
-            Modal.confirm({
-              title: "Unauthorized Access",
-              content: "You do not have permission to view this page",
-              okText: "Go back to lead",
-              cancelText: "Logout",
-              onOk() {
-                router.push("/leads");
-              },
-              onCancel() {
-                logOut();
-              },
-            });
-          } else {
-            Modal.error({
-              title: "An error occurred",
-              content: error.response.data.message || "Please try again later",
-            });
-          }
-        } else {
-          Modal.error({
-            title: "An error occurred",
-            content: "Please try again later",
-          });
-        }
-        console.error(error);
+        authErr(error, logOut);
       });
   }, [pagination, searchParams, router.isReady]);
 

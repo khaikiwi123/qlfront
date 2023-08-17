@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import api from "@/api/api";
 import Link from "next/link";
 import Router from "next/router";
-import { Form, Input, Button, Layout, message } from "antd";
+import { Form, Input, Button, Layout } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
 import { handleApiError } from "@/api/error";
 import AppCrumbs from "@/components/breadcrumbs";
+import authErr from "@/api/authErr";
+import useLogout from "@/hooks/useLogout";
 
 const { Content } = Layout;
 
@@ -19,7 +21,7 @@ const Create = () => {
   const [emailErr, setEmailErr] = useState("");
   const [phoneErr, setPhoneErr] = useState("");
   const [saleErr, setSaleErr] = useState("");
-
+  const { logOut } = useLogout();
   useEffect(() => {
     setId(localStorage.getItem("currUser"));
     setRole(localStorage.getItem("role"));
@@ -46,6 +48,7 @@ const Create = () => {
       Router.push("/leads");
     } catch (error) {
       console.error(error);
+      authErr(error, logOut);
       const { emailError, phoneError, saleError } = handleApiError(error, role);
       setEmailErr(emailError);
       setPhoneErr(phoneError);
