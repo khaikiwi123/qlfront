@@ -8,7 +8,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import moment from "moment";
+import dayjs from "dayjs";
 import checkLogin from "@/Utils/checkLogin";
 const { Content } = Layout;
 const ProtectedPage = () => {
@@ -133,7 +133,7 @@ const ProtectedPage = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
-        return moment(date).format("DD/MM/YYYY");
+        return dayjs(date).format("DD/MM/YYYY");
       },
       filterDropdown: ({
         setSelectedKeys,
@@ -176,9 +176,9 @@ const ProtectedPage = () => {
       ),
       onFilter: (value, record) => {
         if (!value || value.length !== 2) return true;
-        const startDate = moment(value[0]);
-        const endDate = moment(value[1]);
-        const createdDate = moment(record.createdDate);
+        const startDate = dayjs(value[0]);
+        const endDate = dayjs(value[1]);
+        const createdDate = dayjs(record.createdDate);
         return createdDate.isBetween(startDate, endDate, null, "[]");
       },
     },
