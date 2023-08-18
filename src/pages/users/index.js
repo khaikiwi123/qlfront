@@ -100,13 +100,13 @@ const App = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      ...getColumnSearchProps("name", handleSearch, handleReset),
+      ...getColumnSearchProps("name", handleSearch, handleReset, searchParams),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      ...getColumnSearchProps("email", handleSearch, handleReset),
+      ...getColumnSearchProps("email", handleSearch, handleReset, searchParams),
       render: (text, record) => (
         <Link href={`/users/${record._id}`}>
           <Button
@@ -189,7 +189,7 @@ const App = () => {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
-      ...getColumnSearchProps("phone", handleSearch, handleReset),
+      ...getColumnSearchProps("phone", handleSearch, handleReset, searchParams),
     },
     {
       title: "Created Date",

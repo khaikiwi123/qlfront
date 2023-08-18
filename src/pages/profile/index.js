@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import api from "../../api/api";
-import Link from "next/link";
-import checkLogin from "@/Utils/checkLogin";
-import useLogout from "../../hooks/useLogout";
-import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
-import AppHeader from "@/components/header";
-import AppSider from "@/components/sider";
-import format from "date-fns/format";
-import AppCrumbs from "@/components/breadcrumbs";
-import authErr from "@/api/authErr";
 
+import Link from "next/link";
+
+import { Layout, Button, Typography, Spin } from "antd";
 const { Content } = Layout;
 const { Title, Text } = Typography;
+
+import api from "../../api/api";
+import checkLogin from "@/Utils/checkLogin";
+import format from "date-fns/format";
+import authErr from "@/api/authErr";
+
+import useLogout from "../../hooks/useLogout";
+
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
 
 export default function User() {
   const [user, setUser] = useState(null);
@@ -55,7 +58,6 @@ export default function User() {
 
   return (
     <>
-      {" "}
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
@@ -68,7 +70,6 @@ export default function User() {
               alignItems: "start",
             }}
           >
-            <AppCrumbs paths={[{ name: "Profile" }]} />
             <Title>Profile</Title>
             <Text>Name: {user.name}</Text>
             <Text>Email: {user.email}</Text>

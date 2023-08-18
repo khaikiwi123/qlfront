@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import api from "@/api/api";
 import { useRouter } from "next/router";
 import { Form, Input, Button, Layout, Row, Col } from "antd";
+
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
-import Link from "next/link";
-import checkLogin from "@/Utils/checkLogin";
-import { handleApiError } from "@/api/error";
 import AppCrumbs from "@/components/breadcrumbs";
+
+import Link from "next/link";
+
+import api from "@/api/api";
+import checkLogin from "@/Utils/checkLogin";
+import { metaErr } from "@/api/metaErr";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 
@@ -16,6 +19,7 @@ const { Content } = Layout;
 const Update = () => {
   const router = useRouter();
   const id = router.query.id;
+
   const [email, setEmail] = useState("");
   const [emailErr, setEmailErr] = useState("");
   const [phone, setPhone] = useState("");
@@ -24,7 +28,9 @@ const Update = () => {
   const [rep, setRep] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("");
+
   const { logOut } = useLogout();
+
   useEffect(() => {
     setRole(localStorage.getItem("role"));
     const loggedIn = localStorage.getItem("logged_in");
@@ -51,7 +57,7 @@ const Update = () => {
     } catch (error) {
       console.error(error);
       authErr(error, logOut);
-      const { emailError, phoneError } = handleApiError(error, role);
+      const { emailError, phoneError } = metaErr(error, role);
       setEmailErr(emailError);
       setPhoneErr(phoneError);
     } finally {

@@ -1,35 +1,41 @@
 import React, { useEffect, useState } from "react";
-
 import Link from "next/link";
-import { useRouter } from "next/router";
-
-import { Layout, Button } from "antd";
-const { Content } = Layout;
-
-import api from "@/api/api";
-import checkLogin from "@/Utils/checkLogin";
-import authErr from "@/api/authErr";
-import format from "date-fns/format";
-
-import useLogout from "@/hooks/useLogout";
-import useColumnSearch from "@/hooks/useColumnSearch";
+import Router from "next/router";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { Layout, Button, Tooltip } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
+import CreateForm from "@/components/CreateForm";
+
+import useLogout from "@/hooks/useLogout";
+import useColumnSearch from "@/hooks/useColumnSearch";
+
+import api from "@/api/api";
+import checkLogin from "@/Utils/checkLogin";
+import authErr from "@/api/authErr";
+import { translateStatus } from "@/Utils/translate";
+
+const { Content } = Layout;
+
+dayjs.extend(relativeTime);
 
 const ProtectedPage = () => {
-  const router = useRouter();
-  const [clients, setClients] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [isSet, setIsSet] = useState(false);
-  const [role, setRole] = useState("");
+  const [currUser, setCurrUser] = useState("");
+  const [createOk, setOk] = useState(false);
+  const [role, setRole] = useState(null);
+  const [showCreateButton, setShowCreateButton] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
-
   const { logOut } = useLogout();
   const {
     searchParams,
@@ -37,6 +43,8 @@ const ProtectedPage = () => {
     handleReset,
     getColumnSearchProps,
     clearAllFilters,
+    getColumnDateFilterProps,
+    getColumnSelectFilterProps,
   } = useColumnSearch();
 
   useEffect(() => {
@@ -45,11 +53,11 @@ const ProtectedPage = () => {
       checkLogin();
       return;
     }
-    if (!router.isReady) return;
-
-    const email = router.query.email;
-
+    if (createOk) {
+      setOk(false);
+    }
     setRole(localStorage.getItem("role"));
+    setCurrUser(localStorage.getItem("currUser"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
     setLoading(true);
@@ -65,41 +73,50 @@ const ProtectedPage = () => {
         params.inCharge = id;
       }
     }
-    if (email && !isSet) {
-      params.email = email;
-      setIsSet(true);
-    }
 
     const transformedFilters = searchParams.reduce((acc, filter) => {
-      if (filter.value !== "all") {
+      if (filter.id === "createdDate") {
+        if (filter.value) {
+          if (filter.value.startDate) {
+            acc.startDate = filter.value.startDate;
+          }
+          if (filter.value.endDate) {
+            acc.endDate = filter.value.endDate;
+          }
+        }
+      } else {
         acc[filter.id] = filter.value;
       }
       return acc;
     }, {});
+
     params = {
       ...params,
       ...transformedFilters,
     };
-
+    fetchLead(params);
+  }, [pagination, searchParams, createOk]);
+  const fetchLead = (params) => {
     api
-      .get("/clients/", { params })
+      .get("/leads/", { params })
       .then((res) => {
         setTotal(res.data.total);
-        setClients(res.data.clients);
+        setLeads(res.data.leads);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
         authErr(error, logOut);
       });
-  }, [pagination, searchParams, router.isReady]);
+  };
 
-  let baseColumns = [
+  const baseColumns = [
     {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
       fixed: "left",
+      ellipsis: true,
 
       ...getColumnSearchProps("phone", handleSearch, handleReset, searchParams),
     },
@@ -110,14 +127,21 @@ const ProtectedPage = () => {
       fixed: "left",
 
       ...getColumnSearchProps("email", handleSearch, handleReset, searchParams),
+      ellipsis: true,
+      render: (email) => (
+        <Tooltip placement="topLeft" title={email}>
+          {email}
+        </Tooltip>
+      ),
     },
+
     {
       title: "Organization",
       dataIndex: "org",
       key: "org",
       ...getColumnSearchProps("org", handleSearch, handleReset, searchParams),
       render: (text, record) => (
-        <Link href={`/clients/${record._id}`}>
+        <Link href={`/leads/${record._id}`}>
           <Button
             type="link"
             color="neutral"
@@ -125,7 +149,7 @@ const ProtectedPage = () => {
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/clients/${record._id}`);
+              Router.push(`/leads/${record._id}`);
             }}
           >
             {record.org}
@@ -137,6 +161,7 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
+
       ...getColumnSearchProps("rep", handleSearch, handleReset, searchParams),
     },
 
@@ -145,8 +170,28 @@ const ProtectedPage = () => {
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
-        return format(new Date(date), "dd/MM/yyyy");
+        return dayjs(date).format("DD/MM/YYYY");
       },
+      ...getColumnDateFilterProps("createdDate", handleSearch, handleReset),
+    },
+
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      filteredValue: searchParams.find((filter) => filter.id === "status")
+        ?.value
+        ? [searchParams.find((filter) => filter.id === "status").value]
+        : null,
+      render: (status) => {
+        return translateStatus(status);
+      },
+      ...getColumnSelectFilterProps(
+        "status",
+        handleSearch,
+        handleReset,
+        searchParams
+      ),
     },
   ];
   if (role === "admin") {
@@ -164,6 +209,7 @@ const ProtectedPage = () => {
   }
 
   const columns = baseColumns;
+
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>
@@ -187,16 +233,36 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Accquired Clients
+                  Leads Contact
+                  <PlusOutlined
+                    style={{ marginLeft: "10px", cursor: "pointer" }}
+                    onClick={() => setShowCreateButton(!showCreateButton)}
+                  />
+                  {showCreateButton && (
+                    <Button
+                      type="primary"
+                      style={{ marginLeft: "10px" }}
+                      onClick={() => setShowModal(true)}
+                    >
+                      Create
+                    </Button>
+                  )}
+                  <CreateForm
+                    visible={showModal}
+                    onClose={() => setShowModal(false)}
+                    roleId={role}
+                    userId={currUser}
+                    onSuccess={() => setOk(true)}
+                  />
                 </h1>
-                <div>
+                <div style={{ display: "flex", alignItems: "center" }}>
                   <Button onClick={clearAllFilters}>Clear All Filters</Button>
                 </div>
               </div>
               <UserTable
                 key={Date.now()}
                 columns={columns}
-                data={clients}
+                data={leads}
                 total={total}
                 loading={loading}
                 pagination={pagination}

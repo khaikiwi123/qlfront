@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
 import {
   Layout,
   Button,
@@ -7,24 +10,30 @@ import {
   Popconfirm,
   Modal,
   Steps,
+  message,
+  Timeline,
 } from "antd";
-import api from "@/api/api";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { message, Timeline } from "antd";
-import AppHeader from "@/components/header";
-import AppSider from "@/components/sider";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
-import { format } from "date-fns";
-import checkLogin from "@/Utils/checkLogin";
-import AppCrumbs from "@/components/breadcrumbs";
-import authErr from "@/api/authErr";
-import useLogout from "@/hooks/useLogout";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Step } = Steps;
 
+import api from "@/api/api";
+import checkLogin from "@/Utils/checkLogin";
+import { translateStatus } from "@/Utils/translate";
+import authErr from "@/api/authErr";
+import format from "date-fns/format";
+
+import useLogout from "@/hooks/useLogout";
+
+import AppHeader from "@/components/header";
+import AppSider from "@/components/sider";
+import AppCrumbs from "@/components/breadcrumbs";
+
 export default function Lead() {
+  const router = useRouter();
+  const id = router.query.id;
+
   const [lead, setLead] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [showModal, setModal] = useState(false);
@@ -32,8 +41,8 @@ export default function Lead() {
   const [editMode, setEditMode] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
   const [changeLog, setChangeLogs] = useState([]);
-  const router = useRouter();
-  const id = router.query.id;
+  const [isModalLoading, setIsModalLoading] = useState(false);
+
   const { logOut } = useLogout();
 
   const fetchChangeLogs = async () => {
@@ -120,6 +129,7 @@ export default function Lead() {
     setModal(true);
   };
   const handleConfirmChange = async () => {
+    setIsModalLoading(true);
     try {
       if (pendingStatus === "Success") {
         await api.put(`/leads/${id}`, { status: "Success" });
@@ -133,14 +143,8 @@ export default function Lead() {
     } catch (error) {
       console.error(error);
     }
+    setIsModalLoading(false);
     setModal(false);
-  };
-  const statusTranslations = {
-    "No contact": "Chưa liên hệ",
-    "In contact": "Đã liên hệ",
-    "Verified needs": "Đã xác định nhu cầu",
-    Consulted: "Đã tư vấn",
-    Success: "Thành công",
   };
 
   const statusToIndex = {
@@ -251,8 +255,8 @@ export default function Lead() {
                       )}
                     >
                       {log.changedBy} đã thay đổi trạng thái từ{" "}
-                      {statusTranslations[log.oldValue] || log.oldValue} sang{" "}
-                      {statusTranslations[log.newValue] || log.newValue}
+                      {translateStatus(log.oldValue)} sang{" "}
+                      {translateStatus(log.newValue)}
                     </Timeline.Item>
                   ))}
                 </Timeline>
@@ -271,10 +275,11 @@ export default function Lead() {
           setPendingStatus("");
           setModal(false);
         }}
+        confirmLoading={isModalLoading}
       >
         <p>
           Are you sure you want to set this lead's status to "
-          {statusTranslations[pendingStatus]}"?
+          {translateStatus(pendingStatus)}"?
         </p>
       </Modal>
     </>

@@ -1,40 +1,50 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select, DatePicker, Tooltip } from "antd";
-import api from "@/api/api";
-import useLogout from "@/hooks/useLogout";
-import useColumnSearch from "@/hooks/useColumnSearch";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { Layout, Button, Tooltip } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import CreateForm from "@/components/CreateForm";
+
+import useLogout from "@/hooks/useLogout";
+import useColumnSearch from "@/hooks/useColumnSearch";
+
+import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";
+import { translateStatus } from "@/Utils/translate";
+
 const { Content } = Layout;
-const { Option } = Select;
+
 dayjs.extend(relativeTime);
 
 const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("");
+  const [currUser, setCurrUser] = useState("");
+  const [createOk, setOk] = useState(false);
+  const [role, setRole] = useState(null);
   const [showCreateButton, setShowCreateButton] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
   const { logOut } = useLogout();
-  const dateFormat = "DD/MM/YYYY";
   const {
     searchParams,
     handleSearch,
     handleReset,
     getColumnSearchProps,
     clearAllFilters,
+    getColumnDateFilterProps,
+    getColumnSelectFilterProps,
   } = useColumnSearch();
 
   useEffect(() => {
@@ -43,7 +53,11 @@ const ProtectedPage = () => {
       checkLogin();
       return;
     }
+    if (createOk) {
+      setOk(false);
+    }
     setRole(localStorage.getItem("role"));
+    setCurrUser(localStorage.getItem("currUser"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
     setLoading(true);
@@ -80,7 +94,9 @@ const ProtectedPage = () => {
       ...params,
       ...transformedFilters,
     };
-
+    fetchLead(params);
+  }, [pagination, searchParams, createOk]);
+  const fetchLead = (params) => {
     api
       .get("/leads/", { params })
       .then((res) => {
@@ -92,7 +108,7 @@ const ProtectedPage = () => {
         setLoading(false);
         authErr(error, logOut);
       });
-  }, [pagination, searchParams]);
+  };
 
   const baseColumns = [
     {
@@ -101,20 +117,16 @@ const ProtectedPage = () => {
       key: "phone",
       fixed: "left",
       ellipsis: true,
-      filteredValue: searchParams.find((filter) => filter.id === "phone")?.value
-        ? [searchParams.find((filter) => filter.id === "phone").value]
-        : null,
-      ...getColumnSearchProps("phone", handleSearch, handleReset),
+
+      ...getColumnSearchProps("phone", handleSearch, handleReset, searchParams),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       fixed: "left",
-      filteredValue: searchParams.find((filter) => filter.id === "email")?.value
-        ? [searchParams.find((filter) => filter.id === "email").value]
-        : null,
-      ...getColumnSearchProps("email", handleSearch, handleReset),
+
+      ...getColumnSearchProps("email", handleSearch, handleReset, searchParams),
       ellipsis: true,
       render: (email) => (
         <Tooltip placement="topLeft" title={email}>
@@ -127,10 +139,7 @@ const ProtectedPage = () => {
       title: "Organization",
       dataIndex: "org",
       key: "org",
-      filteredValue: searchParams.find((filter) => filter.id === "org")?.value
-        ? [searchParams.find((filter) => filter.id === "org").value]
-        : null,
-      ...getColumnSearchProps("org", handleSearch, handleReset),
+      ...getColumnSearchProps("org", handleSearch, handleReset, searchParams),
       render: (text, record) => (
         <Link href={`/leads/${record._id}`}>
           <Button
@@ -152,10 +161,8 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
-      filteredValue: searchParams.find((filter) => filter.id === "rep")?.value
-        ? [searchParams.find((filter) => filter.id === "rep").value]
-        : null,
-      ...getColumnSearchProps("rep", handleSearch, handleReset),
+
+      ...getColumnSearchProps("rep", handleSearch, handleReset, searchParams),
     },
 
     {
@@ -165,56 +172,7 @@ const ProtectedPage = () => {
       render: (date) => {
         return dayjs(date).format("DD/MM/YYYY");
       },
-      //maybe move this part out
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <DatePicker.RangePicker
-            style={{ marginBottom: 8, display: "block" }}
-            format={dateFormat}
-            allowEmpty={[true, true]}
-            onChange={(dates) => {
-              const formattedStart = dates[0]
-                ? dates[0].format("DD/MM/YYYY")
-                : null;
-              const formattedEnd = dates[1]
-                ? dates[1].format("DD/MM/YYYY")
-                : null;
-              setSelectedKeys([
-                { startDate: formattedStart, endDate: formattedEnd },
-              ]);
-            }}
-          />
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "createdDate")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 10 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "createdDate")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
-      ),
-
-      onFilter: (value, record) => {
-        if (!value || value.length !== 2) return true;
-        const startDate = new Date(value[0]);
-        const endDate = new Date(value[1]);
-        const createdDate = new Date(record.createdDate);
-        return createdDate >= startDate && createdDate <= endDate;
-      },
+      ...getColumnDateFilterProps("createdDate", handleSearch, handleReset),
     },
 
     {
@@ -226,77 +184,23 @@ const ProtectedPage = () => {
         ? [searchParams.find((filter) => filter.id === "status").value]
         : null,
       render: (status, record) => {
-        let displayStatus;
-        switch (status) {
-          case "No contact":
-            displayStatus = "Chưa liên hệ";
-            break;
-          case "In contact":
-            displayStatus = "Đã liên hệ";
-            break;
-          case "Verified needs":
-            displayStatus = "Đã xác định nhu cầu";
-            break;
-          case "Consulted":
-            displayStatus = "Đã tư vấn";
-            break;
-          case "Success":
-            displayStatus = "Thành công";
-            break;
-          default:
-            displayStatus = "";
-        }
+        const displayStatus = translateStatus(status);
         const lastUpdated = record.statusUpdate
           ? `Last updated ${dayjs(record.statusUpdate).fromNow()}`
           : "";
+
         return (
           <Tooltip title={lastUpdated}>
             <span>{displayStatus}</span>
           </Tooltip>
         );
       },
-      //maybe also this
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: 188, marginBottom: 8, display: "block" }}
-            placeholder="Select Status"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
-          >
-            <Option value="No contact">Chưa liên hệ</Option>
-            <Option value="In contact">Đã liên hệ</Option>
-            <Option value="Verified needs">Đã xác định nhu cầu</Option>
-            <Option value="Consulted">Đã tư vấn</Option>
-            <Option value="Success">Thành công</Option>
-          </Select>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "status")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "status")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
+      ...getColumnSelectFilterProps(
+        "status",
+        handleSearch,
+        handleReset,
+        searchParams
       ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-      ),
-      onFilter: (value, record) => record["status"].toString() === value,
     },
   ];
   if (role === "admin") {
@@ -304,7 +208,12 @@ const ProtectedPage = () => {
       title: "In Charge",
       dataIndex: "inCharge",
       key: "inCharge",
-      ...getColumnSearchProps("inCharge", handleSearch, handleReset),
+      ...getColumnSearchProps(
+        "inCharge",
+        handleSearch,
+        handleReset,
+        searchParams
+      ),
     });
   }
 
@@ -342,11 +251,18 @@ const ProtectedPage = () => {
                     <Button
                       type="primary"
                       style={{ marginLeft: "10px" }}
-                      onClick={() => Router.push("/leads/create")}
+                      onClick={() => setShowModal(true)}
                     >
                       Create
                     </Button>
                   )}
+                  <CreateForm
+                    visible={showModal}
+                    onClose={() => setShowModal(false)}
+                    roleId={role}
+                    userId={currUser}
+                    onSuccess={() => setOk(true)}
+                  />
                 </h1>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <Button onClick={clearAllFilters}>Clear All Filters</Button>

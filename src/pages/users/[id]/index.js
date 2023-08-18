@@ -29,6 +29,7 @@ export default function User() {
       checkLogin();
       return;
     }
+    if (!router.isReady) return;
     setCurrID(localStorage.getItem("currID"));
     api
       .get(`/users/${id}`)

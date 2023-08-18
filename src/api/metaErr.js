@@ -1,6 +1,6 @@
 import React from "react";
 
-export const handleApiError = (error, role) => {
+export const metaErr = (error, role) => {
   const {
     error: errorMsg,
     id: clientId,

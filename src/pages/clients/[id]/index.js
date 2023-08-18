@@ -1,29 +1,32 @@
 import { useState, useEffect } from "react";
-import { Layout, Button, Typography, Spin, Avatar } from "antd";
-import api from "@/api/api";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { message } from "antd";
+import Link from "next/link";
+import { format } from "date-fns";
+
+import { Layout, Button, Typography, Spin, Avatar, message } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
-import { EditOutlined } from "@ant-design/icons";
-import { format } from "date-fns";
+import AppCrumbs from "@/components/breadcrumbs";
+
+import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import useLogout from "@/hooks/useLogout";
 import authErr from "@/api/authErr";
-import AppCrumbs from "@/components/breadcrumbs";
+
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 export default function Client() {
-  const [client, setClient] = useState(null);
+  const router = useRouter();
+  const id = router.query.id;
 
+  const [client, setClient] = useState(null);
   const [role, setRole] = useState("");
   const [editMode, setEditMode] = useState(false);
 
   const { logOut } = useLogout();
-  const router = useRouter();
-  const id = router.query.id;
 
   useEffect(() => {
     if (!router.isReady) return;

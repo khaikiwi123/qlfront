@@ -33,12 +33,14 @@ const AppSider = ({ role }) => {
       }}
     >
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
-        <SubMenu key="sub1" icon={<UsergroupAddOutlined />} title="Lists">
+        <SubMenu key="sub1" icon={<UsergroupAddOutlined />} title="Leads">
           <Menu.Item key="1" onClick={() => Router.push("/leads")}>
-            Leads
+            List
           </Menu.Item>
+        </SubMenu>
+        <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Clients">
           <Menu.Item key="2" onClick={() => Router.push("/clients")}>
-            Clients
+            List
           </Menu.Item>
         </SubMenu>
 

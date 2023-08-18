@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
-import api from "@/api/api";
+
 import { useRouter } from "next/router";
+import Link from "next/link";
+
 import { Form, Input, Button, Layout, Row, Col } from "antd";
+const { Content } = Layout;
+
+import api from "@/api/api";
+import checkLogin from "@/Utils/checkLogin";
+import { metaErr } from "@/api/metaErr";
+import authErr from "@/api/authErr";
+
+import useLogout from "@/hooks/useLogout";
+
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
-import Link from "next/link";
-import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
-const { Content } = Layout;
-import { handleApiError } from "@/api/error";
-import authErr from "@/api/authErr";
-import useLogout from "@/hooks/useLogout";
 
 const Update = () => {
   const router = useRouter();
   const id = router.query.id;
+
   const [email, setEmail] = useState("");
   const [emailErr, setEmailErr] = useState("");
   const [phone, setPhone] = useState("");
@@ -51,7 +57,7 @@ const Update = () => {
     } catch (error) {
       console.error(error);
       authErr(error, logOut);
-      const { emailError, phoneError } = handleApiError(error, role);
+      const { emailError, phoneError } = metaErr(error, role);
       setEmailErr(emailError);
       setPhoneErr(phoneError);
     } finally {
