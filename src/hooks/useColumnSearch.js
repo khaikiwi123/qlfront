@@ -47,10 +47,15 @@ const useColumnSearch = () => {
     router.push(router.pathname, undefined, { shallow: true });
   };
   const handleDateSearch = (dates, setSelectedKeys) => {
-    const formattedStart = dates[0] ? dates[0].format("DD/MM/YYYY") : null;
-    const formattedEnd = dates[1] ? dates[1].format("DD/MM/YYYY") : null;
-    setSelectedKeys([{ startDate: formattedStart, endDate: formattedEnd }]);
+    if (dates) {
+      const formattedStart = dates[0] ? dates[0].format("DD/MM/YYYY") : null;
+      const formattedEnd = dates[1] ? dates[1].format("DD/MM/YYYY") : null;
+      setSelectedKeys([{ startDate: formattedStart, endDate: formattedEnd }]);
+    } else {
+      setSelectedKeys([{ startDate: null, endDate: null }]);
+    }
   };
+
   const getColumnDateFilterProps = (dataIndex, handleSearch, handleReset) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -63,6 +68,7 @@ const useColumnSearch = () => {
           style={{ marginBottom: 8, display: "block" }}
           format={dateFormat}
           allowEmpty={[true, true]}
+          allowClear={false}
           onChange={(dates) => handleDateSearch(dates, setSelectedKeys)}
         />
         <Button

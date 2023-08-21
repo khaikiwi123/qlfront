@@ -13,7 +13,11 @@ import {
   message,
   Timeline,
 } from "antd";
-import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  UserOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -247,16 +251,33 @@ export default function Lead() {
                   mode="left"
                   reverse="true"
                 >
-                  {changeLog.map((log) => (
+                  {changeLog.map((log, index) => (
                     <Timeline.Item
-                      label={format(
-                        new Date(log.updatedAt),
-                        "dd/MM/yyyy HH:mm"
-                      )}
+                      label={
+                        <span
+                          style={
+                            index !== changeLog.length - 1
+                              ? { color: "gray" }
+                              : {}
+                          }
+                        >
+                          {format(new Date(log.updatedAt), "dd/MM/yyyy HH:mm")}
+                        </span>
+                      }
+                      color={index !== changeLog.length - 1 ? "gray" : "green"}
                     >
-                      {log.changedBy} đã thay đổi trạng thái từ{" "}
-                      {translateStatus(log.oldValue)} sang{" "}
-                      {translateStatus(log.newValue)}
+                      <span
+                        style={
+                          index !== changeLog.length - 1
+                            ? { color: "gray" }
+                            : {}
+                        }
+                      >
+                        {log.changedBy} đã thay đổi trạng thái từ{" "}
+                        {translateStatus(log.oldValue)} sang{" "}
+                        {translateStatus(log.newValue)} sau{" "}
+                        {log.daysLastUp ? log.daysLastUp : "?"} ngày
+                      </span>
                     </Timeline.Item>
                   ))}
                 </Timeline>

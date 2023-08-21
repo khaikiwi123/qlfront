@@ -1,4 +1,5 @@
 import React from "react";
+import { Modal } from "antd";
 
 export const metaErr = (error, role) => {
   const {
@@ -20,12 +21,8 @@ export const metaErr = (error, role) => {
     role !== "admin" &&
     currUserEmail !== inChargeEmail
   ) {
-    const message = `${inChargeEmail} is in charge of this ${objectType.toLowerCase()}.`;
-    if (errorMsg === "Email existed") {
-      emailError = message;
-    } else {
-      phoneError = message;
-    }
+    const message = `A sale person is alerady in charge of this ${objectType.toLowerCase()}.`;
+    showModal("Lead existed", message);
   } else {
     switch (errorMsg) {
       case "Email existed":
@@ -48,8 +45,7 @@ export const metaErr = (error, role) => {
         ) : (
           errorMsg
         );
-        emailError = errorMsg === "Email existed" ? message : "";
-        phoneError = errorMsg === "Phone existed" ? message : "";
+        showModal("Lead existed", message);
         break;
       case "Email isn't valid":
         emailError = errorMsg;
@@ -67,4 +63,11 @@ export const metaErr = (error, role) => {
   }
 
   return { emailError, phoneError, saleError };
+};
+
+const showModal = (title, content) => {
+  Modal.error({
+    title: title,
+    content: content,
+  });
 };
