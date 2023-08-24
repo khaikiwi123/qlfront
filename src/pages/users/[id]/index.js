@@ -5,11 +5,11 @@ import { useRouter } from "next/router";
 import { Layout, Button, Typography, Spin, Popconfirm } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
-import format from "date-fns/format";
 import checkLogin from "@/Utils/checkLogin";
 import AppCrumbs from "@/components/breadcrumbs";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
+import dayjs from "dayjs";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -87,7 +87,7 @@ export default function User() {
             <Text>Role: {user.role}</Text>
             <Text>Phone: {user.phone}</Text>
             <Text>
-              Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
+              Created At: {dayjs(user.createdDate).format("DD/MM/YYYY")}
             </Text>
             <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
             <Text>

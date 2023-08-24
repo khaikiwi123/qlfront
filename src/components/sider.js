@@ -23,10 +23,18 @@ const AppSider = ({ role }) => {
   }
   return (
     <Sider
-      width={200}
+      breakpoint="lg"
+      collapsedWidth="0"
+      onBreakpoint={(broken) => {
+        console.log(broken);
+      }}
+      onCollapse={(collapsed, type) => {
+        console.log(collapsed, type);
+      }}
       style={{
+        marginTop: "64px",
         overflow: "auto",
-        height: "100vh",
+        height: "calc(100vh - 64px)",
         position: "fixed",
         left: 0,
         zIndex: 2,
@@ -38,7 +46,7 @@ const AppSider = ({ role }) => {
             List
           </Menu.Item>
         </SubMenu>
-        <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Clients">
+        <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Customers">
           <Menu.Item key="2" onClick={() => Router.push("/clients")}>
             List
           </Menu.Item>

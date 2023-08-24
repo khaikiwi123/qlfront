@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button, Modal, Select } from "antd";
+import { Layout, Button } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
-import useColumnSearch from "@/hooks/useColumnSearch";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
-import format from "date-fns/format";
 import authErr from "@/api/authErr";
+import dayjs from "dayjs";
+import FilterModal from "@/components/filter";
+import CreateForm from "@/components/UserForm";
 
 const { Content } = Layout;
 const App = () => {
@@ -20,20 +20,15 @@ const App = () => {
   const [loadingStatus, setLoadingStatus] = useState({});
   const [currID, setCurrID] = useState("");
   const [role, setRole] = useState("");
-  const [showCreateButton, setShowCreateButton] = useState(false);
+  const [createOk, setOk] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const [showModal, setShowModal] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
 
   const { logOut } = useLogout();
-  const {
-    searchParams,
-    handleSearch,
-    handleReset,
-    getColumnSearchProps,
-    clearAllFilters,
-  } = useColumnSearch();
 
   const toggleStatus = async (_id, currentStatus) => {
     setLoadingStatus((prevState) => ({ ...prevState, [_id]: true }));
@@ -59,6 +54,9 @@ const App = () => {
       checkLogin();
       return;
     }
+    if (createOk) {
+      setOk(false);
+    }
     setCurrID(localStorage.getItem("currID"));
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
@@ -71,19 +69,24 @@ const App = () => {
       };
     }
 
-    const transformedFilters = searchParams.reduce((acc, filter) => {
-      if (filter.value !== "all") {
-        acc[filter.id] = filter.value;
-      }
-      return acc;
-    }, {});
     params = {
       ...params,
-      ...transformedFilters,
+      ...appliedFilters,
     };
-
+    fetchUser(params);
+  }, [pagination, createOk, appliedFilters]);
+  const fetchUser = (params) => {
+    let queryParams = Object.keys(params)
+      .map((key) => {
+        if (Array.isArray(params[key])) {
+          return params[key].map((value) => `${key}=${value}`).join("&");
+        } else {
+          return `${key}=${params[key]}`;
+        }
+      })
+      .join("&");
     api
-      .get("/users/", { params })
+      .get(`/users/?${queryParams}`)
       .then((res) => {
         setTotal(res.data.total);
         setData(res.data.users);
@@ -93,35 +96,37 @@ const App = () => {
         setLoading(false);
         authErr(error, logOut);
       });
-  }, [pagination, searchParams]);
+  };
 
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      ...getColumnSearchProps("name", handleSearch, handleReset, searchParams),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      ...getColumnSearchProps("email", handleSearch, handleReset, searchParams),
+      ellipsis: true,
       render: (text, record) => (
-        <Link href={`/users/${record._id}`}>
-          <Button
-            type="link"
-            color="neutral"
-            size="sm"
-            variant="plain"
-            onClick={(e) => {
-              e.preventDefault();
-              Router.push(`/users/${record._id}`);
-            }}
-          >
-            {record.email}
-          </Button>
-        </Link>
+        <div style={{ textAlign: "left" }}>
+          <Link href={`/users/${record._id}`}>
+            <Button
+              type="link"
+              color="neutral"
+              size="sm"
+              variant="plain"
+              style={{ padding: 0, margin: -10 }}
+              onClick={(e) => {
+                e.preventDefault();
+                Router.push(`/users/${record._id}`);
+              }}
+            >
+              {record.email}
+            </Button>
+          </Link>
+        </div>
       ),
     },
 
@@ -139,108 +144,24 @@ const App = () => {
             return text;
         }
       },
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: 188, marginBottom: 8, display: "block" }}
-            placeholder="Select Role"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e ? [e] : [])}
-          >
-            <Select.Option value="">All</Select.Option>
-            <Select.Option value="admin">Admin</Select.Option>
-            <Select.Option value="user">User</Select.Option>
-          </Select>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "role")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "role")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
-      ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-      ),
-      onFilter: (value, record) =>
-        record["role"]
-          ? record["role"]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
-          : "",
     },
     {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
-      ...getColumnSearchProps("phone", handleSearch, handleReset, searchParams),
     },
     {
       title: "Created Date",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
-        return format(new Date(date), "dd/MM/yyyy");
+        return dayjs(date).format("DD/MM/YYYY");
       },
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      filterDropdown: ({
-        setSelectedKeys,
-        selectedKeys,
-        confirm,
-        clearFilters,
-      }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: 188, marginBottom: 8, display: "block" }}
-            placeholder="Select Status"
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e !== "" ? [e] : [])}
-          >
-            <Select.Option value="true">Đang hoạt động</Select.Option>
-            <Select.Option value="false">Đã bị khóa</Select.Option>
-          </Select>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, "status")}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => handleReset(clearFilters, confirm, "status")}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </div>
-      ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
-      ),
-      onFilter: (value, record) => record["status"].toString() === value,
       render: (text, record) => (
         <button
           onClick={() => toggleStatus(record._id, record.status)}
@@ -255,6 +176,17 @@ const App = () => {
         </button>
       ),
     },
+  ];
+  const filter = [
+    { label: "Name", value: "name" },
+    { label: "Email", value: "email" },
+    { label: "Role", value: "phone" },
+    { label: "Phone", value: "phone" },
+    { label: "Status", value: "status" },
+  ];
+  const statusOptions = [
+    { value: "true", label: "Active" },
+    { value: "false", label: "Inactive" },
   ];
   return (
     <>
@@ -280,24 +212,31 @@ const App = () => {
                   }}
                 >
                   User List
-                  <PlusOutlined
-                    style={{ marginLeft: "10px", cursor: "pointer" }}
-                    onClick={() => setShowCreateButton(!showCreateButton)}
-                  />
-                  {showCreateButton && (
-                    <Button
-                      type="primary"
-                      style={{ marginLeft: "10px" }}
-                      onClick={() => Router.push("/users/create")}
-                    >
-                      Create
-                    </Button>
-                  )}
                 </h1>
-                <div>
-                  <Button onClick={clearAllFilters}>Clear All Filters</Button>
+
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Button
+                    style={{ marginLeft: "10px", cursor: "pointer" }}
+                    onClick={() => setShowModal(true)}
+                    type="primary"
+                  >
+                    Create User
+                  </Button>
+                  <CreateForm
+                    visible={showModal}
+                    onClose={() => setShowModal(false)}
+                    onSuccess={() => setOk(true)}
+                  />
                 </div>
               </div>
+              <FilterModal
+                onFilterApply={(newFilters) => {
+                  setAppliedFilters(newFilters);
+                  setPagination({ ...pagination, pageIndex: 1 });
+                }}
+                filterOptions={filter}
+                statusOptions={statusOptions}
+              />
               <UserTable
                 key={Date.now()}
                 columns={columns}

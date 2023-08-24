@@ -16,7 +16,7 @@ import useLogout from "@/hooks/useLogout";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import FilterModal from "@/components/filter";
+import FilterModal from "@/components/filterTest";
 
 const ProtectedPage = () => {
   const router = useRouter();

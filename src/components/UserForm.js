@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Modal, Form, Input, Button, Select } from "antd";
 import api from "@/api/api";
-import { metaErr } from "@/api/metaErr";
+import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
+
+import { metaErr } from "@/api/userMetaErr";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
+
+const { Option } = Select;
 
 const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
   const [form] = Form.useForm();
@@ -15,7 +19,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     setLoading(true);
 
     try {
-      await api.post(`/leads`, {
+      await api.post(`/users`, {
         ...values,
         inCharge: roleId === "admin" ? values.inCharge : userId,
       });
@@ -63,6 +67,13 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
           <Input />
         </Form.Item>
         <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: "Please input your name!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           label="Phone"
           name="phone"
           validateFirst="true"
@@ -90,33 +101,72 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
           <Input />
         </Form.Item>
         <Form.Item
-          label="Representative"
-          name="rep"
-          rules={[{ required: true, message: "Please input your rep!" }]}
+          label="Role"
+          name="role"
+          rules={[{ required: true, message: "Please select a role!" }]}
         >
-          <Input />
+          <Select placeholder="Select a role">
+            <Option value="user">User</Option>
+            <Option value="admin">Admin</Option>
+          </Select>
         </Form.Item>
         <Form.Item
-          label="Organization"
-          name="org"
-          rules={[{ required: true, message: "Please input your org!" }]}
-        >
-          <Input />
-        </Form.Item>
-        {roleId === "admin" && (
-          <Form.Item
-            label="Assign to"
-            name="inCharge"
-            rules={[
-              {
-                required: true,
-                message: "Please input the assigned personel",
+          label="Password"
+          name="password"
+          validateFirst="true"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+            {
+              message: "Password isn't strong enough",
+              validator: (_, value) => {
+                if (
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,18}$/.test(
+                    value
+                  )
+                ) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject("Password is invalid");
+                }
               },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        )}
+            },
+          ]}
+        >
+          <Input.Password
+            iconRender={(visible) =>
+              visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+            }
+          />
+        </Form.Item>
+        <Form.Item
+          label="Confirm Password"
+          name="confirmPassword"
+          rules={[
+            {
+              required: true,
+              message: "Please confirm your password!",
+            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("The two passwords that you entered do not match!")
+                );
+              },
+            }),
+          ]}
+        >
+          <Input.Password
+            iconRender={(visible) =>
+              visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+            }
+          />
+        </Form.Item>
         <Form.Item>
           <Button
             type="primary"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 
 import { Layout, Button, Typography, Spin, Avatar, message } from "antd";
 import { EditOutlined } from "@ant-design/icons";
@@ -85,7 +85,7 @@ export default function Client() {
             <div style={{ padding: 24, minHeight: 360 }}>
               <AppCrumbs
                 paths={[
-                  { name: "Clients", href: "/clients" },
+                  { name: "Customers", href: "/clients" },
                   { name: "Profile" },
                 ]}
               />
@@ -103,11 +103,6 @@ export default function Client() {
                   alignItems: "start",
                 }}
               >
-                <Avatar
-                  size={200}
-                  src={client.avatar}
-                  style={{ marginRight: "20px" }}
-                />{" "}
                 <div style={{ flexGrow: 1 }}>
                   {editMode && (
                     <>
@@ -127,8 +122,7 @@ export default function Client() {
                   <br />
 
                   <Text>
-                    Created At:{" "}
-                    {format(new Date(client.createdDate), "dd/MM/yyyy")}
+                    Created At: {dayjs(client.createdDate).format("DD/MM/YYYY")}
                   </Text>
                 </div>
               </div>

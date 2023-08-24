@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import dayjs from "dayjs";
 
 import {
   Layout,
@@ -13,11 +14,7 @@ import {
   message,
   Timeline,
 } from "antd";
-import {
-  EditOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -26,7 +23,6 @@ import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import { translateStatus } from "@/Utils/translate";
 import authErr from "@/api/authErr";
-import format from "date-fns/format";
 
 import useLogout from "@/hooks/useLogout";
 
@@ -172,13 +168,9 @@ export default function Lead() {
                 paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
               />
 
-              <div className="avatar-container">
-                <UserOutlined style={{ fontSize: "80px", color: "#bfbfbf" }} />
-              </div>
-
-              <div className="info-container">
+              <div style={{ marginLeft: "400px" }}>
                 <Title>
-                  Profile
+                  {lead.org}
                   <EditOutlined
                     onClick={() => setEditMode(!editMode)}
                     style={{ marginLeft: "10px", fontSize: "16px" }}
@@ -206,13 +198,12 @@ export default function Lead() {
                 <br />
                 <Text>Phone: {lead.phone}</Text>
                 <br />
-                <Text>Organization: {lead.org}</Text>
-                <br />
+
                 <Text>Representative: {lead.rep}</Text>
                 <br />
 
                 <Text>
-                  Created At: {format(new Date(lead.createdDate), "dd/MM/yyyy")}
+                  Created At: {dayjs(lead.createdDate).format("DD/MM/YYYY")}
                 </Text>
               </div>
             </div>
@@ -261,7 +252,7 @@ export default function Lead() {
                               : {}
                           }
                         >
-                          {format(new Date(log.updatedAt), "dd/MM/yyyy HH:mm")}
+                          {dayjs(log.updatedAt).format("DD/MM/YYYY HH:mm")}
                         </span>
                       }
                       color={index !== changeLog.length - 1 ? "gray" : "green"}

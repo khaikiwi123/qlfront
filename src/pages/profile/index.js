@@ -8,7 +8,6 @@ const { Title, Text } = Typography;
 
 import api from "../../api/api";
 import checkLogin from "@/Utils/checkLogin";
-import format from "date-fns/format";
 import authErr from "@/api/authErr";
 
 import useLogout from "../../hooks/useLogout";

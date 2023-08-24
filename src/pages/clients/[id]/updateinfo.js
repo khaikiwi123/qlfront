@@ -77,12 +77,12 @@ const Update = () => {
                 <Col span={12}>
                   <AppCrumbs
                     paths={[
-                      { name: "Clients", href: "/clients" },
+                      { name: "Customers", href: "/clients" },
                       { name: "Profile", href: `/clients/${id}` },
                       { name: "Update" },
                     ]}
                   />
-                  <h1>Update Client</h1>
+                  <h1>Update Customer</h1>
                   <Form onFinish={handleSubmit} layout="vertical">
                     <Form.Item
                       label="Email"

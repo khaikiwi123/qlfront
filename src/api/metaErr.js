@@ -54,7 +54,7 @@ export const metaErr = (error, role) => {
         phoneError = errorMsg;
         break;
       case "Sale user doesn't exist":
-        saleError = errorMsg;
+        showModal("Invalid Entry", "Sale person doesn't exist");
         break;
       default:
         console.error("Unhandled error:", errorMsg);
