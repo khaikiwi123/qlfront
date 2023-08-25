@@ -39,7 +39,7 @@ export const metaErr = (error, role) => {
                 window.open(`/${objectUrlPath}/${clientId}`, "_blank")
               }
             >
-              View {objectType.toLowerCase()}'s profile
+              View {objectType.toLowerCase()}&apos;s profile
             </span>
           </>
         ) : (
@@ -54,7 +54,7 @@ export const metaErr = (error, role) => {
         phoneError = errorMsg;
         break;
       case "Sale user doesn't exist":
-        showModal("Invalid Entry", "Sale person doesn't exist");
+        showModal("Invalid Entry", <>Sale person doesn&apos;t exist</>);
         break;
       default:
         console.error("Unhandled error:", errorMsg);

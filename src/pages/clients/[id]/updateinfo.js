@@ -127,7 +127,9 @@ const Update = () => {
                     </Form.Item>
                   </Form>
                   <Button type="primary">
-                    <Link href={`/clients/${id}`}>Back to clients profile</Link>
+                    <Link href={`/clients/${id}`}>
+                      Back to client&apos;s profile
+                    </Link>
                   </Button>
                 </Col>
               </Row>

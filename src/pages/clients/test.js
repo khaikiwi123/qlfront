@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Button, Tooltip, Spin } from "antd";
+import { Layout, Button, Tooltip, Spin, Row, Col } from "antd";
 const { Content } = Layout;
 
 import api from "@/api/api";
@@ -16,7 +16,7 @@ import useLogout from "@/hooks/useLogout";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import FilterModal from "@/components/filterTest";
+import FilterModal from "@/components/filter";
 
 const ProtectedPage = () => {
   const router = useRouter();
@@ -199,48 +199,58 @@ const ProtectedPage = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
-          <AppSider role={role} />
-          <Content style={{ margin: "24px 16px 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0px",
-                }}
-              >
-                <h1
+        <Row>
+          <Col xs={24} md={5} lg={4}>
+            <AppSider role={role} />
+          </Col>
+          <Col
+            xs={24}
+            md={24}
+            lg={20}
+            style={{ width: "100%", minHeight: "100vh" }}
+          >
+            {" "}
+            <Content style={{ margin: "24px 16px 0" }}>
+              <div style={{ padding: 24, minHeight: 360 }}>
+                <div
                   style={{
-                    fontSize: "2em",
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginBottom: "0px",
                   }}
                 >
-                  Accquired Customers
-                </h1>
+                  <h1
+                    style={{
+                      fontSize: "2em",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Accquired Customers
+                  </h1>
+                </div>
+                <FilterModal
+                  queryFilter={router.query}
+                  onFilterApply={(newFilters) => {
+                    setAppliedFilters(newFilters);
+                    setPagination({ ...pagination, pageIndex: 1 });
+                  }}
+                  filterOptions={filterOptions}
+                />
+                <UserTable
+                  key={Date.now()}
+                  columns={columns}
+                  data={clients}
+                  total={total}
+                  loading={loading}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
               </div>
-              <FilterModal
-                queryFilter={router.query}
-                onFilterApply={(newFilters) => {
-                  setAppliedFilters(newFilters);
-                  setPagination({ ...pagination, pageIndex: 1 });
-                }}
-                filterOptions={filterOptions}
-              />
-              <UserTable
-                key={Date.now()}
-                columns={columns}
-                data={clients}
-                total={total}
-                loading={loading}
-                pagination={pagination}
-                setPagination={setPagination}
-              />
-            </div>
-          </Content>
-        </Layout>
+            </Content>
+          </Col>
+        </Row>
       </Layout>
     </>
   );

@@ -10,7 +10,7 @@ html {
   align-items: center;
 }
 .steps-container {
-  margin-top: -100px;
+  margin-top: 0;
 }
 .ant-timeline.ant-timeline-label
   .ant-timeline-item-left
@@ -58,6 +58,31 @@ html {
   margin-left: 10px;
 }
 
+.layoutC {
+  margin-left: 200px;
+}
+
+.ant-layout .ant-layout-sider-zero-width-trigger {
+  position: absolute;
+  top: 500px;
+  inset-inline-end: -40px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #001529;
+  border-start-start-radius: 0;
+  border-start-end-radius: 6px;
+  border-end-end-radius: 6px;
+  border-end-start-radius: 0;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
 @media (max-width: 1100px) {
   .filter-container {
     flex-direction: row;
@@ -67,6 +92,27 @@ html {
   .filter-container .ant-btn {
     flex-basis: 100%;
     margin-top: 10px;
-    max-width: 250px;
+    max-width: 150px;
+  }
+}
+@media (max-width: 990px) {
+  .layoutC {
+    margin-left: 0px;
+  }
+}
+
+@media (max-width: 575px) {
+  .custom-steps.ant-steps.ant-steps-navigation .ant-steps-item::after {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-top: 2px solid #ffffff;
+    border-bottom: none;
+    border-inline-start: none;
+    border-inline-end: 2px solid #ffffff;
+    transform: translateY(-50%) translateX(-50%) rotate(45deg);
+  }
+  .ant-steps.ant-steps-navigation .ant-steps-item::before {
+    background-color: transparent;
   }
 }

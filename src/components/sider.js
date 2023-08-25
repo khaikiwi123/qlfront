@@ -32,12 +32,11 @@ const AppSider = ({ role }) => {
         console.log(collapsed, type);
       }}
       style={{
-        marginTop: "64px",
-        overflow: "auto",
-        height: "calc(100vh - 64px)",
+        marginTop: 64,
+        height: "100vh",
         position: "fixed",
         left: 0,
-        zIndex: 2,
+        zIndex: 3,
       }}
     >
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">

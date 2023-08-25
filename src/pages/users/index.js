@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
-import { Layout, Button } from "antd";
+import { Layout, Button, Row, Col } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import AppHeader from "@/components/header";
@@ -192,63 +192,72 @@ const App = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
-          <AppSider role={role} />
-          <Content style={{ margin: "24px 16px 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0px",
-                }}
-              >
-                <h1
+        <Row>
+          <Col xs={24} md={5} lg={4}>
+            <AppSider role={role} />
+          </Col>
+          <Col
+            xs={24}
+            md={24}
+            lg={20}
+            style={{ width: "100%", minHeight: "100vh" }}
+          >
+            <Content style={{ margin: "24px 16px 0" }}>
+              <div style={{ padding: 24, minHeight: 360 }}>
+                <div
                   style={{
-                    fontSize: "2em",
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginBottom: "0px",
                   }}
                 >
-                  User List
-                </h1>
-
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Button
-                    style={{ marginLeft: "10px", cursor: "pointer" }}
-                    onClick={() => setShowModal(true)}
-                    type="primary"
+                  <h1
+                    style={{
+                      fontSize: "2em",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
                   >
-                    Create User
-                  </Button>
-                  <CreateForm
-                    visible={showModal}
-                    onClose={() => setShowModal(false)}
-                    onSuccess={() => setOk(true)}
-                  />
+                    User List
+                  </h1>
+
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Button
+                      style={{ marginLeft: "10px", cursor: "pointer" }}
+                      onClick={() => setShowModal(true)}
+                      type="primary"
+                    >
+                      Create User
+                    </Button>
+                    <CreateForm
+                      visible={showModal}
+                      onClose={() => setShowModal(false)}
+                      onSuccess={() => setOk(true)}
+                    />
+                  </div>
                 </div>
+                <FilterModal
+                  onFilterApply={(newFilters) => {
+                    setAppliedFilters(newFilters);
+                    setPagination({ ...pagination, pageIndex: 1 });
+                  }}
+                  filterOptions={filter}
+                  statusOptions={statusOptions}
+                />
+                <UserTable
+                  key={Date.now()}
+                  columns={columns}
+                  data={data}
+                  total={total}
+                  loading={loading}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
               </div>
-              <FilterModal
-                onFilterApply={(newFilters) => {
-                  setAppliedFilters(newFilters);
-                  setPagination({ ...pagination, pageIndex: 1 });
-                }}
-                filterOptions={filter}
-                statusOptions={statusOptions}
-              />
-              <UserTable
-                key={Date.now()}
-                columns={columns}
-                data={data}
-                total={total}
-                loading={loading}
-                pagination={pagination}
-                setPagination={setPagination}
-              />
-            </div>
-          </Content>
-        </Layout>
+            </Content>
+          </Col>
+        </Row>
       </Layout>
     </>
   );

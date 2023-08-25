@@ -79,7 +79,7 @@ export default function Client() {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+        <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>

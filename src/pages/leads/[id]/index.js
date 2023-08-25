@@ -160,15 +160,28 @@ export default function Lead() {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+        <Layout className="layoutC">
           <AppSider role={role} />
-          <Content style={{ margin: "0 16px 0" }}>
-            <div style={{ minHeight: 360, display: "flex" }}>
-              <AppCrumbs
-                paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
-              />
-
-              <div style={{ marginLeft: "400px" }}>
+          <Content style={{ margin: "64px 16px 0" }}>
+            <AppCrumbs
+              paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
+            />
+            <div
+              style={{
+                minHeight: 360,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: -70,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
                 <Title>
                   {lead.org}
                   <EditOutlined
@@ -228,7 +241,7 @@ export default function Lead() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "flex-start",
+                alignItems: "self-start",
                 maxHeight: "200px",
                 overflowY: "auto",
                 border: "1px solid #d9d9d9",
@@ -244,6 +257,7 @@ export default function Lead() {
                 >
                   {changeLog.map((log, index) => (
                     <Timeline.Item
+                      key={index}
                       label={
                         <span
                           style={
@@ -290,8 +304,8 @@ export default function Lead() {
         confirmLoading={isModalLoading}
       >
         <p>
-          Are you sure you want to set this lead's status to "
-          {translateStatus(pendingStatus)}"?
+          Are you sure you want to set this lead&apos;s status to &quot;
+          {translateStatus(pendingStatus)}&quot;?
         </p>
       </Modal>
     </>

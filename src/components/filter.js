@@ -69,14 +69,7 @@ const FilterModal = ({
   return (
     <div style={{ marginBottom: "20px" }}>
       {filters.map((filter) => (
-        <div
-          key={filter.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
+        <div key={filter.id} className="filter-container">
           <Select
             style={{ width: 200, marginRight: 10 }}
             value={filter.selectValue || null}
@@ -202,14 +195,9 @@ const FilterModal = ({
 
           {filter.id === Math.max(...filters.map((f) => f.id)) && (
             <>
-              <Button style={{ marginLeft: "10px" }} onClick={setFilter}>
-                Apply Filters
-              </Button>
+              <Button onClick={setFilter}>Apply Filters</Button>
               {isAnyFilterSet() && (
-                <Button
-                  onClick={resetAll}
-                  style={{ marginRight: "10px", marginLeft: "10px" }}
-                >
+                <Button onClick={resetAll} style={{ marginRight: "10px" }}>
                   Clear All Filters
                 </Button>
               )}
