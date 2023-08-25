@@ -5,7 +5,7 @@ import { metaErr } from "@/api/metaErr";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 
-const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
+const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     setLoading(true);
 
     try {
-      await api.put(`/leads/${userId}`, {
+      await api.put(`/${uType}/${userId}`, {
         ...values,
       });
       form.resetFields();

@@ -63,7 +63,9 @@ const FilterModal = ({
     router.push(router.pathname, undefined, { shallow: true });
   };
   const isAnyFilterSet = () => {
-    return filters.some((filter) => filter.value || filter.selectValue);
+    return filters.some(
+      (filter) => filter.value || filter.selectValue || filter.id > 1
+    );
   };
 
   return (

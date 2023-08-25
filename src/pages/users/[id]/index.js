@@ -68,7 +68,7 @@ export default function User() {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, minHeight: "100vh" }}>
+        <Layout className="layoutC">
           <AppSider role={user.role} />
           <Content
             style={{

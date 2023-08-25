@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
-import UpdateForm from "@/components/updateForm";
 
 import {
   Layout,
@@ -30,6 +28,7 @@ import useLogout from "@/hooks/useLogout";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import AppCrumbs from "@/components/breadcrumbs";
+import UpdateForm from "@/components/updateForm";
 
 export default function Lead() {
   const router = useRouter();
@@ -208,6 +207,7 @@ export default function Lead() {
                       roleId={role}
                       userId={id}
                       onSuccess={() => setOk(true)}
+                      uType="leads"
                     />
                     <Popconfirm
                       title="Are you sure to delete this lead?"

@@ -9,7 +9,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import CreateForm from "@/components/CreateForm";
-import FilterModal from "@/components/filterTest";
+import FilterModal from "@/components/filter";
 
 import useLogout from "@/hooks/useLogout";
 

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import dayjs from "dayjs";
 
-import { Layout, Button, Typography, Spin, Avatar, message } from "antd";
+import { Layout, Button, Typography, Spin, message } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import AppCrumbs from "@/components/breadcrumbs";
+import UpdateForm from "@/components/updateForm";
 
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
@@ -25,6 +25,8 @@ export default function Client() {
   const [client, setClient] = useState(null);
   const [role, setRole] = useState("");
   const [editMode, setEditMode] = useState(false);
+  const [showModal, setModal] = useState(false);
+  const [updateOk, setOk] = useState(false);
 
   const { logOut } = useLogout();
 
@@ -58,7 +60,7 @@ export default function Client() {
           router.push("/clients/");
         }
       });
-  }, [id, router]);
+  }, [id, router, updateOk]);
 
   if (client === null) {
     return (
@@ -81,50 +83,67 @@ export default function Client() {
         <AppHeader />
         <Layout className="layoutC">
           <AppSider role={role} />
-          <Content style={{ margin: "24px 16px 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <AppCrumbs
-                paths={[
-                  { name: "Customers", href: "/clients" },
-                  { name: "Profile" },
-                ]}
-              />
-              <Title>
-                Profile
-                <EditOutlined
-                  onClick={() => setEditMode(!editMode)}
-                  style={{ marginLeft: "10px", fontSize: "16px" }}
-                />
-              </Title>
+          <Content style={{ margin: "64px 16px 0" }}>
+            <AppCrumbs
+              paths={[
+                { name: "Customers", href: "/clients" },
+                { name: "Profile" },
+              ]}
+            />
+            <div
+              style={{
+                minHeight: 360,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: -70,
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "start",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
                 }}
               >
-                <div style={{ flexGrow: 1 }}>
-                  {editMode && (
-                    <>
-                      <Link href={`/clients/${id}/updateinfo`}>
-                        <Button>Update client&apos;s information</Button>
-                      </Link>
-                    </>
-                  )}
-                  <br />
-                  <Text>Email: {client.email}</Text>
-                  <br />
-                  <Text>Phone: {client.phone}</Text>
-                  <br />
-                  <Text>Organization: {client.org}</Text>
-                  <br />
-                  <Text>Representative: {client.rep}</Text>
-                  <br />
+                <Title>
+                  {client.org}
+                  <EditOutlined
+                    onClick={() => setEditMode(!editMode)}
+                    style={{ marginLeft: "10px", fontSize: "16px" }}
+                  />
+                </Title>
+                {editMode && (
+                  <>
+                    <Button
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setModal(true)}
+                      type="primary"
+                    >
+                      Update customer&apos;s information
+                    </Button>
+                    <UpdateForm
+                      visible={showModal}
+                      onClose={() => setModal(false)}
+                      roleId={role}
+                      userId={id}
+                      onSuccess={() => setOk(true)}
+                      uType="clients"
+                    />
+                  </>
+                )}
+                <br />
+                <Text>Email: {client.email}</Text>
+                <br />
+                <Text>Phone: {client.phone}</Text>
+                <br />
 
-                  <Text>
-                    Created At: {dayjs(client.createdDate).format("DD/MM/YYYY")}
-                  </Text>
-                </div>
+                <Text>Representative: {client.rep}</Text>
+                <br />
+
+                <Text>
+                  Created At: {dayjs(client.createdDate).format("DD/MM/YYYY")}
+                </Text>
               </div>
             </div>
           </Content>

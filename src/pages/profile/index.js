@@ -9,6 +9,7 @@ const { Title, Text } = Typography;
 import api from "../../api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";
+import dayjs from "dayjs";
 
 import useLogout from "../../hooks/useLogout";
 
@@ -59,11 +60,11 @@ export default function User() {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Layout style={{ marginLeft: 200, marginTop: 64, minHeight: "100vh" }}>
+        <Layout className="layoutC">
           <AppSider role={role} />
           <Content
             style={{
-              margin: "24px 16px 0",
+              margin: "64px 16px 0",
               display: "flex",
               flexDirection: "column",
               alignItems: "start",
@@ -76,7 +77,7 @@ export default function User() {
             <Text>Phone: {user.phone}</Text>
             <Text>Status: {user.status ? "Active" : "Inactive"}</Text>
             <Text>
-              Created At: {format(new Date(user.createdDate), "dd/MM/yyyy")}
+              Created At: {dayjs(user.createdDate).format("DD/MM/YYYY")}
             </Text>
             <Text>
               <Link href="/profile/updateinfo">
