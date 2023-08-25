@@ -223,7 +223,7 @@ const ProtectedPage = () => {
             lg={20}
             style={{ width: "100%", minHeight: "100vh" }}
           >
-            <Content style={{ margin: "24px 16px 0" }}>
+            <Content style={{ margin: "24px 0 0" }}>
               <div style={{ padding: 24, minHeight: 360 }}>
                 <div
                   style={{

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
+import UpdateForm from "@/components/updateForm";
 
 import {
   Layout,
@@ -41,6 +42,9 @@ export default function Lead() {
   const [editMode, setEditMode] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
   const [changeLog, setChangeLogs] = useState([]);
+  const [showUpModal, setShowModal] = useState(false);
+  const [updateOk, setOk] = useState(false);
+
   const [isModalLoading, setIsModalLoading] = useState(false);
 
   const { logOut } = useLogout();
@@ -84,7 +88,7 @@ export default function Lead() {
           router.push("/leads");
         }
       }, fetchChangeLogs());
-  }, [id, router]);
+  }, [id, router, updateOk]);
 
   const onDelete = async (id) => {
     setLoadingDelete(true);
@@ -191,9 +195,20 @@ export default function Lead() {
                 </Title>
                 {editMode && (
                   <>
-                    <Link href={`/leads/${id}/updateinfo`}>
-                      <Button>Update lead&apos;s information</Button>
-                    </Link>
+                    <Button
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setShowModal(true)}
+                      type="primary"
+                    >
+                      Update lead&apos;s information
+                    </Button>
+                    <UpdateForm
+                      visible={showUpModal}
+                      onClose={() => setShowModal(false)}
+                      roleId={role}
+                      userId={id}
+                      onSuccess={() => setOk(true)}
+                    />
                     <Popconfirm
                       title="Are you sure to delete this lead?"
                       onConfirm={() => onDelete(id)}
