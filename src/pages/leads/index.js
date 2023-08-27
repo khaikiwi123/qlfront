@@ -3,7 +3,7 @@ import Link from "next/link";
 import Router from "next/router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Row, Col, Layout, Button, Tooltip, Tabs } from "antd";
+import { Row, Col, Layout, Button, Tooltip, Tabs, Spin } from "antd";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -28,6 +28,7 @@ const ProtectedPage = () => {
   const [currUser, setCurrUser] = useState("");
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState(null);
+  const [tabLoading, setTabLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [activeTab, setActiveTab] = useState("All");
@@ -88,6 +89,7 @@ const ProtectedPage = () => {
         setTotal(res.data.total);
         setLeads(res.data.leads);
         setLoading(false);
+        setTabLoading(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -264,11 +266,18 @@ const ProtectedPage = () => {
                   defaultActiveKey="All"
                   style={{ color: "#363636" }}
                   type="card"
-                  onChange={(key) => setActiveTab(key)}
+                  onChange={(key) => {
+                    setActiveTab(key);
+                    setTabLoading(true);
+                  }}
                 >
-                  <TabPane tab="All" key="All"></TabPane>
+                  <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
                   {statusOptions.map((option) => (
-                    <TabPane tab={option.label} key={option.value}></TabPane>
+                    <TabPane
+                      tab={option.label}
+                      key={option.value}
+                      disabled={tabLoading}
+                    ></TabPane>
                   ))}
                 </Tabs>
                 <FilterModal

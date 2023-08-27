@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Router from "next/router";
-import { Layout, Button, Row, Col } from "antd";
+import Router, { useRouter } from "next/router";
+import { Layout, Button, Row, Col, Spin } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import checkLogin from "@/Utils/checkLogin";
@@ -22,12 +22,14 @@ const App = () => {
   const [currID, setCurrID] = useState("");
   const [role, setRole] = useState("");
   const [createOk, setOk] = useState(false);
+  const [isRouterReady, setIsReady] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
+  const router = useRouter();
 
   const { logOut } = useLogout();
 
@@ -60,6 +62,9 @@ const App = () => {
     }
     setCurrID(localStorage.getItem("currID"));
     setLoading(true);
+    if (router.isReady) {
+      setIsReady(true);
+    }
     const { pageIndex, pageSize } = pagination;
 
     let params = {};
@@ -189,6 +194,20 @@ const App = () => {
     { value: "true", label: "Active" },
     { value: "false", label: "Inactive" },
   ];
+  if (!isRouterReady) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>
