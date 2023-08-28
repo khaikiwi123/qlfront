@@ -41,13 +41,13 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish} hideRequiredMark>
+      <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Email"
           name="email"
           validateFirst="true"
           rules={[
-            { required: true, message: "Please input your email!" },
+            { required: true, message: "Email is required" },
             {
               message: "Email isn't valid",
               validator: (_, value) => {
@@ -69,7 +69,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
           rules={[
             {
               required: true,
-              message: "Please input your phone number!",
+              message: "Phone number is required",
             },
             {
               message: "Phone number isn't valid",
@@ -92,14 +92,18 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
         <Form.Item
           label="Representative"
           name="rep"
-          rules={[{ required: true, message: "Please input your rep!" }]}
+          rules={[
+            { required: true, message: "Representative's name is required" },
+          ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="Organization"
           name="org"
-          rules={[{ required: true, message: "Please input your org!" }]}
+          rules={[
+            { required: true, message: "Organization's name is required" },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -110,7 +114,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
             rules={[
               {
                 required: true,
-                message: "Please input the assigned personel",
+                message: "Assigned personel is required",
               },
             ]}
           >

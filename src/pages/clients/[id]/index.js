@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Button, Typography, Spin, message } from "antd";
+import { Layout, Typography, Spin, message } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 
 import AppHeader from "@/components/header";
@@ -24,7 +24,6 @@ export default function Client() {
 
   const [client, setClient] = useState(null);
   const [role, setRole] = useState("");
-  const [editMode, setEditMode] = useState(false);
   const [showModal, setModal] = useState(false);
   const [updateOk, setOk] = useState(false);
 
@@ -109,29 +108,20 @@ export default function Client() {
                 <Title>
                   {client.org}
                   <EditOutlined
-                    onClick={() => setEditMode(!editMode)}
+                    onClick={() => setModal(true)}
                     style={{ marginLeft: "10px", fontSize: "16px" }}
                   />
                 </Title>
-                {editMode && (
-                  <>
-                    <Button
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setModal(true)}
-                      type="primary"
-                    >
-                      Update customer&apos;s information
-                    </Button>
-                    <UpdateForm
-                      visible={showModal}
-                      onClose={() => setModal(false)}
-                      roleId={role}
-                      userId={id}
-                      onSuccess={() => setOk(true)}
-                      uType="clients"
-                    />
-                  </>
-                )}
+
+                <UpdateForm
+                  visible={showModal}
+                  onClose={() => setModal(false)}
+                  roleId={role}
+                  userId={id}
+                  onSuccess={() => setOk(true)}
+                  uType="clients"
+                />
+
                 <br />
                 <Text>Email: {client.email}</Text>
                 <br />

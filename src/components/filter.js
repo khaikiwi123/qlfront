@@ -122,6 +122,21 @@ const FilterModal = ({
                 </Select.Option>
               ))}
             </Select>
+          ) : filter.selectValue === "role" ? (
+            <Select
+              style={{ width: 305, marginRight: 10 }}
+              value={filter.value || null}
+              placeholder="Select role"
+              onChange={(value) => {
+                const updatedFilters = filters.map((f) =>
+                  f.id === filter.id ? { ...f, value } : f
+                );
+                setFilters(updatedFilters);
+              }}
+            >
+              <Select.Option value="admin">Admin</Select.Option>
+              <Select.Option value="user">User</Select.Option>
+            </Select>
           ) : filter.selectValue === "exactDate" ? (
             <DatePicker
               style={{ width: 305, marginRight: 10 }}

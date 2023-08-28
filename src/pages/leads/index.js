@@ -247,7 +247,11 @@ const ProtectedPage = () => {
 
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <Button
-                      style={{ marginLeft: "10px", cursor: "pointer" }}
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginTop: "10px",
+                      }}
                       onClick={() => setShowModal(true)}
                       type="primary"
                     >

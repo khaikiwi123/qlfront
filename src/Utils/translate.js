@@ -4,6 +4,7 @@ export const statusTranslations = {
   "Verified needs": "Đã xác định nhu cầu",
   Consulted: "Đã tư vấn",
   Success: "Thành công",
+  Failed: "Thất bại",
 };
 
 export function translateStatus(status) {

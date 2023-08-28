@@ -186,7 +186,7 @@ const App = () => {
   const filter = [
     { label: "Name", value: "name" },
     { label: "Email", value: "email" },
-    { label: "Role", value: "phone" },
+    { label: "Role", value: "role" },
     { label: "Phone", value: "phone" },
     { label: "Status", value: "status" },
   ];
@@ -244,7 +244,11 @@ const App = () => {
 
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <Button
-                      style={{ marginLeft: "10px", cursor: "pointer" }}
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginTop: "10px",
+                      }}
                       onClick={() => setShowModal(true)}
                       type="primary"
                     >

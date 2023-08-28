@@ -40,7 +40,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish} hideRequiredMark>
+      <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Email"
           name="email"
