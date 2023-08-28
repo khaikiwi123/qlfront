@@ -43,26 +43,6 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label="Email"
-          name="email"
-          validateFirst="true"
-          rules={[
-            { required: true, message: "Email is required" },
-            {
-              message: "Email isn't valid",
-              validator: (_, value) => {
-                if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
-                  return Promise.resolve();
-                } else {
-                  return Promise.reject("Email is invalid");
-                }
-              },
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
           label="Phone"
           name="phone"
           validateFirst="true"
@@ -82,6 +62,26 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
                   return Promise.resolve();
                 } else {
                   return Promise.reject("Phone is invalid");
+                }
+              },
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          validateFirst="true"
+          rules={[
+            { required: true, message: "Email is required" },
+            {
+              message: "Email isn't valid",
+              validator: (_, value) => {
+                if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject("Email is invalid");
                 }
               },
             },

@@ -62,6 +62,10 @@ html {
   margin-left: 200px;
 }
 
+.failed-steps .ant-steps-item-active .ant-steps-item-title {
+  color: red !important;
+}
+
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
   top: 500px;

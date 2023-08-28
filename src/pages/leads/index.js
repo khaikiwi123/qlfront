@@ -169,6 +169,7 @@ const ProtectedPage = () => {
     { value: "Verified needs", label: "Đã Xác Định Nhu Cầu" },
     { value: "Consulted", label: "Đã Tư Vấn" },
     { value: "Success", label: "Thành Công" },
+    { value: "Failed", label: "Thất Bại" },
   ];
   if (activeTab === "All") {
     baseColumns.push({

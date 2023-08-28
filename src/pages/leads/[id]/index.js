@@ -13,7 +13,11 @@ import {
   message,
   Timeline,
 } from "antd";
-import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  CloseCircleOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -86,6 +90,11 @@ export default function Lead() {
 
           router.push("/leads");
         }
+        if (err.response?.data?.error === "Lead not found") {
+          message.error("Lead doesn't exist");
+
+          router.push("/leads");
+        }
       }, fetchChangeLogs());
   }, [id, router, updateOk]);
 
@@ -96,19 +105,6 @@ export default function Lead() {
     router.push("/leads");
 
     setLoadingDelete(false);
-  };
-
-  const onUpdateStatus = async (newStatus) => {
-    if (newStatus === "Success") {
-      setModal(true);
-      return;
-    }
-    try {
-      await api.put(`/leads/${id}`, { status: newStatus });
-      setLead({ ...lead, status: newStatus });
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   if (lead === null) {
@@ -131,25 +127,33 @@ export default function Lead() {
     setPendingStatus(newStatus);
     setModal(true);
   };
-  const handleConfirmChange = async () => {
+  const handleConfirmChange = async (statusType) => {
     setIsModalLoading(true);
     try {
-      if (pendingStatus === "Success") {
-        await api.put(`/leads/${id}`, { status: "Success" });
-        setLead({ ...lead, status: "Success" });
-        router.push(`/clients?email=${lead.email}`);
+      let updateStatus;
+      if (statusType === "Failed") {
+        updateStatus = { status: "Failed", trackStatus: pendingStatus };
       } else {
-        await onUpdateStatus(pendingStatus);
+        updateStatus = { status: pendingStatus, trackStatus: pendingStatus };
       }
-      setPendingStatus("");
+
+      await api.put(`/leads/${id}`, updateStatus);
+      setLead((prevState) => ({
+        ...prevState,
+        ...updateStatus,
+      }));
+
+      if (updateStatus.status === "Success") {
+        router.push(`/clients?email=${lead.email}`);
+      }
       fetchChangeLogs();
     } catch (error) {
       console.error(error);
     }
+
     setIsModalLoading(false);
     setModal(false);
   };
-
   const statusToIndex = {
     "No contact": 0,
     "In contact": 1,
@@ -157,7 +161,43 @@ export default function Lead() {
     Consulted: 3,
     Success: 4,
   };
-  const shouldAllowStepChange = () => lead.status !== "Success";
+  const renderStepDescription = (currentIndex) => {
+    if (currentStep === currentIndex) {
+      if (lead.status === "Failed") {
+        return (
+          <span
+            onClick={() => onChangeStatusStep(currentIndex)}
+            style={{ cursor: "pointer", color: "red" }}
+          >
+            Action
+          </span>
+        );
+      } else {
+        return (
+          <span
+            onClick={() => onChangeStatusStep(currentIndex)}
+            style={{ cursor: "pointer", color: "#1890ff" }}
+          >
+            Action
+          </span>
+        );
+      }
+    }
+    return null;
+  };
+  const currentStep = statusToIndex[lead.trackStatus] || 0;
+  const shouldAllowStepChange = (currentIndex) => {
+    // if (currentIndex < currentStep) {
+    //   return false;
+    // }
+    return lead.status !== "Success" && lead.status !== "Failed";
+  };
+  const determineStepIcon = (currentIndex) => {
+    if (currentStep === currentIndex && lead.status === "Failed") {
+      return <CloseCircleOutlined style={{ color: "red" }} />;
+    }
+    return null;
+  };
 
   return (
     <>
@@ -240,17 +280,44 @@ export default function Lead() {
               <Steps
                 type="navigation"
                 size="small"
-                current={statusToIndex[lead.status]}
-                onChange={shouldAllowStepChange() ? onChangeStatusStep : null}
-                className="custom-steps"
+                current={currentStep}
+                onChange={(currentIndex) => {
+                  shouldAllowStepChange(currentIndex)
+                    ? onChangeStatusStep(currentIndex)
+                    : null;
+                }}
+                className={`custom-steps ${
+                  lead.status === "Failed" ? "failed-steps" : ""
+                }`}
               >
-                <Step title="Chưa liên hệ" />
-                <Step title="Đã liên hệ" />
-                <Step title="Đã xác định nhu cầu" />
-                <Step title="Đã tư vấn" />
-                <Step title="Thành công" />
+                <Step
+                  title={"Chưa liên hệ"}
+                  description={renderStepDescription(0)}
+                  icon={determineStepIcon(0)}
+                />
+                <Step
+                  title={"Đã liên hệ"}
+                  description={renderStepDescription(1)}
+                  icon={determineStepIcon(1)}
+                />
+                <Step
+                  title={"Đã xác định nhu cầu"}
+                  description={renderStepDescription(2)}
+                  icon={determineStepIcon(2)}
+                />
+                <Step
+                  title={"Đã tư vấn"}
+                  description={renderStepDescription(3)}
+                  icon={determineStepIcon(3)}
+                />
+                <Step
+                  title={"Thành công"}
+                  description={renderStepDescription(4)}
+                  icon={determineStepIcon(4)}
+                />
               </Steps>
             </div>
+
             <h3 style={{ textAlign: "left" }}>History</h3>
             <div
               style={{
@@ -309,19 +376,69 @@ export default function Lead() {
         </Layout>
       </Layout>
       <Modal
-        title="Confirm Status Change"
+        title="Action for Status"
         visible={showModal}
-        onOk={handleConfirmChange}
         onCancel={() => {
           setPendingStatus("");
           setModal(false);
         }}
-        confirmLoading={isModalLoading}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setPendingStatus("");
+              setModal(false);
+            }}
+            loading={isModalLoading}
+          >
+            Cancel
+          </Button>,
+          lead.status === "Failed" && (
+            <Popconfirm
+              title="Are you sure to delete this lead?"
+              onConfirm={() => onDelete(id)}
+              onCancel={null}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button key="delete" danger>
+                Delete
+              </Button>
+            </Popconfirm>
+          ),
+          lead.status === "Failed" && (
+            <Button
+              key="succeed"
+              type="primary"
+              onClick={handleConfirmChange}
+              loading={isModalLoading}
+            >
+              Change to Succeed
+            </Button>
+          ),
+          lead.status !== "Failed" && (
+            <Button
+              key="failed"
+              danger
+              onClick={() => handleConfirmChange("Failed")}
+              loading={isModalLoading}
+            >
+              Failed
+            </Button>
+          ),
+          currentStep !== statusToIndex[pendingStatus] && (
+            <Button
+              key="confirm"
+              type="primary"
+              onClick={handleConfirmChange}
+              loading={isModalLoading}
+            >
+              Confirm
+            </Button>
+          ),
+        ]}
       >
-        <p>
-          Are you sure you want to set this lead&apos;s status to &quot;
-          {translateStatus(pendingStatus)}&quot;?
-        </p>
+        <p>Select an option for this step</p>
       </Modal>
     </>
   );
