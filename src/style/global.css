@@ -72,6 +72,9 @@ html {
 .ant-layout {
   background: #ffffff;
 }
+.ant-steps.ant-steps-small .ant-steps-item-icon {
+  margin-top: 10px;
+}
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
   top: 500px;

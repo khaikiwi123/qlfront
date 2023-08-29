@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 
 import { Button, Popconfirm, Modal, Steps } from "antd";
-import { CloseCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  CheckCircleOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import api from "@/api/api";
 
 const { Step } = Steps;
@@ -19,6 +23,7 @@ const AppStep = ({
   const [showModal, setModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
+  const [selectedStep, setSelectedStep] = useState(null);
 
   const onDelete = async (id) => {
     await api.delete(`/leads/${id}`);
@@ -33,11 +38,30 @@ const AppStep = ({
     Consulted: 3,
     Success: 4,
   };
-  const onChangeStatusStep = (currentIndex) => {
+  const onChangeStatusStep = async (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);
     const newStatus = statusKeys[currentIndex];
-    setPendingStatus(newStatus);
-    setModal(true);
+    setSelectedStep(currentIndex);
+    if (currentIndex === statusKeys.length - 1) {
+      setPendingStatus(newStatus);
+      setModal(true);
+    } else {
+      setIsModalLoading(true);
+      try {
+        const updateStatus = { status: newStatus, trackStatus: newStatus };
+
+        await api.put(`/leads/${id}`, updateStatus);
+        setLead((prevState) => ({
+          ...prevState,
+          ...updateStatus,
+        }));
+        fetchChangeLogs();
+      } catch (error) {
+        console.error(error);
+      }
+      setIsModalLoading(false);
+      setSelectedStep(null);
+    }
   };
   const handleConfirmChange = async (statusType) => {
     setIsModalLoading(true);
@@ -89,19 +113,22 @@ const AppStep = ({
       }
     } else if (currentStep > currentIndex) {
       return <>Completed</>;
+    } else {
+      return <>Incompleted</>;
     }
-    return null;
   };
 
   const currentStep = statusToIndex[trackStatus] || 0;
-  const shouldAllowStepChange = (currentIndex) => {
-    // if (currentIndex < currentStep) {
-    //   return false;
-    // }
-    return status !== "Success" && status !== "Failed";
-  };
+  // const shouldAllowStepChange = (currentIndex) => {
+  // if (currentIndex < currentStep) {
+  //   return false;
+  // }
+  //   return status !== "Success" && status !== "Failed";
+  // };
   const determineStepIcon = (currentIndex) => {
-    if (currentStep === currentIndex) {
+    if (isModalLoading && currentIndex === selectedStep) {
+      return <LoadingOutlined />;
+    } else if (currentStep === currentIndex) {
       if (status === "Failed") {
         return <CloseCircleOutlined style={{ color: "red" }} />;
       } else {
@@ -119,9 +146,7 @@ const AppStep = ({
           size="small"
           current={currentStep}
           onChange={(currentIndex) => {
-            shouldAllowStepChange(currentIndex)
-              ? onChangeStatusStep(currentIndex)
-              : null;
+            onChangeStatusStep(currentIndex);
           }}
           className={`custom-steps ${
             status === "Failed" ? "failed-steps" : "complete-step"
@@ -130,32 +155,37 @@ const AppStep = ({
           <Step
             title={"Chưa liên hệ"}
             description={renderStepDescription(0)}
+            disabled={isModalLoading}
             icon={determineStepIcon(0)}
           />
           <Step
             title={"Đã liên hệ"}
             description={renderStepDescription(1)}
             icon={determineStepIcon(1)}
+            disabled={isModalLoading}
           />
           <Step
             title={"Đã xác định nhu cầu"}
             description={renderStepDescription(2)}
             icon={determineStepIcon(2)}
+            disabled={isModalLoading}
           />
           <Step
             title={"Đã tư vấn"}
             description={renderStepDescription(3)}
             icon={determineStepIcon(3)}
+            disabled={isModalLoading}
           />
           <Step
-            title={"Thành công"}
+            title={status === "Failed" ? "Thất bại" : "Thành công"}
             description={renderStepDescription(4)}
             icon={determineStepIcon(4)}
+            disabled={isModalLoading}
           />
         </Steps>
       </div>
       <Modal
-        title="Action for Status"
+        title="Result"
         visible={showModal}
         onCancel={() => {
           setPendingStatus("");
@@ -180,7 +210,7 @@ const AppStep = ({
               okText="Yes"
               cancelText="No"
             >
-              <Button key="delete" danger>
+              <Button key="delete" type="primary" danger>
                 Delete
               </Button>
             </Popconfirm>
@@ -192,32 +222,23 @@ const AppStep = ({
               onClick={handleConfirmChange}
               loading={isModalLoading}
             >
-              Change to Completed
+              Change to Success
             </Button>
           ),
           status !== "Failed" && (
             <Button
               key="failed"
               danger
+              type="primary"
               onClick={() => handleConfirmChange("Failed")}
               loading={isModalLoading}
             >
               Failed
             </Button>
           ),
-          currentStep !== statusToIndex[pendingStatus] && (
-            <Button
-              key="complete"
-              type="primary"
-              onClick={handleConfirmChange}
-              loading={isModalLoading}
-            >
-              Complete
-            </Button>
-          ),
         ]}
       >
-        <p>Select an option for this step</p>
+        <p>Select a result:</p>
       </Modal>
     </>
   );
