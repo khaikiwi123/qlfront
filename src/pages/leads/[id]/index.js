@@ -51,7 +51,6 @@ export default function Lead() {
   const [isModalLoading, setIsModalLoading] = useState(false);
 
   const { logOut } = useLogout();
-
   const fetchChangeLogs = async () => {
     try {
       const response = await api.get(`/leads/${id}/log`);
@@ -121,6 +120,14 @@ export default function Lead() {
       </div>
     );
   }
+
+  const statusToIndex = {
+    "No contact": 0,
+    "In contact": 1,
+    "Verified needs": 2,
+    Consulted: 3,
+    Success: 4,
+  };
   const onChangeStatusStep = (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);
     const newStatus = statusKeys[currentIndex];
@@ -154,13 +161,6 @@ export default function Lead() {
     setIsModalLoading(false);
     setModal(false);
   };
-  const statusToIndex = {
-    "No contact": 0,
-    "In contact": 1,
-    "Verified needs": 2,
-    Consulted: 3,
-    Success: 4,
-  };
   const renderStepDescription = (currentIndex) => {
     if (currentStep === currentIndex) {
       if (lead.status === "Failed") {
@@ -182,9 +182,12 @@ export default function Lead() {
           </span>
         );
       }
+    } else if (currentStep > currentIndex) {
+      return <>Completed</>;
     }
     return null;
   };
+
   const currentStep = statusToIndex[lead.trackStatus] || 0;
   const shouldAllowStepChange = (currentIndex) => {
     // if (currentIndex < currentStep) {
@@ -211,7 +214,7 @@ export default function Lead() {
             />
             <div
               style={{
-                minHeight: 360,
+                minHeight: 280,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -228,40 +231,18 @@ export default function Lead() {
                 <Title>
                   {lead.org}
                   <EditOutlined
-                    onClick={() => setEditMode(!editMode)}
+                    onClick={() => setShowModal(true)}
                     style={{ marginLeft: "10px", fontSize: "16px" }}
                   />
+                  <UpdateForm
+                    visible={showUpModal}
+                    onClose={() => setShowModal(false)}
+                    roleId={role}
+                    userId={id}
+                    onSuccess={() => setOk(true)}
+                    uType="leads"
+                  />
                 </Title>
-                {editMode && (
-                  <>
-                    <Button
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowModal(true)}
-                      type="primary"
-                    >
-                      Update lead&apos;s information
-                    </Button>
-                    <UpdateForm
-                      visible={showUpModal}
-                      onClose={() => setShowModal(false)}
-                      roleId={role}
-                      userId={id}
-                      onSuccess={() => setOk(true)}
-                      uType="leads"
-                    />
-                    <Popconfirm
-                      title="Are you sure to delete this lead?"
-                      onConfirm={() => onDelete(id)}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <Button danger loading={loadingDelete}>
-                        {loadingDelete ? "Deleting..." : "Delete"}
-                      </Button>
-                    </Popconfirm>
-                  </>
-                )}
-                <br />
                 <Text>Email: {lead.email}</Text>
                 <br />
                 <Text>Phone: {lead.phone}</Text>

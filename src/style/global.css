@@ -66,6 +66,9 @@ html {
   color: red !important;
 }
 
+.ant-layout {
+  background: #ffffff;
+}
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
   top: 500px;

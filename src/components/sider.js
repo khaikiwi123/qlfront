@@ -33,7 +33,7 @@ const AppSider = ({ role }) => {
       }}
       style={{
         marginTop: 64,
-        height: "100vh",
+        height: "100%",
         position: "fixed",
         left: 0,
         zIndex: 3,
