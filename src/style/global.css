@@ -65,6 +65,9 @@ html {
 .failed-steps .ant-steps-item-active .ant-steps-item-title {
   color: red !important;
 }
+.complete-step .ant-steps-item-active .ant-steps-item-title {
+  color: green !important;
+}
 
 .ant-layout {
   background: #ffffff;

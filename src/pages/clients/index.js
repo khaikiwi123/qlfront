@@ -4,14 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Button, Tooltip, Spin, Row, Col, Tabs } from "antd";
+import { Layout, Button, Tooltip, Spin, Row, Col } from "antd";
 const { Content } = Layout;
-const { TabPane } = Tabs;
 
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";
-import { translateStatus } from "@/Utils/translate";
 
 import useLogout from "@/hooks/useLogout";
 
@@ -25,10 +23,8 @@ const ProtectedPage = () => {
   const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [tabLoading, setTabLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
   const [role, setRole] = useState("");
-  const [activeTab, setActiveTab] = useState("All");
   const [isRouterReady, setIsRouterReady] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [pagination, setPagination] = useState({
@@ -72,11 +68,8 @@ const ProtectedPage = () => {
       ...params,
       ...appliedFilters,
     };
-    if (activeTab !== "All") {
-      params.status = activeTab;
-    }
     fetchClient(params);
-  }, [pagination, appliedFilters, router.isReady, activeTab]);
+  }, [pagination, appliedFilters, router.isReady]);
 
   const fetchClient = (params) => {
     let queryParams = Object.keys(params)
@@ -94,7 +87,6 @@ const ProtectedPage = () => {
         setTotal(res.data.total);
         setClients(res.data.clients);
         setLoading(false);
-        setTabLoading(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -184,29 +176,7 @@ const ProtectedPage = () => {
     });
     baseFilter.push({ label: "In Charge", value: "inCharge" });
   }
-  const statusOptions = [
-    { value: "Success", label: "Thành Công" },
-    { value: "Failed", label: "Thất Bại" },
-  ];
-  if (activeTab === "All") {
-    baseColumns.push({
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => {
-        const displayStatus = translateStatus(status);
-        const lastUpdated = record.statusUpdate
-          ? `Last updated ${dayjs(record.statusUpdate).fromNow()}`
-          : "";
 
-        return (
-          <Tooltip title={lastUpdated}>
-            <span>{displayStatus}</span>
-          </Tooltip>
-        );
-      },
-    });
-  }
   if (!router.isReady) {
     return (
       <div
@@ -258,24 +228,7 @@ const ProtectedPage = () => {
                     Accquired Customers
                   </h1>
                 </div>
-                <Tabs
-                  defaultActiveKey="All"
-                  style={{ color: "#363636" }}
-                  type="card"
-                  onChange={(key) => {
-                    setActiveTab(key);
-                    setTabLoading(true);
-                  }}
-                >
-                  <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
-                  {statusOptions.map((option) => (
-                    <TabPane
-                      tab={option.label}
-                      key={option.value}
-                      disabled={tabLoading}
-                    ></TabPane>
-                  ))}
-                </Tabs>
+
                 <FilterModal
                   queryFilter={router.query}
                   onFilterApply={(newFilters) => {
