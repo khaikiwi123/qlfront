@@ -187,7 +187,7 @@ const AppStep = ({
           ),
           status === "Failed" && (
             <Button
-              key="complete"
+              key="completed"
               type="primary"
               onClick={handleConfirmChange}
               loading={isModalLoading}
@@ -207,12 +207,12 @@ const AppStep = ({
           ),
           currentStep !== statusToIndex[pendingStatus] && (
             <Button
-              key="confirm"
+              key="complete"
               type="primary"
               onClick={handleConfirmChange}
               loading={isModalLoading}
             >
-              Confirm
+              Complete
             </Button>
           ),
         ]}
