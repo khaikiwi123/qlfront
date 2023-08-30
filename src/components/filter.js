@@ -90,135 +90,133 @@ const FilterModal = ({
               </Select.Option>
             ))}
           </Select>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {filter.selectValue === "lastUp" ? (
+              <InputNumber
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value || null}
+                placeholder="Enter number of days"
+                min={0}
+                onChange={(value) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              />
+            ) : filter.selectValue === "status" ? (
+              <Select
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value || null}
+                placeholder="Select status"
+                onChange={(value) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              >
+                {statusOptions.map((option) => (
+                  <Select.Option value={option.value} key={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            ) : filter.selectValue === "role" ? (
+              <Select
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value || null}
+                placeholder="Select role"
+                onChange={(value) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              >
+                <Select.Option value="admin">Admin</Select.Option>
+                <Select.Option value="user">User</Select.Option>
+              </Select>
+            ) : filter.selectValue === "exactDate" ? (
+              <DatePicker
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value ? dayjs(filter.value, dateFormat) : null}
+                format={dateFormat}
+                placeholder="Select a date"
+                onChange={(date, dateString) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value: dateString } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              />
+            ) : filter.selectValue === "dateRange" ? (
+              <DatePicker.RangePicker
+                style={{ width: 305, marginRight: 10 }}
+                allowEmpty={[true, true]}
+                format={dateFormat}
+                value={[
+                  filter.value && filter.value[0]
+                    ? dayjs(filter.value[0], dateFormat)
+                    : null,
+                  filter.value && filter.value[1]
+                    ? dayjs(filter.value[1], dateFormat)
+                    : null,
+                ]}
+                onChange={(dates, dateStrings) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value: dateStrings } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              />
+            ) : (
+              <Input
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value || null}
+                placeholder="Enter filter value"
+                onChange={(e) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value: e.target.value } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              />
+            )}
 
-          {filter.selectValue === "lastUp" ? (
-            <InputNumber
-              style={{ width: 305, marginRight: 10 }}
-              value={filter.value || null}
-              placeholder="Enter number of days"
-              min={0}
-              onChange={(value) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value } : f
-                );
-                setFilters(updatedFilters);
+            <PlusOutlined
+              onClick={() => {
+                const newFilter = {
+                  id: Math.max(...filters.map((f) => f.id)) + 1,
+                  value: "",
+                  selectValue: "",
+                };
+                setFilters([...filters, newFilter]);
               }}
             />
-          ) : filter.selectValue === "status" ? (
-            <Select
-              style={{ width: 305, marginRight: 10 }}
-              value={filter.value || null}
-              placeholder="Select status"
-              onChange={(value) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value } : f
-                );
-                setFilters(updatedFilters);
-              }}
-            >
-              {statusOptions.map((option) => (
-                <Select.Option value={option.value} key={option.value}>
-                  {option.label}
-                </Select.Option>
-              ))}
-            </Select>
-          ) : filter.selectValue === "role" ? (
-            <Select
-              style={{ width: 305, marginRight: 10 }}
-              value={filter.value || null}
-              placeholder="Select role"
-              onChange={(value) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value } : f
-                );
-                setFilters(updatedFilters);
-              }}
-            >
-              <Select.Option value="admin">Admin</Select.Option>
-              <Select.Option value="user">User</Select.Option>
-            </Select>
-          ) : filter.selectValue === "exactDate" ? (
-            <DatePicker
-              style={{ width: 305, marginRight: 10 }}
-              value={filter.value ? dayjs(filter.value, dateFormat) : null}
-              format={dateFormat}
-              placeholder="Select a date"
-              onChange={(date, dateString) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value: dateString } : f
-                );
-                setFilters(updatedFilters);
-              }}
-            />
-          ) : filter.selectValue === "dateRange" ? (
-            <DatePicker.RangePicker
-              style={{ width: 305, marginRight: 10 }}
-              allowEmpty={[true, true]}
-              format={dateFormat}
-              value={[
-                filter.value && filter.value[0]
-                  ? dayjs(filter.value[0], dateFormat)
-                  : null,
-                filter.value && filter.value[1]
-                  ? dayjs(filter.value[1], dateFormat)
-                  : null,
-              ]}
-              onChange={(dates, dateStrings) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value: dateStrings } : f
-                );
-                setFilters(updatedFilters);
-              }}
-            />
-          ) : (
-            <Input
-              style={{ width: 305, marginRight: 10 }}
-              value={filter.value || null}
-              placeholder="Enter filter value"
-              onChange={(e) => {
-                const updatedFilters = filters.map((f) =>
-                  f.id === filter.id ? { ...f, value: e.target.value } : f
-                );
-                setFilters(updatedFilters);
-              }}
-            />
-          )}
 
-          <PlusOutlined
-            style={{ marginRight: 10 }}
-            onClick={() => {
-              const newFilter = {
-                id: Math.max(...filters.map((f) => f.id)) + 1,
-                value: "",
-                selectValue: "",
-              };
-              setFilters([...filters, newFilter]);
-            }}
-          />
-
-          <DeleteOutlined
-            type="delete"
-            onClick={() => {
-              if (filters.length > 1) {
-                const updatedFilters = filters.filter(
-                  (f) => f.id !== filter.id
-                );
-                setFilters(updatedFilters);
-              } else {
-                setFilters([{ id: 1, value: "", selectValue: "" }]);
-              }
-            }}
-          />
+            <DeleteOutlined
+              type="delete"
+              onClick={() => {
+                if (filters.length > 1) {
+                  const updatedFilters = filters.filter(
+                    (f) => f.id !== filter.id
+                  );
+                  setFilters(updatedFilters);
+                } else {
+                  setFilters([{ id: 1, value: "", selectValue: "" }]);
+                }
+              }}
+            />
+          </div>
 
           {filter.id === Math.max(...filters.map((f) => f.id)) && (
-            <>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <Button onClick={setFilter}>Apply Filters</Button>
               {isAnyFilterSet() && (
-                <Button onClick={resetAll} style={{ marginRight: "10px" }}>
-                  Clear All Filters
-                </Button>
+                <Button onClick={resetAll}>Clear All Filters</Button>
               )}
-            </>
+            </div>
           )}
         </div>
       ))}

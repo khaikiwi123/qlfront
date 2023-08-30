@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { Layout, Typography, Spin, message, Descriptions } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";

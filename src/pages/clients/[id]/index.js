@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Typography, Spin, message } from "antd";
+import { Layout, Typography, Spin, message, Descriptions } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 
 import AppHeader from "@/components/header";
@@ -16,7 +16,7 @@ import useLogout from "@/hooks/useLogout";
 import authErr from "@/api/authErr";
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export default function Client() {
   const router = useRouter();
@@ -75,6 +75,33 @@ export default function Client() {
       </div>
     );
   }
+  const items = [
+    {
+      key: "1",
+      label: "Email",
+      children: client.email,
+    },
+    {
+      key: "2",
+      label: "Phone Number",
+      children: client.phone,
+    },
+    {
+      key: "3",
+      label: "Representative",
+      children: client.rep,
+    },
+    {
+      key: "4",
+      label: "Person In Charge",
+      children: client.inCharge,
+    },
+    {
+      key: "5",
+      label: "Created Date",
+      children: dayjs(client.createdDate).format("DD/MM/YYYY"),
+    },
+  ];
 
   return (
     <>
@@ -91,7 +118,7 @@ export default function Client() {
             />
             <div
               style={{
-                minHeight: 360,
+                minHeight: 280,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -100,40 +127,35 @@ export default function Client() {
             >
               <div
                 style={{
+                  marginTop: 80,
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "flex-start",
+                  alignItems: "center",
+                  borderBottom: "1px solid #A9A9A9",
+                  borderTop: "1px solid #A9A9A9",
                 }}
               >
-                <Title>
+                <Title style={{ marginTop: -5 }}>
                   {client.org}
                   <EditOutlined
                     onClick={() => setModal(true)}
                     style={{ marginLeft: "10px", fontSize: "16px" }}
                   />
+                  <UpdateForm
+                    visible={showModal}
+                    onClose={() => setModal(false)}
+                    roleId={role}
+                    userId={id}
+                    onSuccess={() => setOk(true)}
+                    uType="clients"
+                  />
                 </Title>
-
-                <UpdateForm
-                  visible={showModal}
-                  onClose={() => setModal(false)}
-                  roleId={role}
-                  userId={id}
-                  onSuccess={() => setOk(true)}
-                  uType="clients"
+                <Descriptions
+                  size="small"
+                  layout="vertical"
+                  items={items}
+                  style={{ marginLeft: 50, marginBottom: 20 }}
                 />
-
-                <br />
-                <Text>Email: {client.email}</Text>
-                <br />
-                <Text>Phone: {client.phone}</Text>
-                <br />
-
-                <Text>Representative: {client.rep}</Text>
-                <br />
-
-                <Text>
-                  Created At: {dayjs(client.createdDate).format("DD/MM/YYYY")}
-                </Text>
               </div>
             </div>
           </Content>

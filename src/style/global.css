@@ -79,7 +79,7 @@ html {
 }
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
-  top: 500px;
+  top: 0;
   inset-inline-end: -40px;
   z-index: 1;
   width: 40px;
