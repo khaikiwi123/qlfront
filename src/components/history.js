@@ -21,6 +21,7 @@ const AppHistory = ({ changeLog }) => {
       >
         {changeLog.length > 0 ? (
           <Timeline
+            className="timeline-responsive"
             style={{ textAlign: "left", marginTop: 0 }}
             mode="left"
             reverse="true"
