@@ -2,7 +2,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Typography, Spin, message, Descriptions } from "antd";
+import {
+  Layout,
+  Typography,
+  Spin,
+  message,
+  Descriptions,
+  Button,
+  Modal,
+  Row,
+  Col,
+} from "antd";
 import { EditOutlined } from "@ant-design/icons";
 const { Content } = Layout;
 const { Title } = Typography;
@@ -28,6 +38,8 @@ export default function Lead() {
   const [role, setRole] = useState("");
   const [changeLog, setChangeLogs] = useState([]);
   const [showUpModal, setShowModal] = useState(false);
+  const [delModal, setDelModal] = useState(false);
+  const [delLoading, setDelLoading] = useState(false);
   const [updateOk, setOk] = useState(false);
 
   const { logOut } = useLogout();
@@ -37,6 +49,20 @@ export default function Lead() {
       setChangeLogs(response.data.changelog);
     } catch (error) {
       console.error("Failed to fetch change logs:", error);
+    }
+  };
+  const onDelete = async (id) => {
+    setDelLoading(true);
+    try {
+      await api.delete(`/leads/${id}`);
+      setDelModal(false);
+      message.success("Lead deleted");
+      router.push("/leads");
+    } catch (error) {
+      console.error("Failed to delete lead:", error);
+      message.error("Error deleting lead");
+    } finally {
+      setDelLoading(false);
     }
   };
   useEffect(() => {
@@ -90,6 +116,7 @@ export default function Lead() {
       </div>
     );
   }
+
   const items = [
     {
       key: "1",
@@ -184,6 +211,55 @@ export default function Lead() {
 
             <h3 style={{ textAlign: "left" }}>History</h3>
             <AppHistory id={id} changeLog={changeLog} />
+            <div
+              style={{
+                minHeight: 280,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: -70,
+              }}
+            >
+              <Button key="delete" danger onClick={() => setDelModal(true)}>
+                Delete
+              </Button>
+              <Modal
+                title="Delete"
+                visible={delModal}
+                centered
+                onCancel={() => {
+                  setDelModal(false);
+                }}
+                footer={[
+                  <Row style={{ width: "100%" }}>
+                    <Col span={2}>
+                      <Button
+                        key="no"
+                        onClick={() => {
+                          setDelModal(false);
+                        }}
+                        loading={delLoading}
+                      >
+                        No
+                      </Button>
+                    </Col>
+                    <Col span={22} style={{ textAlign: "right" }}>
+                      <Button
+                        key="complete"
+                        type="primary"
+                        onClick={() => onDelete(id)}
+                        danger
+                        loading={delLoading}
+                      >
+                        Yes
+                      </Button>
+                    </Col>
+                  </Row>,
+                ]}
+              >
+                <p>Are you sure you want to delete this?</p>
+              </Modal>
+            </div>
           </Content>
         </Layout>
       </Layout>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 
-import { Button, Popconfirm, Modal, Steps } from "antd";
+import { Button, Modal, Steps, Row, Col } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -24,12 +24,6 @@ const AppStep = ({
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
-
-  const onDelete = async (id) => {
-    await api.delete(`/leads/${id}`);
-
-    router.push("/leads");
-  };
 
   const statusToIndex = {
     "No contact": 0,
@@ -234,60 +228,53 @@ const AppStep = ({
           setModal(false);
         }}
         footer={[
-          <Button
-            key="cancel"
-            onClick={() => {
-              setPendingStatus("");
-              setModal(false);
-            }}
-            loading={isModalLoading}
-          >
-            Cancel
-          </Button>,
-          status === "Failed" && (
-            <Popconfirm
-              title="Are you sure to delete this lead?"
-              onConfirm={() => onDelete(id)}
-              onCancel={null}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button key="delete" type="primary" danger>
-                Delete
+          <Row style={{ width: "100%" }}>
+            <Col span={2}>
+              <Button
+                key="cancel"
+                onClick={() => {
+                  setPendingStatus("");
+                  setModal(false);
+                }}
+                loading={isModalLoading}
+              >
+                Cancel
               </Button>
-            </Popconfirm>
-          ),
-          status === "Failed" && (
-            <Button
-              key="completed"
-              type="primary"
-              onClick={handleConfirmChange}
-              loading={isModalLoading}
-            >
-              Change to Success
-            </Button>
-          ),
-          status !== "Failed" && (
-            <Button
-              key="failed"
-              danger
-              type="primary"
-              onClick={() => handleConfirmChange("Failed")}
-              loading={isModalLoading}
-            >
-              Failed
-            </Button>
-          ),
-          currentStep !== statusToIndex[pendingStatus] && (
-            <Button
-              key="complete"
-              type="primary"
-              onClick={handleConfirmChange}
-              loading={isModalLoading}
-            >
-              Success
-            </Button>
-          ),
+            </Col>
+            <Col span={22} style={{ textAlign: "right" }}>
+              {status === "Failed" && (
+                <Button
+                  key="completed"
+                  type="primary"
+                  onClick={handleConfirmChange}
+                  loading={isModalLoading}
+                >
+                  Change to Success
+                </Button>
+              )}
+              {status !== "Failed" && (
+                <Button
+                  key="failed"
+                  danger
+                  type="primary"
+                  onClick={() => handleConfirmChange("Failed")}
+                  loading={isModalLoading}
+                >
+                  Failed
+                </Button>
+              )}
+              {currentStep !== statusToIndex[pendingStatus] && (
+                <Button
+                  key="complete"
+                  type="primary"
+                  onClick={handleConfirmChange}
+                  loading={isModalLoading}
+                >
+                  Success
+                </Button>
+              )}
+            </Col>
+          </Row>,
         ]}
       >
         <p>Select a result:</p>
