@@ -228,7 +228,7 @@ const AppStep = ({
           setModal(false);
         }}
         footer={[
-          <Row style={{ width: "100%" }}>
+          <Row key="footerRow" style={{ width: "100%" }}>
             <Col span={2}>
               <Button
                 key="cancel"
