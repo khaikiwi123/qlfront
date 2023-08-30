@@ -37,13 +37,22 @@ const AppHeader = () => {
         zIndex: 1,
         padding: 0,
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         alignItems: "center",
       }}
     >
+      <img
+        src="https://w.ladicdn.com/s550x350/60c6df75a65e92002c16b379/logo-intro-20221103032359-an-0c.png"
+        alt="Logo"
+        style={{
+          marginLeft: "30px",
+          height: "30px",
+        }}
+      />
+
       <Dropdown overlay={menu} trigger={["click"]}>
         <Avatar
-          style={{ backgroundColor: "#87d068" }}
+          style={{ backgroundColor: "#87d068", marginRight: "15px" }}
           icon={<UserOutlined />}
         />
       </Dropdown>

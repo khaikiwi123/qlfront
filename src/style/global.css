@@ -68,7 +68,9 @@ html {
 .complete-step .ant-steps-item-active .ant-steps-item-title {
   color: green !important;
 }
-
+.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab {
+  border-color: #1677ff;
+}
 .ant-layout {
   background: #ffffff;
 }
