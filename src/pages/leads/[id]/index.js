@@ -174,7 +174,7 @@ export default function Lead() {
                   borderTop: "1px solid #A9A9A9",
                 }}
               >
-                <Title style={{ marginTop: -5 }}>
+                <Title level={2} style={{ marginTop: -5 }}>
                   {lead.org}
                   <EditOutlined
                     onClick={() => setShowModal(true)}
@@ -193,8 +193,11 @@ export default function Lead() {
                 <Descriptions
                   size="small"
                   layout="vertical"
+                  labelStyle={{ color: "black" }}
+                  contentStyle={{ fontWeight: "bold", color: "black" }}
                   items={items}
                   className="Desc"
+                  colon={false}
                 />
               </div>
             </div>
@@ -210,7 +213,9 @@ export default function Lead() {
               />
             </div>
 
-            <h3 style={{ textAlign: "left" }}>History</h3>
+            <h3 style={{ textAlign: "left", borderTop: "1px solid #A9A9A9" }}>
+              History
+            </h3>
             <AppHistory id={id} changeLog={changeLog} />
             <div
               style={{

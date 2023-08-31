@@ -204,6 +204,7 @@ const AppStep = ({
           />
 
           <Step
+            className="lastStep"
             title={
               status === "Failed"
                 ? clickableWrapper("Thất bại", 4)

@@ -53,6 +53,11 @@ export default function User() {
       .catch((err) => {
         console.error(err);
         authErr(err, logOut);
+        if (err.response?.data?.error === "User doesn't exist") {
+          message.error("User doesn't exist");
+
+          router.push("/users");
+        }
       });
   }, [id, router, updateOk]);
 

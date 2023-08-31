@@ -12,7 +12,6 @@ const AppHistory = ({ changeLog }) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "self-start",
-          maxHeight: "200px",
           overflowY: "auto",
           border: "1px solid #d9d9d9",
           borderRadius: "4px",

@@ -38,6 +38,10 @@ html {
   border-inline-end: 2px solid #001d66;
   transform: translateY(-50%) translateX(-50%) rotate(45deg);
 }
+.custom-steps.ant-steps.ant-steps-navigation .lastStep::after {
+  border: none;
+  display: none;
+}
 
 .filter-container {
   display: flex;
@@ -81,6 +85,11 @@ html {
   margin-left: 220px;
   margin-bottom: 20px;
 }
+.Desc .ant-descriptions-item {
+  margin-right: 20px; /* adjust as needed */
+  margin-bottom: 20px; /* adjust as needed */
+}
+
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
   top: 0;

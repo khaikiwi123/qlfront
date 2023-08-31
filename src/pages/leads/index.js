@@ -3,7 +3,7 @@ import Link from "next/link";
 import Router from "next/router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Row, Col, Layout, Button, Tooltip, Tabs, Spin } from "antd";
+import { Row, Col, Layout, Button, Tooltip, Tabs } from "antd";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -120,22 +120,25 @@ const ProtectedPage = () => {
     {
       title: "Organization",
       dataIndex: "org",
+      ellipsis: "true",
       key: "org",
       render: (text, record) => (
-        <Link href={`/leads/${record._id}`}>
-          <Button
-            type="link"
-            color="neutral"
-            size="sm"
-            variant="plain"
-            onClick={(e) => {
-              e.preventDefault();
-              Router.push(`/leads/${record._id}`);
-            }}
-          >
-            {record.org}
-          </Button>
-        </Link>
+        <Tooltip placement="topLeft" title={record.org}>
+          <Link href={`/leads/${record._id}`}>
+            <Button
+              type="link"
+              color="neutral"
+              size="sm"
+              variant="plain"
+              onClick={(e) => {
+                e.preventDefault();
+                Router.push(`/leads/${record._id}`);
+              }}
+            >
+              {record.org}
+            </Button>
+          </Link>
+        </Tooltip>
       ),
     },
     {
