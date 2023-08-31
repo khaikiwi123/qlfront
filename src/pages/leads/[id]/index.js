@@ -189,11 +189,12 @@ export default function Lead() {
                     uType="leads"
                   />
                 </Title>
+
                 <Descriptions
                   size="small"
                   layout="vertical"
                   items={items}
-                  style={{ marginLeft: 50, marginBottom: 20 }}
+                  className="Desc"
                 />
               </div>
             </div>
@@ -221,12 +222,11 @@ export default function Lead() {
               }}
             >
               <Button key="delete" danger onClick={() => setDelModal(true)}>
-                Delete
+                Delete this lead
               </Button>
               <Modal
                 title="Delete"
                 visible={delModal}
-                centered
                 onCancel={() => {
                   setDelModal(false);
                 }}

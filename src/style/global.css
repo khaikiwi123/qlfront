@@ -77,6 +77,10 @@ html {
 .ant-steps.ant-steps-small .ant-steps-item-icon {
   margin-top: 10px;
 }
+.Desc {
+  margin-left: 220px;
+  margin-bottom: 20px;
+}
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
   top: 0;
@@ -118,10 +122,18 @@ html {
   .timeline-responsive {
     margin-left: -150px;
   }
+  .Desc {
+    margin-left: 150px;
+    margin-bottom: 20px;
+  }
 }
 @media (max-width: 990px) {
   .layoutC {
     margin-left: 0px;
+  }
+  .Desc {
+    margin-left: 100px;
+    margin-bottom: 20px;
   }
 }
 
@@ -138,5 +150,9 @@ html {
   }
   .ant-steps.ant-steps-navigation .ant-steps-item::before {
     background-color: transparent;
+  }
+  .Desc {
+    margin-left: 40px;
+    margin-bottom: 20px;
   }
 }

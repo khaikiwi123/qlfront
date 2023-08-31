@@ -9,7 +9,7 @@ import useLogout from "@/hooks/useLogout";
 
 const { Option } = Select;
 
-const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
+const CreateForm = ({ visible, onClose, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,6 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     try {
       await api.post(`/users`, {
         ...values,
-        inCharge: roleId === "admin" ? values.inCharge : userId,
       });
       form.resetFields();
       if (onSuccess) {
@@ -32,7 +31,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     } catch (error) {
       console.error(error);
       authErr(error, logOut);
-      metaErr(error, roleId);
+      metaErr(error);
     } finally {
       setLoading(false);
     }

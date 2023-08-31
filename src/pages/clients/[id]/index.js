@@ -154,7 +154,7 @@ export default function Client() {
                   size="small"
                   layout="vertical"
                   items={items}
-                  style={{ marginLeft: 50, marginBottom: 20 }}
+                  className="Desc"
                 />
               </div>
             </div>
