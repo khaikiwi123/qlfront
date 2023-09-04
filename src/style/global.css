@@ -23,10 +23,10 @@ html {
   margin-bottom: 0;
 }
 
-.Desc {
+/* .Desc {
   margin-left: 50px;
   margin-right: 5px;
-}
+} */
 
 .Desc .ant-descriptions-item {
   margin-right: 20px;
@@ -36,6 +36,7 @@ html {
 /* Steps */
 .steps-container {
   margin-top: 20px;
+  border-bottom: 1px solid #a9a9a9;
 }
 
 .custom-steps.ant-steps.ant-steps-navigation .ant-steps-item::after {
@@ -47,6 +48,9 @@ html {
   border-inline-start: none;
   border-inline-end: 2px solid #001d66;
   transform: translateY(-50%) translateX(-50%) rotate(45deg);
+}
+.custom-steps.ant-steps.ant-steps-navigation .ant-steps-item::before {
+  background-color: transparent;
 }
 
 .custom-steps.ant-steps.ant-steps-navigation .lastStep::after {
@@ -178,7 +182,9 @@ html {
   .ant-steps.ant-steps-navigation .ant-steps-item::before {
     background-color: transparent;
   }
-
+  .timeline-responsive {
+    margin-left: -100px;
+  }
   .Desc {
     margin-left: 20px;
     margin-bottom: 20px;

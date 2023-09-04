@@ -125,6 +125,7 @@ export default function Customer() {
             >
               <Descriptions
                 title={customer.org}
+                size="small"
                 extra={
                   <Button
                     onClick={() => setModal(true)}
@@ -134,6 +135,8 @@ export default function Customer() {
                       marginLeft: "10px",
                       fontSize: "16px",
                       minWidth: "100px",
+                      marginTop: "20px",
+                      marginBottom: "10px",
                     }}
                   >
                     Edit

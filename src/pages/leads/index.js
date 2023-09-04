@@ -134,6 +134,7 @@ const ProtectedPage = () => {
                 e.preventDefault();
                 Router.push(`/leads/${record._id}`);
               }}
+              style={{ padding: 0 }}
             >
               {record.org}
             </Button>

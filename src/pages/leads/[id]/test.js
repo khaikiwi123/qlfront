@@ -213,9 +213,7 @@ export default function Lead() {
               />
             </div>
 
-            <h3 style={{ textAlign: "left", borderTop: "1px solid #A9A9A9" }}>
-              History
-            </h3>
+            <h3 style={{ textAlign: "left" }}>History</h3>
             <AppHistory id={id} changeLog={changeLog} />
             <div
               style={{
