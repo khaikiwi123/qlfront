@@ -4,7 +4,7 @@ import { Modal } from "antd";
 export const metaErr = (error, role) => {
   const {
     error: errorMsg,
-    id: clientId,
+    id: customerId,
     incharge: inChargeEmail,
     type: objectType,
   } = error.response.data;
@@ -27,7 +27,7 @@ export const metaErr = (error, role) => {
     switch (errorMsg) {
       case "Email existed":
       case "Phone existed":
-        const message = clientId ? (
+        const message = customerId ? (
           <>
             {`${objectType} existed. `}
             <span
@@ -36,7 +36,7 @@ export const metaErr = (error, role) => {
                 cursor: "pointer",
               }}
               onClick={() =>
-                window.open(`/${objectUrlPath}/${clientId}`, "_blank")
+                window.open(`/${objectUrlPath}/${customerId}`, "_blank")
               }
             >
               View {objectType.toLowerCase()}&apos;s profile

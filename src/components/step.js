@@ -74,7 +74,7 @@ const AppStep = ({
       }));
 
       if (updateStatus.status === "Success") {
-        router.push(`/clients?email=${email}`);
+        router.push(`/customers?email=${email}`);
       }
       fetchChangeLogs();
     } catch (error) {

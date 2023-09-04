@@ -28,7 +28,7 @@ const ProtectedPage = () => {
   const [currUser, setCurrUser] = useState("");
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState(null);
-  const [tabLoading, setTabLoading] = useState(false);
+  const [tabLoading, setTabLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [activeTab, setActiveTab] = useState("All");
@@ -229,7 +229,7 @@ const ProtectedPage = () => {
             lg={20}
             style={{ width: "100%", minHeight: "100vh" }}
           >
-            <Content style={{ margin: "50px 30px 0" }}>
+            <Content style={{ margin: "30px 30px 0" }}>
               <div style={{ padding: 24, minHeight: 360 }}>
                 <div
                   style={{

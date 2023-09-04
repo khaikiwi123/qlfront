@@ -20,7 +20,7 @@ import FilterModal from "@/components/filter";
 
 const ProtectedPage = () => {
   const router = useRouter();
-  const [clients, setClients] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
@@ -68,10 +68,10 @@ const ProtectedPage = () => {
       ...params,
       ...appliedFilters,
     };
-    fetchClient(params);
+    fetchCustomer(params);
   }, [pagination, appliedFilters, router.isReady]);
 
-  const fetchClient = (params) => {
+  const fetchCustomer = (params) => {
     let queryParams = Object.keys(params)
       .map((key) => {
         if (Array.isArray(params[key])) {
@@ -82,10 +82,10 @@ const ProtectedPage = () => {
       })
       .join("&");
     api
-      .get(`/clients/?${queryParams}`)
+      .get(`/customers/?${queryParams}`)
       .then((res) => {
         setTotal(res.data.total);
-        setClients(res.data.clients);
+        setCustomers(res.data.customers);
         setLoading(false);
       })
       .catch((error) => {
@@ -93,20 +93,6 @@ const ProtectedPage = () => {
         authErr(error, logOut);
       });
   };
-  if (!isRouterReady) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   let baseColumns = [
     {
@@ -131,7 +117,7 @@ const ProtectedPage = () => {
       dataIndex: "org",
       key: "org",
       render: (text, record) => (
-        <Link href={`/clients/${record._id}`}>
+        <Link href={`/customers/${record._id}`}>
           <Button
             type="link"
             color="neutral"
@@ -139,7 +125,7 @@ const ProtectedPage = () => {
             variant="plain"
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/clients/${record._id}`);
+              router.push(`/customers/${record._id}`);
             }}
           >
             {record.org}
@@ -177,21 +163,6 @@ const ProtectedPage = () => {
     baseFilter.push({ label: "In Charge", value: "inCharge" });
   }
 
-  if (!router.isReady) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
-
   const filterOptions = baseFilter;
   const columns = baseColumns;
   return (
@@ -208,7 +179,7 @@ const ProtectedPage = () => {
             lg={20}
             style={{ width: "100%", minHeight: "100vh" }}
           >
-            <Content style={{ margin: "24px 16px 0" }}>
+            <Content style={{ margin: "30px 30px 0" }}>
               <div style={{ padding: 24, minHeight: 360 }}>
                 <div
                   style={{
@@ -240,7 +211,7 @@ const ProtectedPage = () => {
                 <UserTable
                   key={Date.now()}
                   columns={columns}
-                  data={clients}
+                  data={customers}
                   total={total}
                   loading={loading}
                   pagination={pagination}

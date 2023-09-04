@@ -194,20 +194,7 @@ const App = () => {
     { value: "true", label: "Active" },
     { value: "false", label: "Inactive" },
   ];
-  if (!isRouterReady) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
+
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>

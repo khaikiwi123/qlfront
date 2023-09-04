@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Typography, Spin, message, Descriptions } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Layout, Typography, Spin, message, Descriptions, Button } from "antd";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -18,11 +17,11 @@ import authErr from "@/api/authErr";
 const { Content } = Layout;
 const { Title } = Typography;
 
-export default function Client() {
+export default function Customer() {
   const router = useRouter();
   const id = router.query.id;
 
-  const [client, setClient] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [role, setRole] = useState("");
   const [showModal, setModal] = useState(false);
   const [updateOk, setOk] = useState(false);
@@ -38,9 +37,9 @@ export default function Client() {
     }
     setRole(localStorage.getItem("role"));
     api
-      .get(`/clients/${id}`)
+      .get(`/customers/${id}`)
       .then((response) => {
-        setClient(response.data);
+        setCustomer(response.data);
       })
       .catch((err) => {
         console.error(err);
@@ -49,19 +48,19 @@ export default function Client() {
 
         if (err.response?.data?.error === "Not authorized") {
           message.error(
-            `You are not authorized to view this client. ${
+            `You are not authorized to view this customer. ${
               inchargeEmail
-                ? `${inchargeEmail} is in charge of this client.`
+                ? `${inchargeEmail} is in charge of this customer.`
                 : "(It belonged to another salesperson)"
             }`
           );
 
-          router.push("/clients/");
+          router.push("/customers/");
         }
       });
   }, [id, router, updateOk]);
 
-  if (client === null) {
+  if (customer === null) {
     return (
       <div
         style={{
@@ -79,27 +78,27 @@ export default function Client() {
     {
       key: "1",
       label: "Email",
-      children: client.email,
+      children: customer.email,
     },
     {
       key: "2",
       label: "Phone Number",
-      children: client.phone,
+      children: customer.phone,
     },
     {
       key: "3",
       label: "Representative",
-      children: client.rep,
+      children: customer.rep,
     },
     {
       key: "4",
       label: "Person In Charge",
-      children: client.inCharge,
+      children: customer.inCharge,
     },
     {
       key: "5",
       label: "Created Date",
-      children: dayjs(client.createdDate).format("DD/MM/YYYY"),
+      children: dayjs(customer.createdDate).format("DD/MM/YYYY"),
     },
   ];
 
@@ -112,51 +111,54 @@ export default function Client() {
           <Content style={{ margin: "64px 16px 0" }}>
             <AppCrumbs
               paths={[
-                { name: "Customers", href: "/clients" },
+                { name: "Customers", href: "/customers" },
                 { name: "Profile" },
               ]}
             />
             <div
               style={{
-                minHeight: 280,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                marginTop: -70,
+                borderBottom: "1px solid #A9A9A9",
+                borderTop: "1px solid #A9A9A9",
               }}
             >
-              <div
-                style={{
-                  marginTop: 80,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  borderBottom: "1px solid #A9A9A9",
-                  borderTop: "1px solid #A9A9A9",
-                }}
-              >
-                <Title style={{ marginTop: -5 }}>
-                  {client.org}
-                  <EditOutlined
+              <Descriptions
+                title={customer.org}
+                extra={
+                  <Button
                     onClick={() => setModal(true)}
-                    style={{ marginLeft: "10px", fontSize: "16px" }}
-                  />
-                  <UpdateForm
-                    visible={showModal}
-                    onClose={() => setModal(false)}
-                    roleId={role}
-                    userId={id}
-                    onSuccess={() => setOk(true)}
-                    uType="clients"
-                  />
-                </Title>
-                <Descriptions
-                  size="small"
-                  layout="vertical"
-                  items={items}
-                  className="Desc"
-                />
-              </div>
+                    type="primary"
+                    ghost
+                    style={{
+                      marginLeft: "10px",
+                      fontSize: "16px",
+                      minWidth: "100px",
+                    }}
+                  >
+                    Edit
+                  </Button>
+                }
+                layout="vertical"
+                labelStyle={{}}
+                contentStyle={{
+                  fontWeight: "600",
+                  color: "black",
+                  marginTop: -15,
+                }}
+                items={items}
+                className="Desc"
+                colon={false}
+              />
+              <UpdateForm
+                visible={showModal}
+                onClose={() => setModal(false)}
+                roleId={role}
+                userId={id}
+                onSuccess={() => setOk(true)}
+                uType="leads"
+              />
             </div>
           </Content>
         </Layout>

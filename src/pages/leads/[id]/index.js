@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 
 import {
   Layout,
-  Typography,
   Spin,
   message,
   Descriptions,
@@ -13,9 +12,7 @@ import {
   Row,
   Col,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 const { Content } = Layout;
-const { Title } = Typography;
 
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
@@ -155,51 +152,51 @@ export default function Lead() {
             <AppCrumbs
               paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
             />
+
             <div
               style={{
-                minHeight: 280,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                marginTop: -70,
+                borderBottom: "1px solid #A9A9A9",
+                borderTop: "1px solid #A9A9A9",
               }}
             >
-              <div
-                style={{
-                  marginTop: 80,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  borderBottom: "1px solid #A9A9A9",
-                  borderTop: "1px solid #A9A9A9",
-                }}
-              >
-                <Title level={2} style={{ marginTop: -5 }}>
-                  {lead.org}
-                  <EditOutlined
+              <Descriptions
+                title={lead.org}
+                extra={
+                  <Button
                     onClick={() => setShowModal(true)}
-                    style={{ marginLeft: "10px", fontSize: "16px" }}
-                  />
-                  <UpdateForm
-                    visible={showUpModal}
-                    onClose={() => setShowModal(false)}
-                    roleId={role}
-                    userId={id}
-                    onSuccess={() => setOk(true)}
-                    uType="leads"
-                  />
-                </Title>
-
-                <Descriptions
-                  size="small"
-                  layout="vertical"
-                  labelStyle={{ color: "black" }}
-                  contentStyle={{ fontWeight: "bold", color: "black" }}
-                  items={items}
-                  className="Desc"
-                  colon={false}
-                />
-              </div>
+                    type="primary"
+                    ghost
+                    style={{
+                      marginLeft: "10px",
+                      fontSize: "16px",
+                      minWidth: "100px",
+                    }}
+                  >
+                    Edit
+                  </Button>
+                }
+                layout="vertical"
+                labelStyle={{}}
+                contentStyle={{
+                  fontWeight: "600",
+                  color: "black",
+                  marginTop: -15,
+                }}
+                items={items}
+                className="Desc"
+                colon={false}
+              />
+              <UpdateForm
+                visible={showUpModal}
+                onClose={() => setShowModal(false)}
+                roleId={role}
+                userId={id}
+                onSuccess={() => setOk(true)}
+                uType="leads"
+              />
             </div>
 
             <div className="steps-container">
