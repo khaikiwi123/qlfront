@@ -15,7 +15,6 @@ import useLogout from "@/hooks/useLogout";
 import authErr from "@/api/authErr";
 
 const { Content } = Layout;
-const { Title } = Typography;
 
 export default function Customer() {
   const router = useRouter();

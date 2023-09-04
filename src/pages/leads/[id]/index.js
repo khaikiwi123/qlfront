@@ -163,6 +163,7 @@ export default function Lead() {
               }}
             >
               <Descriptions
+                size="small"
                 title={lead.org}
                 extra={
                   <Button
@@ -173,6 +174,8 @@ export default function Lead() {
                       marginLeft: "10px",
                       fontSize: "16px",
                       minWidth: "100px",
+                      marginTop: "20px",
+                      marginBottom: "10px",
                     }}
                   >
                     Edit

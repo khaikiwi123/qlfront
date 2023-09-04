@@ -1,7 +1,5 @@
 import dayjs from "dayjs";
-
 import { Timeline } from "antd";
-
 import { translateStatus } from "@/Utils/translate";
 
 const AppHistory = ({ changeLog }) => {
@@ -44,10 +42,15 @@ const AppHistory = ({ changeLog }) => {
                     index !== changeLog.length - 1 ? { color: "gray" } : {}
                   }
                 >
-                  {log.changedBy} đã thay đổi trạng thái từ{" "}
-                  {translateStatus(log.oldValue)} sang{" "}
-                  {translateStatus(log.newValue)} sau{" "}
-                  {log.daysLastUp ? log.daysLastUp : "?"} ngày
+                  {log.field === "created"
+                    ? `${log.changedBy} đã tạo lead này`
+                    : `${
+                        log.changedBy
+                      } đã thay đổi trạng thái từ ${translateStatus(
+                        log.oldValue
+                      )} sang ${translateStatus(log.newValue)} sau ${
+                        log.daysLastUp ? log.daysLastUp : "?"
+                      } ngày`}
                 </span>
               </Timeline.Item>
             ))}

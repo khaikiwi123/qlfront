@@ -40,7 +40,7 @@ const UserTable = ({
     }}
     scroll={{
       x: 1000,
-      y: 300,
+      y: 335,
     }}
   />
 );

@@ -162,8 +162,8 @@ const ProtectedPage = () => {
     { label: "Email", value: "email" },
     { label: "Organization", value: "org" },
     { label: "Representative", value: "rep" },
-    { label: "Exact Date", value: "exactDate" },
-    { label: "Date Range", value: "dateRange" },
+    { label: "Created Date", value: "exactDate" },
+    { label: "Created Date From", value: "dateRange" },
     { label: "Last Updated", value: "lastUp" },
   ];
   const statusOptions = [

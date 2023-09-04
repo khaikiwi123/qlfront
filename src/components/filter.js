@@ -93,7 +93,7 @@ const FilterModal = ({
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {filter.selectValue === "lastUp" ? (
               <InputNumber
-                style={{ width: 305, marginRight: 10 }}
+                style={{ width: 250, marginRight: 10 }}
                 value={filter.value || null}
                 placeholder="Enter number of days"
                 min={0}

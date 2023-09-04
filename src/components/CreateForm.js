@@ -17,6 +17,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
     try {
       await api.post(`/leads`, {
         ...values,
+        createdBy: userId,
         inCharge: roleId === "admin" ? values.inCharge : userId,
       });
       form.resetFields();
