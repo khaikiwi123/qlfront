@@ -212,11 +212,24 @@ export default function Lead() {
                 fetchChangeLogs={fetchChangeLogs}
               />
             </div>
+            <div
+              style={{
+                textAlign: "left",
+                borderTop: "1px solid #A9A9A9",
+                marginTop: 15,
+              }}
+            >
+              <h3
+                style={{
+                  textAlign: "left",
+                  marginTop: 15,
+                }}
+              >
+                History
+              </h3>
+              <AppHistory id={id} changeLog={changeLog} />
+            </div>
 
-            <h3 style={{ textAlign: "left", borderTop: "1px solid #A9A9A9" }}>
-              History
-            </h3>
-            <AppHistory id={id} changeLog={changeLog} />
             <div
               style={{
                 minHeight: 280,

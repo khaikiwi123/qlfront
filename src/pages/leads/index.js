@@ -120,28 +120,27 @@ const ProtectedPage = () => {
     {
       title: "Organization",
       dataIndex: "org",
-      ellipsis: "true",
       key: "org",
+      ellipsis: true,
       render: (text, record) => (
         <Tooltip placement="topLeft" title={record.org}>
           <Link href={`/leads/${record._id}`}>
-            <Button
-              type="link"
-              color="neutral"
-              size="sm"
-              variant="plain"
-              onClick={(e) => {
-                e.preventDefault();
-                Router.push(`/leads/${record._id}`);
+            <div
+              style={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
               }}
-              style={{ padding: 0 }}
             >
               {record.org}
-            </Button>
+            </div>
           </Link>
         </Tooltip>
       ),
     },
+
     {
       title: "Representative",
       dataIndex: "rep",

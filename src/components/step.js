@@ -154,7 +154,6 @@ const AppStep = ({
                 ? clickableWrapper("Chưa liên hệ", 0)
                 : "Chưa liên hệ"
             }
-            description={renderStepDescription(0)}
             disabled={isModalLoading}
             icon={
               currentStep === 0
@@ -168,7 +167,6 @@ const AppStep = ({
                 ? clickableWrapper("Đã liên hệ", 1)
                 : "Đã liên hệ"
             }
-            description={renderStepDescription(1)}
             icon={
               currentStep === 1
                 ? clickableWrapper(determineStepIcon(1), 1)
@@ -182,7 +180,6 @@ const AppStep = ({
                 ? clickableWrapper("Đã xác định nhu cầu", 2)
                 : "Đã xác định nhu cầu"
             }
-            description={renderStepDescription(2)}
             disabled={isModalLoading}
             icon={
               currentStep === 2
@@ -194,7 +191,6 @@ const AppStep = ({
             title={
               currentStep === 3 ? clickableWrapper("Đã tư vấn", 3) : "Đã tư vấn"
             }
-            description={renderStepDescription(3)}
             icon={
               currentStep === 3
                 ? clickableWrapper(determineStepIcon(3), 3)
@@ -210,7 +206,6 @@ const AppStep = ({
                 ? clickableWrapper("Thất bại", 4)
                 : clickableWrapper("Thành công", 4)
             }
-            description={renderStepDescription(4)}
             icon={
               currentStep === 4
                 ? clickableWrapper(determineStepIcon(4), 4)
