@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 
-import { Button, Modal, Steps, Row, Col } from "antd";
+import { Button, Modal, Steps, Row, Col, Select } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -10,7 +10,7 @@ import {
 import api from "@/api/api";
 
 const { Step } = Steps;
-
+const { Option } = Select;
 const AppStep = ({
   id,
   status,
@@ -18,12 +18,15 @@ const AppStep = ({
   email,
   setLead,
   fetchChangeLogs,
+  products,
 }) => {
   const router = useRouter();
   const [showModal, setModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
+  const [productModal, setProductModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const statusToIndex = {
     "No contact": 0,
@@ -32,6 +35,7 @@ const AppStep = ({
     Consulted: 3,
     Success: 4,
   };
+  console.log(products);
   const onChangeStatusStep = async (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);
     const newStatus = statusKeys[currentIndex];
@@ -59,10 +63,17 @@ const AppStep = ({
   };
   const handleConfirmChange = async (statusType) => {
     setIsModalLoading(true);
+
     try {
       let updateStatus;
       if (statusType === "Failed") {
         updateStatus = { status: "Failed", trackStatus: pendingStatus };
+      } else if (statusType === "Success") {
+        updateStatus = {
+          status: pendingStatus,
+          trackStatus: pendingStatus,
+          product: selectedProduct,
+        };
       } else {
         updateStatus = { status: pendingStatus, trackStatus: pendingStatus };
       }
@@ -79,38 +90,13 @@ const AppStep = ({
       fetchChangeLogs();
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsModalLoading(false);
+      setModal(false);
+      setProductModal(false);
     }
+  };
 
-    setIsModalLoading(false);
-    setModal(false);
-  };
-  const renderStepDescription = (currentIndex) => {
-    if (currentStep === currentIndex) {
-      if (status === "Failed") {
-        return (
-          <span
-            onClick={() => onChangeStatusStep(currentIndex)}
-            style={{ cursor: "pointer", color: "red" }}
-          >
-            Current
-          </span>
-        );
-      } else {
-        return (
-          <span
-            onClick={() => onChangeStatusStep(currentIndex)}
-            style={{ cursor: "pointer", color: "#1890ff" }}
-          >
-            Current
-          </span>
-        );
-      }
-    } else if (currentStep > currentIndex) {
-      return <>Completed</>;
-    } else {
-      return <>Incompleted</>;
-    }
-  };
   const clickableWrapper = (content, index) => (
     <span
       onClick={() => onChangeStatusStep(index)}
@@ -204,7 +190,9 @@ const AppStep = ({
             title={
               status === "Failed"
                 ? clickableWrapper("Thất bại", 4)
-                : clickableWrapper("Thành công", 4)
+                : status === "Success"
+                ? clickableWrapper("Thành công", 4)
+                : clickableWrapper("Kết thúc", 4)
             }
             icon={
               currentStep === 4
@@ -242,7 +230,7 @@ const AppStep = ({
                 <Button
                   key="completed"
                   type="primary"
-                  onClick={handleConfirmChange}
+                  onClick={() => setProductModal(true)}
                   loading={isModalLoading}
                 >
                   Change to Success
@@ -263,7 +251,7 @@ const AppStep = ({
                 <Button
                   key="complete"
                   type="primary"
-                  onClick={handleConfirmChange}
+                  onClick={() => setProductModal(true)}
                   loading={isModalLoading}
                 >
                   Success
@@ -274,6 +262,31 @@ const AppStep = ({
         ]}
       >
         <p>Select a result:</p>
+      </Modal>
+      <Modal
+        title="Select Product"
+        visible={productModal}
+        centered
+        onCancel={() => setProductModal(false)}
+        onOk={() => {
+          handleConfirmChange("Success");
+          setProductModal(false);
+        }}
+      >
+        {products && products.length > 0 && (
+          <Select
+            placeholder="Select a product"
+            onChange={setSelectedProduct}
+            value={selectedProduct}
+            style={{ width: "100%" }}
+          >
+            {products.map((product) => (
+              <Option key={product._id} value={product._id}>
+                {product.name}
+              </Option>
+            ))}
+          </Select>
+        )}
       </Modal>
     </>
   );

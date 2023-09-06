@@ -184,7 +184,7 @@ export default function Lead() {
                 layout="vertical"
                 labelStyle={{}}
                 contentStyle={{
-                  fontWeight: "600",
+                  fontWeight: "400",
                   color: "black",
                   marginTop: -15,
                 }}
@@ -216,13 +216,13 @@ export default function Lead() {
               style={{
                 textAlign: "left",
                 borderTop: "1px solid #A9A9A9",
-                marginTop: 15,
               }}
             >
               <h3
                 style={{
                   textAlign: "left",
                   marginTop: 15,
+                  color: "#00000073",
                 }}
               >
                 History
@@ -230,18 +230,25 @@ export default function Lead() {
               <AppHistory id={id} changeLog={changeLog} />
             </div>
 
-            <div
-              style={{
-                minHeight: 280,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: -70,
-              }}
-            >
-              <Button key="delete" danger onClick={() => setDelModal(true)}>
-                Delete this lead
-              </Button>
+            <div>
+              <Row
+                key="delButton"
+                style={{
+                  width: "100%",
+                  marginBottom: 40,
+                }}
+              >
+                <Col span={8} offset={3}></Col>
+                <Button
+                  key="delete"
+                  danger
+                  style={{ marginTop: 15 }}
+                  onClick={() => setDelModal(true)}
+                >
+                  Delete this lead
+                </Button>
+              </Row>
+
               <Modal
                 title="Delete"
                 visible={delModal}

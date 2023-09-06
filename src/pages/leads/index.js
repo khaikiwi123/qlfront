@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Router from "next/router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Row, Col, Layout, Button, Tooltip, Tabs } from "antd";
@@ -229,8 +228,8 @@ const ProtectedPage = () => {
             lg={20}
             style={{ width: "100%", minHeight: "100vh" }}
           >
-            <Content style={{ margin: "30px 30px 0" }}>
-              <div style={{ padding: 24, minHeight: 360 }}>
+            <Content style={{ margin: "30px 0 0" }}>
+              <div style={{ padding: 24 }}>
                 <div
                   style={{
                     display: "flex",

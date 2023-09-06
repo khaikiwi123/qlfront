@@ -145,7 +145,7 @@ export default function Customer() {
                 layout="vertical"
                 labelStyle={{}}
                 contentStyle={{
-                  fontWeight: "600",
+                  fontWeight: "400",
                   color: "black",
                   marginTop: -15,
                 }}

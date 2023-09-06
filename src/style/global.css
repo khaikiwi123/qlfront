@@ -22,9 +22,6 @@ html {
 .ant-descriptions .ant-descriptions-header {
   margin-bottom: 0;
 }
-.ant-descriptions .ant-descriptions-view table {
-  width: 138%;
-}
 
 .Desc {
   margin-bottom: 15px;
@@ -37,11 +34,11 @@ html {
 
 /* Steps */
 .steps-container {
-  margin-top: 20px;
-  margin-bottom: 15px;
+  margin-top: 3px;
+  margin-bottom: 3px;
   margin-left: -25px;
-  width: 104%;
 }
+
 .ant-steps.ant-steps-vertical > .ant-steps-item .ant-steps-item-content {
   display: block;
   overflow: hidden;
@@ -99,7 +96,12 @@ html {
   width: auto;
   text-align: start;
 }
-
+.ant-timeline .ant-timeline-item-last > .ant-timeline-item-content {
+  min-height: 0;
+}
+.ant-timeline-item .ant-timeline-item-last > .ant-timeline-item-left {
+  padding-bottom: 0;
+}
 /* Filter Container */
 .filter-container {
   display: flex;
@@ -148,11 +150,7 @@ html {
     margin-left: -100px;
   }
   .steps-container {
-    width: 103%;
     margin-left: -10px;
-  }
-  .ant-descriptions .ant-descriptions-view table {
-    width: 135%;
   }
 }
 
@@ -171,17 +169,11 @@ html {
   .timeline-responsive {
     margin-left: -150px;
   }
-  .ant-descriptions .ant-descriptions-view table {
-    width: 133%;
-  }
 }
 
 @media (max-width: 990px) {
   .layoutC {
     margin-left: 0px;
-  }
-  .ant-descriptions .ant-descriptions-view table {
-    width: 132%;
   }
 }
 @media (max-width: 880px) {
