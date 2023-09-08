@@ -9,11 +9,12 @@ import {
   Descriptions,
   Button,
   Modal,
+  Typography,
   Row,
   Col,
 } from "antd";
 const { Content } = Layout;
-
+const { Title } = Typography;
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";
@@ -38,6 +39,7 @@ export default function Lead() {
   const [delModal, setDelModal] = useState(false);
   const [delLoading, setDelLoading] = useState(false);
   const [updateOk, setOk] = useState(false);
+  const [products, setProducts] = useState([]);
 
   const { logOut } = useLogout();
   const fetchChangeLogs = async () => {
@@ -48,6 +50,17 @@ export default function Lead() {
       console.error("Failed to fetch change logs:", error);
     }
   };
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get("products?list=name");
+      if (response.data && response.data.products) {
+        setProducts(response.data.products);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
   const onDelete = async (id) => {
     setDelLoading(true);
     try {
@@ -97,6 +110,7 @@ export default function Lead() {
           router.push("/leads");
         }
       }, fetchChangeLogs());
+    fetchProducts();
   }, [id, router, updateOk]);
 
   if (lead === null) {
@@ -164,7 +178,11 @@ export default function Lead() {
             >
               <Descriptions
                 size="small"
-                title={lead.org}
+                title={
+                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                    {lead.org}
+                  </div>
+                }
                 extra={
                   <Button
                     onClick={() => setShowModal(true)}
@@ -202,7 +220,7 @@ export default function Lead() {
               />
             </div>
 
-            <div className="steps-container">
+            <div>
               <AppStep
                 id={id}
                 status={lead.status}
@@ -210,6 +228,7 @@ export default function Lead() {
                 email={lead.email}
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}
+                products={products}
               />
             </div>
             <div
@@ -232,15 +251,11 @@ export default function Lead() {
 
             <div>
               <Row
-                key="delButton"
-                style={{
-                  width: "100%",
-                  marginBottom: 40,
-                }}
+                type="flex"
+                justify="center"
+                style={{ width: "100%", marginBottom: 40 }}
               >
-                <Col span={8} offset={3}></Col>
                 <Button
-                  key="delete"
                   danger
                   style={{ marginTop: 15 }}
                   onClick={() => setDelModal(true)}

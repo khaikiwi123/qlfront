@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import { Button, Modal, Steps, Row, Col, Select } from "antd";
+import { Button, Modal, Steps, Select, Popover } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -21,13 +21,27 @@ const AppStep = ({
   products,
 }) => {
   const router = useRouter();
-  const [showModal, setModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
   const [productModal, setProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [popVis, setPop] = useState(false);
 
+  const popoverRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+        setPop(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const statusToIndex = {
     "No contact": 0,
     "In contact": 1,
@@ -35,14 +49,13 @@ const AppStep = ({
     Consulted: 3,
     Success: 4,
   };
-  console.log(products);
   const onChangeStatusStep = async (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);
     const newStatus = statusKeys[currentIndex];
     setSelectedStep(currentIndex);
     if (currentIndex === statusKeys.length - 1) {
       setPendingStatus(newStatus);
-      setModal(true);
+      handlePop();
     } else {
       setIsModalLoading(true);
       try {
@@ -61,6 +74,7 @@ const AppStep = ({
       setSelectedStep(null);
     }
   };
+
   const handleConfirmChange = async (statusType) => {
     setIsModalLoading(true);
 
@@ -92,15 +106,27 @@ const AppStep = ({
       console.error(error);
     } finally {
       setIsModalLoading(false);
-      setModal(false);
+      setProductModal(false);
+    }
+  };
+
+  const handleProductChange = async () => {
+    try {
+      await api.put(`/customers/${id}`, { product: selectedProduct });
+
+      router.push(`/customers?email=${email}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsModalLoading(false);
       setProductModal(false);
     }
   };
 
   const clickableWrapper = (content, index) => (
     <span
-      onClick={() => onChangeStatusStep(index)}
-      style={{ cursor: "pointer" }}
+      onClick={() => (isModalLoading ? null : onChangeStatusStep(index))}
+      style={isModalLoading ? { cursor: "not-allowed" } : { cursor: "pointer" }}
     >
       {content}
     </span>
@@ -117,14 +143,110 @@ const AppStep = ({
         return <CheckCircleOutlined style={{ color: "green" }} />;
       }
     }
-    return null;
+  };
+  const popContent = (
+    <>
+      <div ref={popoverRef}>
+        {status === "Success" && (
+          <Button
+            key="completed"
+            type="primary"
+            style={{ width: "100%", background: "green" }}
+            onClick={() => {
+              setProductModal(true);
+              setPop(false);
+            }}
+            loading={isModalLoading}
+          >
+            Change product
+          </Button>
+        )}
+        {status !== "Failed" && (
+          <Button
+            key="failed"
+            danger
+            style={{ width: status === "Success" ? "100%" : "auto" }}
+            onClick={() => handleConfirmChange("Failed")}
+            loading={isModalLoading}
+          >
+            Failed
+          </Button>
+        )}
+        {status !== "Failed" && status !== "Success" && (
+          <Button
+            key="complete"
+            type="primary"
+            style={{ width: "50%", marginLeft: 10, background: "green" }}
+            onClick={() => {
+              setProductModal(true);
+              setPop(false);
+            }}
+            loading={isModalLoading}
+          >
+            Success
+          </Button>
+        )}
+
+        {status === "Failed" && (
+          <Button
+            key="completed"
+            type="primary"
+            style={{ width: "100%", background: "green" }}
+            onClick={() => {
+              setProductModal(true);
+              setPop(false);
+            }}
+            loading={isModalLoading}
+          >
+            Change to Success
+          </Button>
+        )}
+      </div>
+    </>
+  );
+  const renderContent = (index) => {
+    if (index === 4) {
+      return (
+        <Popover
+          content={popContent}
+          visible={popVis}
+          arrow={false}
+          placement="bottom"
+        >
+          {renderStepContent(index)}
+        </Popover>
+      );
+    }
+    return renderStepContent(index);
+  };
+
+  const renderStepContent = (index) => (
+    <div
+      onClick={() => (isModalLoading ? null : onChangeStatusStep(index))}
+      style={isModalLoading ? { cursor: "not-allowed" } : { cursor: "pointer" }}
+    >
+      <span>
+        {index === 4
+          ? status === "Failed"
+            ? "Thất bại"
+            : status === "Success"
+            ? "Thành công"
+            : "Kết thúc"
+          : null}
+      </span>
+    </div>
+  );
+
+  const handlePop = () => {
+    setPop(!popVis);
+    console.log(popVis);
   };
 
   return (
     <>
-      <div className="steps-container">
+      <div>
         <Steps
-          type="navigation"
+          labelPlacement="vertical"
           size="small"
           current={currentStep}
           onChange={(currentIndex) => {
@@ -187,13 +309,7 @@ const AppStep = ({
 
           <Step
             className="lastStep"
-            title={
-              status === "Failed"
-                ? clickableWrapper("Thất bại", 4)
-                : status === "Success"
-                ? clickableWrapper("Thành công", 4)
-                : clickableWrapper("Kết thúc", 4)
-            }
+            title={renderContent(4)}
             icon={
               currentStep === 4
                 ? clickableWrapper(determineStepIcon(4), 4)
@@ -204,73 +320,18 @@ const AppStep = ({
         </Steps>
       </div>
       <Modal
-        title="Result"
-        visible={showModal}
-        centered
-        onCancel={() => {
-          setPendingStatus("");
-          setModal(false);
-        }}
-        footer={[
-          <Row key="footerRow" style={{ width: "100%" }}>
-            <Col span={2}>
-              <Button
-                key="cancel"
-                onClick={() => {
-                  setPendingStatus("");
-                  setModal(false);
-                }}
-                loading={isModalLoading}
-              >
-                Cancel
-              </Button>
-            </Col>
-            <Col span={22} style={{ textAlign: "right" }}>
-              {status === "Failed" && (
-                <Button
-                  key="completed"
-                  type="primary"
-                  onClick={() => setProductModal(true)}
-                  loading={isModalLoading}
-                >
-                  Change to Success
-                </Button>
-              )}
-              {status !== "Failed" && (
-                <Button
-                  key="failed"
-                  danger
-                  type="primary"
-                  onClick={() => handleConfirmChange("Failed")}
-                  loading={isModalLoading}
-                >
-                  Failed
-                </Button>
-              )}
-              {currentStep !== statusToIndex[pendingStatus] && (
-                <Button
-                  key="complete"
-                  type="primary"
-                  onClick={() => setProductModal(true)}
-                  loading={isModalLoading}
-                >
-                  Success
-                </Button>
-              )}
-            </Col>
-          </Row>,
-        ]}
-      >
-        <p>Select a result:</p>
-      </Modal>
-      <Modal
         title="Select Product"
         visible={productModal}
         centered
         onCancel={() => setProductModal(false)}
         onOk={() => {
-          handleConfirmChange("Success");
-          setProductModal(false);
+          if (status !== "Success") {
+            handleConfirmChange("Success");
+            setProductModal(false);
+          } else {
+            handleProductChange();
+            setProductModal(false);
+          }
         }}
       >
         {products && products.length > 0 && (

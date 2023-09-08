@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Button, Tooltip, Spin, Row, Col } from "antd";
+import { Layout, Button, Tooltip, Row, Col } from "antd";
 const { Content } = Layout;
 
 import api from "@/api/api";
