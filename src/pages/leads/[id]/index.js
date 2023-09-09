@@ -9,12 +9,10 @@ import {
   Descriptions,
   Button,
   Modal,
-  Typography,
   Row,
   Col,
 } from "antd";
 const { Content } = Layout;
-const { Title } = Typography;
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";

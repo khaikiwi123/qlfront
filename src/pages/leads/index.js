@@ -217,97 +217,88 @@ const ProtectedPage = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Row>
-          <Col xs={24} md={5} lg={4}>
-            <AppSider role={role} />
-          </Col>
+        <Layout className="layoutC">
+          <AppSider role={role} />
 
-          <Col
-            xs={24}
-            md={24}
-            lg={20}
-            style={{ width: "100%", minHeight: "100vh" }}
-          >
-            <Content style={{ margin: "30px 0 0" }}>
-              <div style={{ padding: 24 }}>
-                <div
+          <Content style={{ margin: "30px 0 0" }}>
+            <div style={{ padding: 24 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0px",
+                }}
+              >
+                <h1
                   style={{
+                    fontSize: "2em",
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "0px",
                   }}
                 >
-                  <h1
-                    style={{
-                      fontSize: "2em",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    Leads Contact
-                  </h1>
+                  Leads Contact
+                </h1>
 
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Button
-                      style={{
-                        marginLeft: "10px",
-                        cursor: "pointer",
-                        marginTop: "10px",
-                      }}
-                      onClick={() => setShowModal(true)}
-                      type="primary"
-                    >
-                      Create Lead
-                    </Button>
-                    <CreateForm
-                      visible={showModal}
-                      onClose={() => setShowModal(false)}
-                      roleId={role}
-                      userId={currUser}
-                      onSuccess={() => setOk(true)}
-                    />
-                  </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Button
+                    style={{
+                      marginLeft: "10px",
+                      cursor: "pointer",
+                      marginTop: "10px",
+                    }}
+                    onClick={() => setShowModal(true)}
+                    type="primary"
+                  >
+                    Create Lead
+                  </Button>
+                  <CreateForm
+                    visible={showModal}
+                    onClose={() => setShowModal(false)}
+                    roleId={role}
+                    userId={currUser}
+                    onSuccess={() => setOk(true)}
+                  />
                 </div>
-                <Tabs
-                  defaultActiveKey="All"
-                  style={{ color: "#363636" }}
-                  type="card"
-                  onChange={(key) => {
-                    setActiveTab(key);
-                    setTabLoading(true);
-                  }}
-                >
-                  <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
-                  {statusOptions.map((option) => (
-                    <TabPane
-                      tab={option.label}
-                      key={option.value}
-                      disabled={tabLoading}
-                    ></TabPane>
-                  ))}
-                </Tabs>
-                <FilterModal
-                  onFilterApply={(newFilters) => {
-                    setAppliedFilters(newFilters);
-                    setPagination({ ...pagination, pageIndex: 1 });
-                  }}
-                  filterOptions={filterOptions}
-                  statusOptions={statusOptions}
-                />
-                <UserTable
-                  key={Date.now()}
-                  columns={columns}
-                  data={leads}
-                  total={total}
-                  loading={loading}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                />
               </div>
-            </Content>
-          </Col>
-        </Row>
+              <Tabs
+                defaultActiveKey="All"
+                style={{ color: "#363636" }}
+                type="card"
+                onChange={(key) => {
+                  setActiveTab(key);
+                  setTabLoading(true);
+                }}
+              >
+                <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
+                {statusOptions.map((option) => (
+                  <TabPane
+                    tab={option.label}
+                    key={option.value}
+                    disabled={tabLoading}
+                  ></TabPane>
+                ))}
+              </Tabs>
+              <FilterModal
+                onFilterApply={(newFilters) => {
+                  setAppliedFilters(newFilters);
+                  setPagination({ ...pagination, pageIndex: 1 });
+                }}
+                filterOptions={filterOptions}
+                statusOptions={statusOptions}
+              />
+              <UserTable
+                key={Date.now()}
+                columns={columns}
+                data={leads}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
+            </div>
+          </Content>
+        </Layout>
       </Layout>
     </>
   );
