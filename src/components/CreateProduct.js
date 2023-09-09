@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button } from "antd";
 import api from "@/api/api";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
+import { metaErr } from "@/api/prodErr";
 
 const CreateForm = ({ visible, onClose, onSuccess }) => {
   const [form] = Form.useForm();
@@ -26,6 +27,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
     } catch (error) {
       console.error(error);
       authErr(error, logOut);
+      metaErr(error);
     } finally {
       setLoading(false);
     }
@@ -41,7 +43,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Name"
-          name="name"
+          name="prodName"
           validateFirst="true"
           rules={[
             {
@@ -84,7 +86,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           name="description"
           rules={[{ required: true, message: "A description is required" }]}
         >
-          <Input />
+          <Input.TextArea rows={4} placeholder="Please enter description" />
         </Form.Item>
 
         <Form.Item>

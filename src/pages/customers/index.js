@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Button, Tooltip, Row, Col } from "antd";
+import { Layout, Tooltip, Spin } from "antd";
 const { Content } = Layout;
 
 import api from "@/api/api";
@@ -116,21 +116,23 @@ const ProtectedPage = () => {
       title: "Organization",
       dataIndex: "org",
       key: "org",
+      ellipsis: true,
       render: (text, record) => (
-        <Link href={`/customers/${record._id}`}>
-          <Button
-            type="link"
-            color="neutral"
-            size="sm"
-            variant="plain"
-            onClick={(e) => {
-              e.preventDefault();
-              router.push(`/customers/${record._id}`);
-            }}
-          >
-            {record.org}
-          </Button>
-        </Link>
+        <Tooltip placement="topLeft" title={record.org}>
+          <Link href={`/customers/${record._id}`}>
+            <div
+              style={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+              }}
+            >
+              {record.org}
+            </div>
+          </Link>
+        </Tooltip>
       ),
     },
     {
@@ -147,6 +149,30 @@ const ProtectedPage = () => {
         return dayjs(date).format("DD/MM/YYYY");
       },
     },
+    {
+      title: "Product",
+      dataIndex: "product",
+      key: "product",
+      ellipsis: true,
+
+      render: (text, record) => (
+        <Tooltip placement="topLeft" title={record.product}>
+          <Link href={`/products?prodName=${record.product}`}>
+            <div
+              style={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+              }}
+            >
+              {record.product}
+            </div>
+          </Link>
+        </Tooltip>
+      ),
+    },
   ];
   const baseFilter = [
     { label: "Phone", value: "phone" },
@@ -162,6 +188,20 @@ const ProtectedPage = () => {
     });
     baseFilter.push({ label: "In Charge", value: "inCharge" });
   }
+  if (!isRouterReady) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const filterOptions = baseFilter;
   const columns = baseColumns;
@@ -169,58 +209,50 @@ const ProtectedPage = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Row>
-          <Col xs={24} md={5} lg={4}>
-            <AppSider role={role} />
-          </Col>
-          <Col
-            xs={24}
-            md={24}
-            lg={20}
-            style={{ width: "100%", minHeight: "100vh" }}
-          >
-            <Content style={{ margin: "30px 30px 0" }}>
-              <div style={{ padding: 24, minHeight: 360 }}>
-                <div
+        <Layout className="layoutC">
+          <AppSider role={role} />
+
+          <Content style={{ margin: "30px 0 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0px",
+                }}
+              >
+                <h1
                   style={{
+                    fontSize: "2em",
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "0px",
                   }}
                 >
-                  <h1
-                    style={{
-                      fontSize: "2em",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    Accquired Customers
-                  </h1>
-                </div>
-
-                <FilterModal
-                  queryFilter={router.query}
-                  onFilterApply={(newFilters) => {
-                    setAppliedFilters(newFilters);
-                    setPagination({ ...pagination, pageIndex: 1 });
-                  }}
-                  filterOptions={filterOptions}
-                />
-                <UserTable
-                  key={Date.now()}
-                  columns={columns}
-                  data={customers}
-                  total={total}
-                  loading={loading}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                />
+                  Accquired Customers
+                </h1>
               </div>
-            </Content>
-          </Col>
-        </Row>
+
+              <FilterModal
+                queryFilter={router.query}
+                onFilterApply={(newFilters) => {
+                  setAppliedFilters(newFilters);
+                  setPagination({ ...pagination, pageIndex: 1 });
+                }}
+                filterOptions={filterOptions}
+              />
+              <UserTable
+                key={Date.now()}
+                columns={columns}
+                data={customers}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
+            </div>
+          </Content>
+        </Layout>
       </Layout>
     </>
   );

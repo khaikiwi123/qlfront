@@ -199,76 +199,68 @@ const App = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-        <Row>
-          <Col xs={24} md={5} lg={4}>
-            <AppSider role={role} />
-          </Col>
-          <Col
-            xs={24}
-            md={24}
-            lg={20}
-            style={{ width: "100%", minHeight: "100vh" }}
-          >
-            <Content style={{ margin: "24px 16px 0" }}>
-              <div style={{ padding: 24, minHeight: 360 }}>
-                <div
+        <Layout className="layoutC">
+          <AppSider role={role} />
+
+          <Content style={{ margin: "30px 0 0" }}>
+            <div style={{ padding: 24, minHeight: 360 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0px",
+                }}
+              >
+                <h1
                   style={{
+                    fontSize: "2em",
                     display: "flex",
-                    justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "0px",
                   }}
                 >
-                  <h1
-                    style={{
-                      fontSize: "2em",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    User List
-                  </h1>
+                  User List
+                </h1>
 
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Button
-                      style={{
-                        marginLeft: "10px",
-                        cursor: "pointer",
-                        marginTop: "10px",
-                      }}
-                      onClick={() => setShowModal(true)}
-                      type="primary"
-                    >
-                      Create User
-                    </Button>
-                    <CreateForm
-                      visible={showModal}
-                      onClose={() => setShowModal(false)}
-                      onSuccess={() => setOk(true)}
-                    />
-                  </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Button
+                    style={{
+                      marginLeft: "10px",
+                      cursor: "pointer",
+                      marginTop: "10px",
+                    }}
+                    onClick={() => setShowModal(true)}
+                    type="primary"
+                  >
+                    Create User
+                  </Button>
+                  <CreateForm
+                    visible={showModal}
+                    onClose={() => setShowModal(false)}
+                    onSuccess={() => setOk(true)}
+                  />
                 </div>
-                <FilterModal
-                  onFilterApply={(newFilters) => {
-                    setAppliedFilters(newFilters);
-                    setPagination({ ...pagination, pageIndex: 1 });
-                  }}
-                  filterOptions={filter}
-                  statusOptions={statusOptions}
-                />
-                <UserTable
-                  key={Date.now()}
-                  columns={columns}
-                  data={data}
-                  total={total}
-                  loading={loading}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                />
               </div>
-            </Content>
-          </Col>
-        </Row>
+              <FilterModal
+                onFilterApply={(newFilters) => {
+                  setAppliedFilters(newFilters);
+                  setPagination({ ...pagination, pageIndex: 1 });
+                }}
+                filterOptions={filter}
+                statusOptions={statusOptions}
+              />
+              <UserTable
+                key={Date.now()}
+                columns={columns}
+                data={data}
+                total={total}
+                loading={loading}
+                pagination={pagination}
+                setPagination={setPagination}
+              />
+            </div>
+          </Content>
+        </Layout>
       </Layout>
     </>
   );

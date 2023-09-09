@@ -342,8 +342,8 @@ const AppStep = ({
             style={{ width: "100%" }}
           >
             {products.map((product) => (
-              <Option key={product._id} value={product._id}>
-                {product.name}
+              <Option key={product.prodName} value={product.prodName}>
+                {product.prodName}
               </Option>
             ))}
           </Select>

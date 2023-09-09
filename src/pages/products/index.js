@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import Link from "next/link";
 import { useRouter } from "next/router";
-import dayjs from "dayjs";
 
-import { Layout, Button, Tooltip, Row, Col, Space } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Layout, Button, Tooltip, Space, Spin } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 
@@ -32,7 +30,8 @@ const ProtectedPage = () => {
   const [role, setRole] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showUpModal, setShowUpModal] = useState(false);
-  const [delModal, setDelModal] = useState(false);
+  const [isRouterReady, setIsRouterReady] = useState(false);
+
   const [appliedFilters, setAppliedFilters] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -49,7 +48,11 @@ const ProtectedPage = () => {
     if (createOk) {
       setOk(false);
     }
-    const email = router.query.email;
+    if (!router.isReady) return;
+    if (router.isReady) {
+      setIsRouterReady(true);
+    }
+    const prodName = router.query.prodName;
     setRole(localStorage.getItem("role"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
@@ -66,8 +69,8 @@ const ProtectedPage = () => {
         params.inCharge = id;
       }
     }
-    if (email && !isSet) {
-      params.email = email;
+    if (prodName && !isSet) {
+      params.prodName = prodName;
       setIsSet(true);
     }
     params = {
@@ -106,8 +109,8 @@ const ProtectedPage = () => {
   let baseColumns = [
     {
       title: "Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "prodName",
+      key: "prodName",
     },
     {
       title: "Price (₫)",
@@ -119,20 +122,30 @@ const ProtectedPage = () => {
       title: "Description",
       dataIndex: "description",
       key: "desc",
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (description) => (
+        <Tooltip placement="topLeft" title={description}>
+          {description}
+        </Tooltip>
+      ),
     },
 
-    {
-      title: "Created Date",
-      dataIndex: "createdDate",
-      key: "createdDate",
-      render: (date) => {
-        return dayjs(date).format("DD/MM/YYYY");
-      },
-    },
+    // {
+    //   title: "Created Date",
+    //   dataIndex: "createdDate",
+    //   key: "createdDate",
+    //   render: (date) => {
+    //     return dayjs(date).format("DD/MM/YYYY");
+    //   },
+    // }, sideline for now
+
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: "180px",
       render: (status) => {
         switch (status) {
           case "active":
@@ -166,11 +179,25 @@ const ProtectedPage = () => {
     },
   ];
   const baseFilter = [
-    { label: "Name", value: "name" },
+    { label: "Name", value: "prodName" },
     { label: "Price", value: "price" },
     { label: "Created Date", value: "exactDate" },
     { label: "Created Date From", value: "dateRange" },
   ];
+  if (!isRouterReady) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const filterOptions = baseFilter;
   const columns = baseColumns;

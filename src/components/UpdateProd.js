@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button, Select, message } from "antd";
 import api from "@/api/api";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
+import { metaErr } from "@/api/prodErr";
 
 const { Option } = Select;
 
@@ -28,6 +29,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
     } catch (error) {
       console.error(error);
       authErr(error, logOut);
+      metaErr(error);
     } finally {
       setLoading(false);
     }
@@ -41,7 +43,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
       footer={null}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item label="Name" name="name">
+        <Form.Item label="Name" name="prodName">
           <Input />
         </Form.Item>
         <Form.Item
@@ -58,7 +60,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
           <Input />
         </Form.Item>
         <Form.Item label="Description" name="description">
-          <Input />
+          <Input.TextArea rows={4} placeholder="Please enter description" />
         </Form.Item>
         <Form.Item label="Status" name="status">
           <Select placeholder="Select a status">
