@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-import { Layout, Typography, Spin, message, Descriptions, Button } from "antd";
+import { Layout, Spin, message, Descriptions, Button } from "antd";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -99,6 +99,11 @@ export default function Customer() {
       label: "Created Date",
       children: dayjs(customer.createdDate).format("DD/MM/YYYY"),
     },
+    {
+      key: "6",
+      label: "Product",
+      children: customer.product,
+    },
   ];
 
   return (
@@ -124,7 +129,11 @@ export default function Customer() {
               }}
             >
               <Descriptions
-                title={customer.org}
+                title={
+                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                    {customer.org}
+                  </div>
+                }
                 size="small"
                 extra={
                   <Button

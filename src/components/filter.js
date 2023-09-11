@@ -90,7 +90,14 @@ const FilterModal = ({
               </Select.Option>
             ))}
           </Select>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginRight: 10,
+            }}
+          >
             {filter.selectValue === "lastUp" ? (
               <InputNumber
                 style={{ width: 250, marginRight: 10 }}
@@ -211,10 +218,16 @@ const FilterModal = ({
           </div>
 
           {filter.id === Math.max(...filters.map((f) => f.id)) && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Button onClick={setFilter}>Apply Filters</Button>
+            <div
+              style={{ display: "flex", alignItems: "baseline", gap: "10px" }}
+            >
+              <Button className="Apply" onClick={setFilter}>
+                Apply Filters
+              </Button>
               {isAnyFilterSet() && (
-                <Button onClick={resetAll}>Clear All Filters</Button>
+                <Button className="ClearAll" onClick={resetAll}>
+                  Clear All Filters
+                </Button>
               )}
             </div>
           )}

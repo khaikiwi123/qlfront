@@ -153,6 +153,13 @@ export default function Lead() {
       children: dayjs(lead.createdDate).format("DD/MM/YYYY"),
     },
   ];
+  if (lead.product !== "None") {
+    items.push({
+      key: "6",
+      label: "Product",
+      children: lead.product,
+    });
+  }
 
   return (
     <>
@@ -227,6 +234,7 @@ export default function Lead() {
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}
                 products={products}
+                currProd={lead.product}
               />
             </div>
             <div

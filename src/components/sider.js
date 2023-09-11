@@ -1,6 +1,11 @@
 import React from "react";
 import { Layout, Menu } from "antd";
-import { UsergroupAddOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+  UsergroupAddOutlined,
+  TeamOutlined,
+  DollarCircleOutlined,
+  FunnelPlotOutlined,
+} from "@ant-design/icons";
 import Router, { useRouter } from "next/router";
 
 const { Sider } = Layout;
@@ -15,8 +20,11 @@ const AppSider = ({ role }) => {
     case "/customers":
       selectedKey = "2";
       break;
-    case "/users":
+    case "/products":
       selectedKey = "3";
+      break;
+    case "/users":
+      selectedKey = "4";
       break;
     default:
       selectedKey = "1";
@@ -40,7 +48,7 @@ const AppSider = ({ role }) => {
       }}
     >
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
-        <SubMenu key="sub1" icon={<UsergroupAddOutlined />} title="Leads">
+        <SubMenu key="sub1" icon={<FunnelPlotOutlined />} title="Leads">
           <Menu.Item key="1" onClick={() => Router.push("/leads")}>
             List
           </Menu.Item>
@@ -50,11 +58,16 @@ const AppSider = ({ role }) => {
             List
           </Menu.Item>
         </SubMenu>
+        <SubMenu key="sub3" icon={<DollarCircleOutlined />} title="Products">
+          <Menu.Item key="3" onClick={() => Router.push("/products")}>
+            List
+          </Menu.Item>
+        </SubMenu>
 
         {role === "admin" && (
           <>
             <Menu.Item
-              key="3"
+              key="4"
               icon={<TeamOutlined />}
               onClick={() => Router.push("/users")}
             >

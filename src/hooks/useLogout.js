@@ -1,13 +1,21 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Modal } from "antd";
+import { Modal, Spin } from "antd";
 
 const useLogout = () => {
   const router = useRouter();
   const [loading, setLoadingOut] = useState(false);
 
   const logOut = async (e) => {
+    Modal.confirm({
+      title: "Logging Out...",
+      content: <Spin tip="Logging out..."></Spin>,
+      footer: null,
+      closable: false,
+      maskClosable: false,
+    });
+
     setLoadingOut(true);
     const token = localStorage.getItem("refresh_token");
 
@@ -27,6 +35,7 @@ const useLogout = () => {
       console.error(error);
     } finally {
       setLoadingOut(false);
+      Modal.destroyAll();
       localStorage.clear();
       Modal.success({
         content: "You have been logged out.",

@@ -97,10 +97,6 @@ html {
   max-width: 250px;
 }
 
-.filter-container .ant-btn {
-  margin-left: 10px;
-}
-
 /* Sider Trigger */
 .ant-layout .ant-layout-sider-zero-width-trigger {
   position: absolute;
@@ -133,7 +129,6 @@ html {
 
   .filter-container .ant-btn {
     flex-basis: 100%;
-    margin-top: 10px;
     max-width: 150px;
   }
 }
@@ -141,6 +136,16 @@ html {
 @media (max-width: 990px) {
   .layoutC {
     margin-left: 0px;
+  }
+}
+@media (max-width: 880px) {
+  .ClearAll {
+    margin-top: 10px;
+  }
+}
+@media (max-width: 740px) {
+  .Apply {
+    margin-top: 10px;
   }
 }
 

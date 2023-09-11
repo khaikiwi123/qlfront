@@ -19,6 +19,7 @@ const AppStep = ({
   setLead,
   fetchChangeLogs,
   products,
+  currProd,
 }) => {
   const router = useRouter();
   const [pendingStatus, setPendingStatus] = useState("");
@@ -111,15 +112,18 @@ const AppStep = ({
   };
 
   const handleProductChange = async () => {
+    setIsModalLoading(true);
     try {
-      await api.put(`/customers/${id}`, { product: selectedProduct });
+      await api.put(`/leads/${id}`, { product: selectedProduct });
 
       router.push(`/customers?email=${email}`);
+      fetchChangeLogs();
     } catch (error) {
       console.error(error);
     } finally {
       setIsModalLoading(false);
       setProductModal(false);
+      fetchChangeLogs();
     }
   };
 
@@ -146,12 +150,31 @@ const AppStep = ({
   };
   const popContent = (
     <>
-      <div ref={popoverRef}>
+      <div
+        ref={popoverRef}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
+        {status !== "Failed" && (
+          <Button
+            key="failed"
+            danger
+            style={{ flex: 1, marginRight: 10 }}
+            onClick={() => handleConfirmChange("Failed")}
+            loading={isModalLoading}
+          >
+            {status === "Success" ? "Change to failed" : "Failed"}
+          </Button>
+        )}
         {status === "Success" && (
           <Button
             key="completed"
             type="primary"
-            style={{ width: "100%", background: "green" }}
+            ghost
+            style={{ flex: 1 }}
             onClick={() => {
               setProductModal(true);
               setPop(false);
@@ -161,44 +184,18 @@ const AppStep = ({
             Change product
           </Button>
         )}
-        {status !== "Failed" && (
-          <Button
-            key="failed"
-            danger
-            style={{ width: status === "Success" ? "100%" : "auto" }}
-            onClick={() => handleConfirmChange("Failed")}
-            loading={isModalLoading}
-          >
-            Failed
-          </Button>
-        )}
-        {status !== "Failed" && status !== "Success" && (
+        {status !== "Success" && (
           <Button
             key="complete"
             type="primary"
-            style={{ width: "50%", marginLeft: 10, background: "green" }}
+            style={{ flex: 1, background: "green" }}
             onClick={() => {
               setProductModal(true);
               setPop(false);
             }}
             loading={isModalLoading}
           >
-            Success
-          </Button>
-        )}
-
-        {status === "Failed" && (
-          <Button
-            key="completed"
-            type="primary"
-            style={{ width: "100%", background: "green" }}
-            onClick={() => {
-              setProductModal(true);
-              setPop(false);
-            }}
-            loading={isModalLoading}
-          >
-            Change to Success
+            {status === "Failed" ? "Change to Success" : "Success"}
           </Button>
         )}
       </div>
@@ -341,11 +338,13 @@ const AppStep = ({
             value={selectedProduct}
             style={{ width: "100%" }}
           >
-            {products.map((product) => (
-              <Option key={product.prodName} value={product.prodName}>
-                {product.prodName}
-              </Option>
-            ))}
+            {products
+              .filter((product) => product.prodName !== currProd)
+              .map((product) => (
+                <Option key={product.prodName} value={product.prodName}>
+                  {product.prodName}
+                </Option>
+              ))}
           </Select>
         )}
       </Modal>

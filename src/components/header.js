@@ -6,7 +6,6 @@ import {
   ProfileOutlined,
 } from "@ant-design/icons";
 import Router from "next/router";
-import Image from "next/image";
 import useLogout from "@/hooks/useLogout";
 
 const { Header } = Layout;
