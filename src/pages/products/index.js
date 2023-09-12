@@ -46,6 +46,8 @@ const ProtectedPage = () => {
       checkLogin();
       return;
     }
+    setRole(localStorage.getItem("role"));
+
     if (createOk) {
       setOk(false);
     }
@@ -151,7 +153,9 @@ const ProtectedPage = () => {
         }
       },
     },
-    {
+  ];
+  if (role === "admin") {
+    baseColumns.push({
       title: "Action",
       key: "action",
       width: "100px",
@@ -177,8 +181,8 @@ const ProtectedPage = () => {
           />
         </Space>
       ),
-    },
-  ];
+    });
+  }
   const baseFilter = [
     { label: "Name", value: "prodName" },
     { label: "Price", value: "price" },
@@ -229,17 +233,19 @@ const ProtectedPage = () => {
                   Products
                 </h1>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <Button
-                    style={{
-                      marginLeft: "10px",
-                      cursor: "pointer",
-                      marginTop: "10px",
-                    }}
-                    onClick={() => setShowModal(true)}
-                    type="primary"
-                  >
-                    Create Product
-                  </Button>
+                  {role === "admin" ? (
+                    <Button
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginTop: "10px",
+                      }}
+                      onClick={() => setShowModal(true)}
+                      type="primary"
+                    >
+                      Create Product
+                    </Button>
+                  ) : null}
                   <CreateForm
                     visible={showModal}
                     onClose={() => setShowModal(false)}
