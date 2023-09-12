@@ -119,6 +119,7 @@ export default function User() {
       children: user.status ? "Active" : "Inactive",
     },
   ];
+  const title = "Profile";
 
   return (
     <>

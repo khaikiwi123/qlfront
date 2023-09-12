@@ -107,8 +107,9 @@ const ProtectedPage = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-
-      ellipsis: true,
+      ellipsis: {
+        showTitle: false,
+      },
       render: (email) => (
         <Tooltip placement="topLeft" title={email}>
           {email}
@@ -144,6 +145,14 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (rep) => (
+        <Tooltip placement="topLeft" title={rep}>
+          {rep}
+        </Tooltip>
+      ),
     },
 
     {

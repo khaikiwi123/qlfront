@@ -14,11 +14,9 @@ import {
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
-import AppCrumbs from "@/components/breadcrumbs";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 import dayjs from "dayjs";
-import UserUpForm from "@/components/userUp";
 import ProfileUpForm from "@/components/profileUp";
 
 const { Content } = Layout;

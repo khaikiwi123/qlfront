@@ -139,6 +139,14 @@ const ProtectedPage = () => {
       title: "Representative",
       dataIndex: "rep",
       key: "rep",
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (rep) => (
+        <Tooltip placement="topLeft" title={rep}>
+          {rep}
+        </Tooltip>
+      ),
     },
 
     {

@@ -160,6 +160,7 @@ export default function Lead() {
       children: lead.product,
     });
   }
+  const leadTitle = lead.org;
 
   return (
     <>
@@ -182,7 +183,7 @@ export default function Lead() {
                 size="small"
                 title={
                   <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
-                    {lead.org}
+                    {leadTitle}
                   </div>
                 }
                 extra={
