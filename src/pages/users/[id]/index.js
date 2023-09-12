@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import {
   Layout,
   Button,
-  Typography,
   Spin,
   Descriptions,
   Modal,
@@ -12,7 +11,6 @@ import {
   Col,
   message,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
@@ -23,7 +21,6 @@ import dayjs from "dayjs";
 import UserUpForm from "@/components/userUp";
 
 const { Content } = Layout;
-const { Title } = Typography;
 
 export default function User() {
   const [user, setUser] = useState(null);
@@ -130,61 +127,71 @@ export default function User() {
         <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs
-              paths={[{ name: "Users", href: "/users" }, { name: "Profile" }]}
-            />
+            <AppCrumbs paths={[{ name: "Users", href: "/users" }]} />
             <div
               style={{
-                minHeight: 280,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                marginTop: -70,
+                borderBottom: "1px solid #A9A9A9",
+                borderTop: "1px solid #A9A9A9",
               }}
             >
-              <div
-                style={{
-                  marginTop: 80,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  borderBottom: "1px solid #A9A9A9",
-                  borderTop: "1px solid #A9A9A9",
-                }}
-              >
-                <Title style={{ marginTop: -5 }}>
-                  Profile
-                  <EditOutlined
+              <UserUpForm
+                visible={showModal}
+                onClose={() => setModal(false)}
+                onSuccess={() => setOk(true)}
+                userId={id}
+              />
+              <Descriptions
+                size="small"
+                title={
+                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                    Profile
+                  </div>
+                }
+                extra={
+                  <Button
                     onClick={() => setModal(true)}
-                    style={{ marginLeft: "10px", fontSize: "16px" }}
-                  />
-                  <UserUpForm
-                    visible={showModal}
-                    onClose={() => setModal(false)}
-                    onSuccess={() => setOk(true)}
-                    userId={id}
-                  />
-                </Title>
-                <Descriptions
-                  size="small"
-                  layout="vertical"
-                  items={items}
-                  className="Desc"
-                />
-              </div>
+                    type="primary"
+                    ghost
+                    style={{
+                      marginLeft: "10px",
+                      fontSize: "16px",
+                      minWidth: "100px",
+                      marginTop: "20px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    Edit
+                  </Button>
+                }
+                layout="vertical"
+                labelStyle={{}}
+                contentStyle={{
+                  fontWeight: "400",
+                  color: "black",
+                  marginTop: -15,
+                }}
+                items={items}
+                className="Desc"
+                colon={false}
+              />
             </div>
-            <div
-              style={{
-                minHeight: 280,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: -70,
-              }}
-            >
-              <Button key="delete" danger onClick={() => setDelModal(true)}>
-                Delete this user
-              </Button>
+            <div>
+              <Row
+                type="flex"
+                justify="center"
+                style={{ width: "100%", marginBottom: 40 }}
+              >
+                <Button
+                  danger
+                  style={{ marginTop: 15 }}
+                  onClick={() => setDelModal(true)}
+                >
+                  Delete this user
+                </Button>
+              </Row>
               <Modal
                 title="Delete"
                 visible={delModal}

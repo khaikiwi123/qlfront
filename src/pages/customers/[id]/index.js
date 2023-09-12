@@ -113,12 +113,7 @@ export default function Customer() {
         <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs
-              paths={[
-                { name: "Customers", href: "/customers" },
-                { name: "Profile" },
-              ]}
-            />
+            <AppCrumbs paths={[{ name: "Customers", href: "/customers" }]} />
             <div
               style={{
                 display: "flex",

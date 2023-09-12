@@ -168,10 +168,7 @@ export default function Lead() {
         <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs
-              paths={[{ name: "Leads", href: "/leads" }, { name: "Profile" }]}
-            />
-
+            <AppCrumbs paths={[{ name: "Leads", href: "/leads" }]} />
             <div
               style={{
                 display: "flex",

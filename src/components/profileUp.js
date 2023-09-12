@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, Form, Input, Button, Select, message, Tabs } from "antd";
+import { Modal, Form, Input, Button, message, Tabs } from "antd";
 import api from "@/api/api";
 import { EyeTwoTone, EyeInvisibleOutlined } from "@ant-design/icons";
 
@@ -8,24 +8,43 @@ import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 
 const { TabPane } = Tabs;
-const { Option } = Select;
 
-const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
-  const [form] = Form.useForm();
+const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
+  const [userInfoForm] = Form.useForm();
+  const [passwordForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
 
   const { logOut } = useLogout();
 
-  const onFinish = async (values) => {
+  const onFinishUserInfo = async (values) => {
     setLoading(true);
     try {
       await api.put(`/users/${userId}`, { ...values });
-      form.resetFields();
+      userInfoForm.resetFields();
       if (onSuccess) {
         onSuccess();
       }
-      message.success(values.newPassword ? "Password updated" : "User updated");
+      message.success("User updated");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      authErr(error, logOut);
+      metaErr(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onFinishPassword = async (values) => {
+    setLoading(true);
+    try {
+      await api.put(`/users/${userId}`, { ...values });
+      passwordForm.resetFields();
+      if (onSuccess) {
+        onSuccess();
+      }
+      message.success("Password updated");
       onClose();
     } catch (error) {
       console.error(error);
@@ -46,13 +65,21 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
       <Tabs
         activeKey={activeTab}
         onChange={(key) => {
-          form.resetFields();
+          if (key === "1") {
+            userInfoForm.resetFields();
+          } else {
+            passwordForm.resetFields();
+          }
           setActiveTab(key);
         }}
         type="card"
       >
         <TabPane tab="User Info" key="1">
-          <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form
+            form={userInfoForm}
+            layout="vertical"
+            onFinish={onFinishUserInfo}
+          >
             <Form.Item
               label="Email"
               name="email"
@@ -102,12 +129,6 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
             >
               <Input />
             </Form.Item>
-            <Form.Item label="Role" name="role">
-              <Select placeholder="Select a role">
-                <Option value="user">User</Option>
-                <Option value="admin">Admin</Option>
-              </Select>
-            </Form.Item>
             <Form.Item>
               <Button
                 type="primary"
@@ -121,12 +142,52 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
           </Form>
         </TabPane>
         <TabPane tab="Password" key="2">
-          <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form
+            form={passwordForm}
+            layout="vertical"
+            onFinish={onFinishPassword}
+          >
             <Form.Item
-              label="Password"
+              label="Old Password"
+              name="oldPassword"
+              validateFirst="true"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your old password!",
+                },
+                {
+                  message: "Password isn't strong enough",
+                  validator: (_, value) => {
+                    if (
+                      !value ||
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,18}$/.test(
+                        value
+                      )
+                    ) {
+                      return Promise.resolve();
+                    } else {
+                      return Promise.reject("Password is invalid");
+                    }
+                  },
+                },
+              ]}
+            >
+              <Input.Password
+                iconRender={(visible) =>
+                  visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              label="New Password"
               name="newPassword"
               validateFirst="true"
               rules={[
+                {
+                  required: true,
+                  message: "Please input your password!",
+                },
                 {
                   message: "Password isn't strong enough",
                   validator: (_, value) => {
@@ -152,7 +213,6 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
             </Form.Item>
             <Form.Item
               label="Confirm Password"
-              name="confirmPassword"
               rules={[
                 ({ getFieldValue }) => ({
                   validator(_, value) {
@@ -191,4 +251,4 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
   );
 };
 
-export default UserUpForm;
+export default ProfileUpForm;
