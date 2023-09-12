@@ -153,7 +153,7 @@ export default function Lead() {
       children: dayjs(lead.createdDate).format("DD/MM/YYYY"),
     },
   ];
-  if (lead.product !== "None") {
+  if (lead.product !== "Chưa có sản phẩm") {
     items.push({
       key: "6",
       label: "Product",

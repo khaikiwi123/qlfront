@@ -162,7 +162,7 @@ const ProtectedPage = () => {
     { label: "Organization", value: "org" },
     { label: "Representative", value: "rep" },
     { label: "Created Date", value: "exactDate" },
-    { label: "Created Date From", value: "dateRange" },
+    { label: "Created Date Range", value: "dateRange" },
     { label: "Last Updated", value: "lastUp" },
   ];
   const statusOptions = [

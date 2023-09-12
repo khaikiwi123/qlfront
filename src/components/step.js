@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import { Button, Modal, Steps, Select, Popover } from "antd";
+import { Button, Modal, Steps, Select, Popover, Row, Col } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -321,15 +321,37 @@ const AppStep = ({
         visible={productModal}
         centered
         onCancel={() => setProductModal(false)}
-        onOk={() => {
-          if (status !== "Success") {
-            handleConfirmChange("Success");
-            setProductModal(false);
-          } else {
-            handleProductChange();
-            setProductModal(false);
-          }
-        }}
+        footer={[
+          <Row key="footerRow" style={{ width: "100%" }}>
+            <Col span={2}>
+              <Button
+                key="back"
+                onClick={() => setProductModal(false)}
+                style={{ marginRight: "auto" }}
+              >
+                Cancel
+              </Button>
+            </Col>
+            <Col span={22} style={{ textAlign: "right" }}>
+              <Button
+                key="submit"
+                type="primary"
+                disabled={!selectedProduct}
+                onClick={() => {
+                  if (status !== "Success") {
+                    handleConfirmChange("Success");
+                    setProductModal(false);
+                  } else {
+                    handleProductChange();
+                    setProductModal(false);
+                  }
+                }}
+              >
+                Ok
+              </Button>
+            </Col>
+          </Row>,
+        ]}
       >
         {products && products.length > 0 && (
           <Select

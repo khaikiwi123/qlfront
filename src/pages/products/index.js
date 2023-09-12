@@ -31,6 +31,7 @@ const ProtectedPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showUpModal, setShowUpModal] = useState(false);
   const [isRouterReady, setIsRouterReady] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   const [appliedFilters, setAppliedFilters] = useState({});
   const [pagination, setPagination] = useState({
@@ -111,6 +112,7 @@ const ProtectedPage = () => {
       title: "Name",
       dataIndex: "prodName",
       key: "prodName",
+      fixed: "left",
     },
     {
       title: "Price (₫)",
@@ -131,16 +133,6 @@ const ProtectedPage = () => {
         </Tooltip>
       ),
     },
-
-    // {
-    //   title: "Created Date",
-    //   dataIndex: "createdDate",
-    //   key: "createdDate",
-    //   render: (date) => {
-    //     return dayjs(date).format("DD/MM/YYYY");
-    //   },
-    // }, sideline for now
-
     {
       title: "Status",
       dataIndex: "status",
@@ -164,14 +156,23 @@ const ProtectedPage = () => {
       key: "action",
       width: "100px",
       align: "center",
+      fixed: "right",
       render: (record) => (
         <Space size="middle">
-          <EditOutlined onClick={() => setShowUpModal(true)} />
-          {/* <DeleteOutlined /> */}
+          <EditOutlined
+            onClick={() => {
+              setShowUpModal(true);
+              setSelectedProductId(record._id);
+            }}
+          />
+
           <ProdUp
             visible={showUpModal}
-            onClose={() => setShowUpModal(false)}
-            id={record._id}
+            onClose={() => {
+              setShowUpModal(false);
+              setSelectedProductId(null);
+            }}
+            id={selectedProductId}
             onSuccess={() => setOk((prev) => !prev)}
           />
         </Space>
