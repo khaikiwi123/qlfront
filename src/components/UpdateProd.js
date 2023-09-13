@@ -24,7 +24,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
       if (onSuccess) {
         onSuccess();
       }
-      message.success("Product updated");
+      message.success("Cập nhập thành công");
       onClose();
     } catch (error) {
       console.error(error);
@@ -38,32 +38,32 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
   return (
     <Modal
       visible={visible}
-      title="Update Product"
+      title="Cập nhập sản phẩm"
       onCancel={onClose}
       footer={null}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item label="Name" name="prodName">
+        <Form.Item label="Tên sản phẩm" name="prodName">
           <Input />
         </Form.Item>
         <Form.Item
-          label="Price"
+          label="Giá sản phẩm"
           name="price"
           validateFirst="true"
           rules={[
             {
               pattern: /^\d+$/,
-              message: "Price must be a number",
+              message: "Giá phải là số",
             },
           ]}
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Description" name="description">
-          <Input.TextArea rows={4} placeholder="Please enter description" />
+        <Form.Item label="Thông tin sản phẩm" name="description">
+          <Input.TextArea rows={4} placeholder="Xin vui lòng điền thông tin" />
         </Form.Item>
-        <Form.Item label="Status" name="status">
-          <Select placeholder="Select a status">
+        <Form.Item label="Trạng thái" name="status">
+          <Select placeholder="Chọn trạng thái">
             <Option value="active">Active</Option>
             <Option value="inactive">Inactive</Option>
             <Option value="delete">Removed</Option>
@@ -76,7 +76,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
             loading={loading}
             style={{ width: "100%" }}
           >
-            Update
+            Cập nhập
           </Button>
         </Form.Item>
       </Form>

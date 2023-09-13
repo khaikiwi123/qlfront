@@ -43,16 +43,8 @@ export default function Customer() {
       .catch((err) => {
         console.error(err);
         authErr(err, logOut);
-        const inchargeEmail = err.response?.data?.incharge;
-
         if (err.response?.data?.error === "Not authorized") {
-          message.error(
-            `You are not authorized to view this customer. ${
-              inchargeEmail
-                ? `${inchargeEmail} is in charge of this customer.`
-                : "(It belonged to another salesperson)"
-            }`
-          );
+          message.error("Bạn không có quyền để xem khách hàng này");
 
           router.push("/customers/");
         }
@@ -81,27 +73,27 @@ export default function Customer() {
     },
     {
       key: "2",
-      label: "Phone Number",
+      label: "Số điện thoại",
       children: customer.phone,
     },
     {
       key: "3",
-      label: "Representative",
+      label: "Người đại diện",
       children: customer.rep,
     },
     {
       key: "4",
-      label: "Person In Charge",
+      label: "Người chịu trách nhiệm",
       children: customer.inCharge,
     },
     {
       key: "5",
-      label: "Created Date",
+      label: "Ngày tạo",
       children: dayjs(customer.createdDate).format("DD/MM/YYYY"),
     },
     {
       key: "6",
-      label: "Product",
+      label: "Sản phẩm",
       children: customer.product,
     },
   ];
@@ -163,7 +155,7 @@ export default function Customer() {
                 roleId={role}
                 userId={id}
                 onSuccess={() => setOk(true)}
-                uType="leads"
+                uType="customers"
               />
             </div>
           </Content>

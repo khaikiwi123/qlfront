@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { Timeline, Row, Col } from "antd";
+import { Timeline } from "antd";
 import { translateStatus } from "@/Utils/translate";
 
 const AppHistory = ({ changeLog }) => {
@@ -65,7 +65,7 @@ const AppHistory = ({ changeLog }) => {
             })}
           </Timeline>
         ) : (
-          <p>History is empty</p>
+          <p>Lịch sử trống</p>
         )}
       </div>
     </>

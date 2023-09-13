@@ -17,12 +17,12 @@ const AppHeader = () => {
     <Menu>
       <Menu.Item key="0">
         <Button type="text" onClick={() => Router.push("/profile")}>
-          <ProfileOutlined /> Profile
+          <ProfileOutlined /> Trang cá nhân
         </Button>
       </Menu.Item>
       <Menu.Item key="1">
         <Button type="text" onClick={logOut} loading={loadingOut}>
-          <LogoutOutlined /> Logout
+          <LogoutOutlined /> Đăng xuất
         </Button>
       </Menu.Item>
     </Menu>

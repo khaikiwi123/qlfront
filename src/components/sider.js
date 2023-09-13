@@ -50,17 +50,17 @@ const AppSider = ({ role }) => {
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
         <SubMenu key="sub1" icon={<FunnelPlotOutlined />} title="Leads">
           <Menu.Item key="1" onClick={() => Router.push("/leads")}>
-            List
+            Danh sách
           </Menu.Item>
         </SubMenu>
-        <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Customers">
+        <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Khách hàng">
           <Menu.Item key="2" onClick={() => Router.push("/customers")}>
-            List
+            Danh sách
           </Menu.Item>
         </SubMenu>
-        <SubMenu key="sub3" icon={<DollarCircleOutlined />} title="Products">
+        <SubMenu key="sub3" icon={<DollarCircleOutlined />} title="Sản phẩm">
           <Menu.Item key="3" onClick={() => Router.push("/products")}>
-            List
+            Danh sách
           </Menu.Item>
         </SubMenu>
 
@@ -71,7 +71,7 @@ const AppSider = ({ role }) => {
               icon={<TeamOutlined />}
               onClick={() => Router.push("/users")}
             >
-              Users
+              Người dùng
             </Menu.Item>
           </>
         )}

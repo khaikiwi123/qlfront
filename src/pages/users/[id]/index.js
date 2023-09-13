@@ -51,7 +51,7 @@ export default function User() {
         console.error(err);
         authErr(err, logOut);
         if (err.response?.data?.error === "User doesn't exist") {
-          message.error("User doesn't exist");
+          message.error("Người dùng không tồn tại");
 
           router.push("/users");
         }
@@ -63,11 +63,11 @@ export default function User() {
     try {
       await api.delete(`/users/${id}`);
       setDelModal(false);
-      message.success("User deleted");
+      message.success("Người dùng đã xóa thành công");
       router.push("/users");
     } catch (error) {
       console.error("Failed to delete user:", error);
-      message.error("Error deleting user");
+      message.error("Có lỗi xóa người dùng");
     } finally {
       setLoadingDelete(false);
     }
@@ -90,7 +90,7 @@ export default function User() {
   const items = [
     {
       key: "1",
-      label: "Name",
+      label: "Tên",
       children: user.name,
     },
     {
@@ -100,27 +100,25 @@ export default function User() {
     },
     {
       key: "3",
-      label: "Role",
+      label: "Vai trò",
       children: user.role === "admin" ? "Admin" : "N.V Sale",
     },
     {
       key: "4",
-      label: "Phone Number",
+      label: "Số điện thoại",
       children: user.phone,
     },
     {
       key: "5",
-      label: "Created Date",
+      label: "Ngày tạo",
       children: dayjs(user.createdDate).format("DD/MM/YYYY"),
     },
     {
       key: "6",
-      label: "Status",
-      children: user.status ? "Active" : "Inactive",
+      label: "Trạng thái",
+      children: user.status ? "Đang hoạt động" : "Đã bị khóa",
     },
   ];
-  const title = "Profile";
-
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>
@@ -128,7 +126,9 @@ export default function User() {
         <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs paths={[{ name: "Users", href: "/users" }]} />
+            <AppCrumbs
+              paths={[{ name: "Danh sách người dùng", href: "/users" }]}
+            />
             <div
               style={{
                 display: "flex",
@@ -148,7 +148,7 @@ export default function User() {
                 size="small"
                 title={
                   <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
-                    Profile
+                    Thông tin chi tiết
                   </div>
                 }
                 extra={
@@ -164,7 +164,7 @@ export default function User() {
                       marginBottom: "10px",
                     }}
                   >
-                    Edit
+                    Cập nhập
                   </Button>
                 }
                 layout="vertical"
@@ -190,7 +190,7 @@ export default function User() {
                   style={{ marginTop: 15 }}
                   onClick={() => setDelModal(true)}
                 >
-                  Delete this user
+                  Xóa người dùng này
                 </Button>
               </Row>
               <Modal
@@ -209,7 +209,7 @@ export default function User() {
                         }}
                         loading={loadingDelete}
                       >
-                        No
+                        Không
                       </Button>
                     </Col>
                     <Col span={22} style={{ textAlign: "right" }}>
@@ -220,13 +220,13 @@ export default function User() {
                         danger
                         loading={loadingDelete}
                       >
-                        Yes
+                        Có
                       </Button>
                     </Col>
                   </Row>,
                 ]}
               >
-                <p>Are you sure you want to delete this?</p>
+                <p>Bạn có chắc là bạn muốn xóa người dùng này?</p>
               </Modal>
             </div>
           </Content>

@@ -5,16 +5,16 @@ const authErr = (error, logOut) => {
   if (error.response) {
     if (error.response.status === 401) {
       Modal.error({
-        title: "Session expired",
-        content: "Please log in again",
+        title: "Session hết hạn",
+        content: "Xin vui lòng đăng nhập lại!",
         onOk: logOut,
       });
     } else if (error.response.status === 403) {
       Modal.confirm({
-        title: "Unauthorized Access",
-        content: "You do not have permission to view this page",
-        okText: "Go back",
-        cancelText: "Logout",
+        title: "Không có quyền truy cập",
+        content: "Bạn không có quyền để truy cập vào trang này",
+        okText: "Quay lại",
+        cancelText: "Đăng xuất",
         onOk() {
           Router.push("/leads");
         },
@@ -23,8 +23,8 @@ const authErr = (error, logOut) => {
     }
   } else {
     Modal.error({
-      title: "An error occurred",
-      content: "Please try again later",
+      title: "Có lỗi bất ngờ",
+      content: "Xin vui lòng thử lại sau",
     });
   }
   console.error(error);

@@ -25,7 +25,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
       if (onSuccess) {
         onSuccess();
       }
-      message.success("User updated");
+      message.success("Cập nhập thành công");
       onClose();
     } catch (error) {
       console.error(error);
@@ -44,7 +44,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
       if (onSuccess) {
         onSuccess();
       }
-      message.success("Password updated");
+      message.success("Cập nhập mật khẩu thành công");
       onClose();
     } catch (error) {
       console.error(error);
@@ -58,7 +58,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
   return (
     <Modal
       visible={visible}
-      title="Update User"
+      title="Cập nhập người dùng"
       onCancel={onClose}
       footer={null}
     >
@@ -74,7 +74,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
         }}
         type="card"
       >
-        <TabPane tab="User Info" key="1">
+        <TabPane tab="Thông tin người dùng" key="1">
           <Form
             form={userInfoForm}
             layout="vertical"
@@ -86,7 +86,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
               validateFirst="true"
               rules={[
                 {
-                  message: "Email isn't valid",
+                  message: "Email không hợp lệ",
                   validator: (_, value) => {
                     if (
                       !value ||
@@ -94,7 +94,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                     ) {
                       return Promise.resolve();
                     } else {
-                      return Promise.reject("Email is invalid");
+                      return Promise.reject("Email không hợp lệ");
                     }
                   },
                 },
@@ -106,12 +106,12 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
               <Input />
             </Form.Item>
             <Form.Item
-              label="Phone"
+              label="Số điện thoại"
               name="phone"
               validateFirst="true"
               rules={[
                 {
-                  message: "Phone number isn't valid",
+                  message: "Số điện thoại không hợp lệ",
                   validator: (_, value) => {
                     if (
                       !value ||
@@ -121,7 +121,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                     ) {
                       return Promise.resolve();
                     } else {
-                      return Promise.reject("Phone is invalid");
+                      return Promise.reject("Số điện thoại không hợp lệ");
                     }
                   },
                 },
@@ -136,28 +136,29 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                 loading={loading}
                 style={{ width: "100%" }}
               >
-                Update
+                Cập nhập thông tin
               </Button>
             </Form.Item>
           </Form>
         </TabPane>
-        <TabPane tab="Password" key="2">
+        <TabPane tab="Mật khẩu" key="2">
           <Form
             form={passwordForm}
             layout="vertical"
             onFinish={onFinishPassword}
           >
             <Form.Item
-              label="Old Password"
+              label="Mật khẩu cũ"
               name="oldPassword"
               validateFirst="true"
               rules={[
                 {
                   required: true,
-                  message: "Please input your old password!",
+                  message: "Cần nhập mật khẩu cũ",
                 },
                 {
-                  message: "Password isn't strong enough",
+                  message:
+                    "Mật khẩu không đủ khỏe (Cần ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt với độ dài từ 8-18)",
                   validator: (_, value) => {
                     if (
                       !value ||
@@ -167,7 +168,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                     ) {
                       return Promise.resolve();
                     } else {
-                      return Promise.reject("Password is invalid");
+                      return Promise.reject("Mật khẩu không hợp lệ");
                     }
                   },
                 },
@@ -180,16 +181,17 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
               />
             </Form.Item>
             <Form.Item
-              label="New Password"
+              label="Mật khẩu mới"
               name="newPassword"
               validateFirst="true"
               rules={[
                 {
                   required: true,
-                  message: "Please input your password!",
+                  message: "Cần nhập mật khẩu mới",
                 },
                 {
-                  message: "Password isn't strong enough",
+                  message:
+                    "Mật khẩu không đủ khỏe (Cần ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt với độ dài từ 8-18)",
                   validator: (_, value) => {
                     if (
                       !value ||
@@ -199,7 +201,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                     ) {
                       return Promise.resolve();
                     } else {
-                      return Promise.reject("Password is invalid");
+                      return Promise.reject("Mật khẩu không hợp lệ");
                     }
                   },
                 },
@@ -212,18 +214,15 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
               />
             </Form.Item>
             <Form.Item
-              label="Confirm Password"
+              label="Nhập lại mật khẩu mới"
+              name="confirmNewPassword"
               rules={[
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (getFieldValue("newPassword") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(
-                      new Error(
-                        "The two passwords that you entered do not match!"
-                      )
-                    );
+                    return Promise.reject(new Error("Mật khẩu không khớp"));
                   },
                 }),
               ]}
@@ -241,7 +240,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                 loading={loading}
                 style={{ width: "100%" }}
               >
-                Update Password
+                Đổi mật khẩu
               </Button>
             </Form.Item>
           </Form>

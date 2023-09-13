@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Modal, Form, Input, Button, message } from "antd";
 import api from "@/api/api";
 import { metaErr } from "@/api/metaErr";
 import authErr from "@/api/authErr";
@@ -22,7 +22,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
       if (onSuccess) {
         onSuccess();
       }
-
+      message.success("Cập nhập thành công");
       onClose();
     } catch (error) {
       console.error(error);
@@ -36,7 +36,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
   return (
     <Modal
       visible={visible}
-      title="Create Lead"
+      title="Cập nhập Lead"
       onCancel={onClose}
       footer={null}
     >
@@ -47,7 +47,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
           validateFirst="true"
           rules={[
             {
-              message: "Email isn't valid",
+              message: "Email không hợp lệ",
               validator: (_, value) => {
                 if (!value || /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
                   return Promise.resolve();
@@ -62,12 +62,12 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
         </Form.Item>
 
         <Form.Item
-          label="Phone"
+          label="Số điện thoại"
           name="phone"
           validateFirst="true"
           rules={[
             {
-              message: "Phone number isn't valid",
+              message: "Số điện thoại không hợp lệ",
               validator: (_, value) => {
                 if (
                   !value ||
@@ -86,14 +86,14 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item label="Representative" name="rep">
+        <Form.Item label="Người đại diện" name="rep">
           <Input />
         </Form.Item>
-        <Form.Item label="Organization" name="org">
+        <Form.Item label="Đơn vị" name="org">
           <Input />
         </Form.Item>
         {roleId === "admin" && (
-          <Form.Item label="Assign to" name="inCharge">
+          <Form.Item label="Cấp quyền cho" name="inCharge">
             <Input />
           </Form.Item>
         )}
@@ -104,7 +104,7 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
             loading={loading}
             style={{ width: "100%" }}
           >
-            Update
+            Cập nhập
           </Button>
         </Form.Item>
       </Form>

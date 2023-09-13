@@ -5,7 +5,7 @@ export const metaErr = (error) => {
 
   switch (errorMsg) {
     case "Product existed":
-      showModal("Product existed", "Please double check inputs");
+      showModal("Sản phẩm đã tồn tại", "Xin vui lòng kiểm tra thông tin nhập");
       break;
 
     default:

@@ -40,7 +40,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
   return (
     <Modal
       visible={visible}
-      title="Create Lead"
+      title="Tạo người dùng"
       onCancel={onClose}
       footer={null}
     >
@@ -50,9 +50,9 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           name="email"
           validateFirst="true"
           rules={[
-            { required: true, message: "Please input your email!" },
+            { required: true, message: "Cần nhập Email" },
             {
-              message: "Email isn't valid",
+              message: "Email không hợp lệ",
               validator: (_, value) => {
                 if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
                   return Promise.resolve();
@@ -68,21 +68,21 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
         <Form.Item
           label="Name"
           name="name"
-          rules={[{ required: true, message: "Please input your name!" }]}
+          rules={[{ required: true, message: "Cần nhập tên" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Phone"
+          label="Số điện thoại"
           name="phone"
           validateFirst="true"
           rules={[
             {
               required: true,
-              message: "Please input your phone number!",
+              message: "Cần nhập số điện thoại",
             },
             {
-              message: "Phone number isn't valid",
+              message: "Số điện thoại không hợp lệ",
               validator: (_, value) => {
                 if (
                   /^((\+?84)|0)((3([2-9]))|(5([25689]))|(7([0|6-9]))|(8([1-9]))|(9([0-9])))([0-9]{7})$/.test(
@@ -102,24 +102,25 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
         <Form.Item
           label="Role"
           name="role"
-          rules={[{ required: true, message: "Please select a role!" }]}
+          rules={[{ required: true, message: "Cần chọn vai trò" }]}
         >
-          <Select placeholder="Select a role">
-            <Option value="user">User</Option>
+          <Select placeholder="Chọn vai trò">
+            <Option value="user">Nhân viên sale</Option>
             <Option value="admin">Admin</Option>
           </Select>
         </Form.Item>
         <Form.Item
-          label="Password"
+          label="Mật khẩu"
           name="password"
           validateFirst="true"
           rules={[
             {
               required: true,
-              message: "Please input your password!",
+              message: "Cần nhập mật khẩu",
             },
             {
-              message: "Password isn't strong enough",
+              message:
+                "Mật khẩu không đủ khỏe (Cần ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt với độ dài từ 8-18)",
               validator: (_, value) => {
                 if (
                   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,18}$/.test(
@@ -141,12 +142,12 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Confirm Password"
+          label="Nhập lại mật khẩu"
           name="confirmPassword"
           rules={[
             {
               required: true,
-              message: "Please confirm your password!",
+              message: "Cần nhập lại mật khẩu",
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
@@ -154,7 +155,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error("The two passwords that you entered do not match!")
+                  new Error("Mật khẩu nhập không trùng khớp")
                 );
               },
             }),
@@ -173,7 +174,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             loading={loading}
             style={{ width: "100%" }}
           >
-            Create
+            Tạo
           </Button>
         </Form.Item>
       </Form>

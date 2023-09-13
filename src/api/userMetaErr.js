@@ -9,13 +9,16 @@ export const metaErr = (error) => {
   switch (errorMsg) {
     case "Email existed":
     case "Phone existed":
-      showModal("User existed", "Please double check inputs");
+      showModal(
+        "Người dùng đã tồn tại",
+        "Xin vui lòng kiểm tra thông tin nhập"
+      );
       break;
     case "Email isn't valid":
-      emailError = errorMsg;
+      emailError = "Email không hợp lệ";
       break;
     case "Phone isn't valid":
-      phoneError = errorMsg;
+      phoneError = "Số điện thoại không hợp lệ";
       break;
     default:
       console.error("Unhandled error:", errorMsg);

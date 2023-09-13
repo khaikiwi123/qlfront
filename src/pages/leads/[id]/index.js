@@ -64,11 +64,11 @@ export default function Lead() {
     try {
       await api.delete(`/leads/${id}`);
       setDelModal(false);
-      message.success("Lead deleted");
+      message.success("Lead xóa thành công");
       router.push("/leads");
     } catch (error) {
       console.error("Failed to delete lead:", error);
-      message.error("Error deleting lead");
+      message.error("Lỗi xóa lead");
     } finally {
       setDelLoading(false);
     }
@@ -89,21 +89,13 @@ export default function Lead() {
       .catch((err) => {
         console.error(err);
         authErr(err, logOut);
-        const inchargeEmail = err.response?.data?.incharge;
-
         if (err.response?.data?.error === "Not authorized") {
-          message.error(
-            `You are not authorized to view this lead. ${
-              inchargeEmail
-                ? `${inchargeEmail} is in charge of this lead.`
-                : "(It belonged to another salesperson)"
-            }`
-          );
+          message.error("Bạn không có quyền để xem lead này");
 
           router.push("/leads");
         }
         if (err.response?.data?.error === "Lead not found") {
-          message.error("Lead doesn't exist");
+          message.error("Lead không tồn tại");
 
           router.push("/leads");
         }
@@ -134,29 +126,29 @@ export default function Lead() {
     },
     {
       key: "2",
-      label: "Phone Number",
+      label: "Số điện thoại",
       children: lead.phone,
     },
     {
       key: "3",
-      label: "Representative",
+      label: "Người đại diện",
       children: lead.rep,
     },
     {
       key: "4",
-      label: "Person In Charge",
+      label: "Chịu trách nhiệm",
       children: lead.inCharge,
     },
     {
       key: "5",
-      label: "Created Date",
+      label: "Ngày tạo",
       children: dayjs(lead.createdDate).format("DD/MM/YYYY"),
     },
   ];
   if (lead.product !== "Chưa có sản phẩm") {
     items.push({
       key: "6",
-      label: "Product",
+      label: "Sản phẩm",
       children: lead.product,
     });
   }
@@ -199,7 +191,7 @@ export default function Lead() {
                       marginBottom: "10px",
                     }}
                   >
-                    Edit
+                    Cập nhập
                   </Button>
                 }
                 layout="vertical"
@@ -248,7 +240,7 @@ export default function Lead() {
                   color: "#00000073",
                 }}
               >
-                History
+                Lịch sử
               </h3>
               <AppHistory id={id} changeLog={changeLog} />
             </div>
@@ -264,12 +256,12 @@ export default function Lead() {
                   style={{ marginTop: 15 }}
                   onClick={() => setDelModal(true)}
                 >
-                  Delete this lead
+                  Xóa lead này
                 </Button>
               </Row>
 
               <Modal
-                title="Delete"
+                title="Xóa"
                 visible={delModal}
                 onCancel={() => {
                   setDelModal(false);
@@ -284,7 +276,7 @@ export default function Lead() {
                         }}
                         loading={delLoading}
                       >
-                        No
+                        Không
                       </Button>
                     </Col>
                     <Col span={22} style={{ textAlign: "right" }}>
@@ -295,13 +287,13 @@ export default function Lead() {
                         danger
                         loading={delLoading}
                       >
-                        Yes
+                        Có
                       </Button>
                     </Col>
                   </Row>,
                 ]}
               >
-                <p>Are you sure you want to delete this?</p>
+                <p>Bạn có chắc là bạn muốn xóa lead này?</p>
               </Modal>
             </div>
           </Content>

@@ -82,7 +82,7 @@ const FilterModal = ({
               );
               setFilters(updatedFilters);
             }}
-            placeholder="Select a filter field"
+            placeholder="Chọn bộ lọc"
           >
             {filterOptions.map((option) => (
               <Select.Option value={option.value} key={option.value}>
@@ -102,7 +102,7 @@ const FilterModal = ({
               <InputNumber
                 style={{ width: 250, marginRight: 10 }}
                 value={filter.value || null}
-                placeholder="Enter number of days"
+                placeholder="Nhập số ngày"
                 min={0}
                 onChange={(value) => {
                   const updatedFilters = filters.map((f) =>
@@ -115,7 +115,7 @@ const FilterModal = ({
               <Select
                 style={{ width: 305, marginRight: 10 }}
                 value={filter.value || null}
-                placeholder="Select status"
+                placeholder="Lọc trạng thái"
                 onChange={(value) => {
                   const updatedFilters = filters.map((f) =>
                     f.id === filter.id ? { ...f, value } : f
@@ -133,7 +133,7 @@ const FilterModal = ({
               <Select
                 style={{ width: 305, marginRight: 10 }}
                 value={filter.value || null}
-                placeholder="Select role"
+                placeholder="Lọc vai trò"
                 onChange={(value) => {
                   const updatedFilters = filters.map((f) =>
                     f.id === filter.id ? { ...f, value } : f
@@ -149,7 +149,7 @@ const FilterModal = ({
                 style={{ width: 305, marginRight: 10 }}
                 value={filter.value ? dayjs(filter.value, dateFormat) : null}
                 format={dateFormat}
-                placeholder="Select a date"
+                placeholder="Chọn một ngày"
                 onChange={(date, dateString) => {
                   const updatedFilters = filters.map((f) =>
                     f.id === filter.id ? { ...f, value: dateString } : f
@@ -181,7 +181,7 @@ const FilterModal = ({
               <Input
                 style={{ width: 305, marginRight: 10 }}
                 value={filter.value || null}
-                placeholder="Enter filter value"
+                placeholder="Nhập thông tin lọc"
                 onChange={(e) => {
                   const updatedFilters = filters.map((f) =>
                     f.id === filter.id ? { ...f, value: e.target.value } : f
@@ -222,11 +222,11 @@ const FilterModal = ({
               style={{ display: "flex", alignItems: "baseline", gap: "10px" }}
             >
               <Button className="Apply" onClick={setFilter}>
-                Apply Filters
+                Áp dụng bộ lọc
               </Button>
               {isAnyFilterSet() && (
                 <Button className="ClearAll" onClick={resetAll}>
-                  Clear All Filters
+                  Xóa toàn bộ bộ lọc
                 </Button>
               )}
             </div>

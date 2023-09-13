@@ -166,7 +166,7 @@ const AppStep = ({
             onClick={() => handleConfirmChange("Failed")}
             loading={isModalLoading}
           >
-            {status === "Success" ? "Change to failed" : "Failed"}
+            {status === "Success" ? "Đổi sang thất bại" : "Thất bại"}
           </Button>
         )}
         {status === "Success" && (
@@ -181,7 +181,7 @@ const AppStep = ({
             }}
             loading={isModalLoading}
           >
-            Change product
+            Đổi sản phẩm
           </Button>
         )}
         {status !== "Success" && (
@@ -195,7 +195,7 @@ const AppStep = ({
             }}
             loading={isModalLoading}
           >
-            {status === "Failed" ? "Change to Success" : "Success"}
+            {status === "Failed" ? "Đổi sang thành công" : "Thành công"}
           </Button>
         )}
       </div>
@@ -329,7 +329,7 @@ const AppStep = ({
                 onClick={() => setProductModal(false)}
                 style={{ marginRight: "auto" }}
               >
-                Cancel
+                Hủy
               </Button>
             </Col>
             <Col span={22} style={{ textAlign: "right" }}>

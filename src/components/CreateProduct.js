@@ -42,39 +42,37 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label="Name"
+          label="Tên sản phẩm"
           name="prodName"
           validateFirst="true"
           rules={[
             {
               required: true,
-              message: "Name is required",
+              message: "Cần nhập tên sản phẩm",
             },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Price"
+          label="Giá sản phẩm (đ)"
           name="price"
           validateFirst="true"
           rules={[
             {
               required: true,
-              message: "A price is required",
+              message: "Cần nhập giá sản phẩm",
             },
             {
               pattern: /^\d+$/,
-              message: "Price must be a number",
+              message: "Giá tiền phải là số",
             },
             {
               validator: (_, value) => {
                 if (value && parseFloat(value) > 1000) {
                   return Promise.resolve();
                 }
-                return Promise.reject(
-                  new Error("Price must be greater than 1000")
-                );
+                return Promise.reject(new Error("Giá tiền phải lớn hơn 1000"));
               },
             },
           ]}
@@ -82,11 +80,14 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           <Input />
         </Form.Item>
         <Form.Item
-          label="Description"
+          label="Thông tin sản phẩm"
           name="description"
-          rules={[{ required: true, message: "A description is required" }]}
+          rules={[{ required: true, message: "Cần nhập thông tin sảm phẩm" }]}
         >
-          <Input.TextArea rows={4} placeholder="Please enter description" />
+          <Input.TextArea
+            rows={4}
+            placeholder="Xin vui lòng điền thông tin của sản phẩm"
+          />
         </Form.Item>
 
         <Form.Item>
@@ -96,7 +97,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             loading={loading}
             style={{ width: "100%" }}
           >
-            Create
+            Tạo
           </Button>
         </Form.Item>
       </Form>

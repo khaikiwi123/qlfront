@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "../../api/api";
-import { useRouter } from "next/router";
 import {
   Layout,
   Button,
@@ -69,7 +68,7 @@ export default function User() {
     ? [
         {
           key: "1",
-          label: "Name",
+          label: "Tên",
           children: user.name,
         },
         {
@@ -79,22 +78,22 @@ export default function User() {
         },
         {
           key: "3",
-          label: "Role",
+          label: "Vai trò",
           children: user.role === "admin" ? "Admin" : "N.V Sale",
         },
         {
           key: "4",
-          label: "Phone Number",
+          label: "Số điện thoại",
           children: user.phone,
         },
         {
           key: "5",
-          label: "Created Date",
+          label: "Ngày tạo",
           children: dayjs(user.createdDate).format("DD/MM/YYYY"),
         },
         {
           key: "6",
-          label: "Status",
+          label: "Trạng thái",
           children: user.status ? "Active" : "Inactive",
         },
       ]
@@ -141,7 +140,7 @@ export default function User() {
                 size="small"
                 title={
                   <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
-                    Profile
+                    Thông tin cá nhân
                   </div>
                 }
                 extra={
@@ -157,7 +156,7 @@ export default function User() {
                       marginBottom: "10px",
                     }}
                   >
-                    Edit
+                    Cập nhập
                   </Button>
                 }
                 layout="vertical"
@@ -183,7 +182,7 @@ export default function User() {
                   style={{ marginTop: 15 }}
                   onClick={() => setDelModal(true)}
                 >
-                  Delete your account
+                  Xóa tài khoản
                 </Button>
               </Row>
               <Modal
@@ -202,7 +201,7 @@ export default function User() {
                         }}
                         loading={loadingDelete}
                       >
-                        No
+                        Không
                       </Button>
                     </Col>
                     <Col span={22} style={{ textAlign: "right" }}>
@@ -213,13 +212,13 @@ export default function User() {
                         danger
                         loading={loadingDelete}
                       >
-                        Yes
+                        Có
                       </Button>
                     </Col>
                   </Row>,
                 ]}
               >
-                <p>Are you sure you want to delete this?</p>
+                <p>Bạn có chắc là bạn muốn xóa tài khoản không?</p>
               </Modal>
             </div>
           </Content>

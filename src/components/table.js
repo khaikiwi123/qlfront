@@ -23,7 +23,8 @@ const UserTable = ({
       pageSizeOptions: ["10", "50"],
       showSizeChanger: true,
       showLessItems: true,
-      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+      showTotal: (total, range) =>
+        `Hiển thị ${range[0]}-${range[1]} trên ${total}`,
       onChange: (pageIndex, pageSize) => {
         if (pageSize !== pagination.pageSize) {
           setPagination({

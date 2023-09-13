@@ -9,8 +9,8 @@ const useLogout = () => {
 
   const logOut = async (e) => {
     Modal.confirm({
-      title: "Logging Out...",
-      content: <Spin tip="Logging out..."></Spin>,
+      title: "Đang đăng xuất...",
+      content: <Spin tip="Đang đăng xuất..."></Spin>,
       footer: null,
       closable: false,
       maskClosable: false,
@@ -38,7 +38,7 @@ const useLogout = () => {
       Modal.destroyAll();
       localStorage.clear();
       Modal.success({
-        content: "You have been logged out.",
+        content: "Đăng xuất thành công",
         onOk() {
           router.push("/login");
         },

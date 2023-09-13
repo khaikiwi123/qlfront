@@ -21,15 +21,15 @@ export const metaErr = (error, role) => {
     role !== "admin" &&
     currUserEmail !== inChargeEmail
   ) {
-    const message = `A sale person is alerady in charge of this ${objectType.toLowerCase()}.`;
-    showModal("Lead existed", message);
+    const message = `Đã có người chịu trách nhiệm cho ${objectType.toLowerCase()} này.`;
+    showModal("Lead đã tồn tại", message);
   } else {
     switch (errorMsg) {
       case "Email existed":
       case "Phone existed":
         const message = customerId ? (
           <>
-            {`${objectType} existed. `}
+            {`${objectType} đã tồn tại. `}
             <span
               style={{
                 textDecoration: "underline",
@@ -39,22 +39,22 @@ export const metaErr = (error, role) => {
                 window.open(`/${objectUrlPath}/${customerId}`, "_blank")
               }
             >
-              View {objectType.toLowerCase()}&apos;s profile
+              Xem thông tin chi tiết của {objectType.toLowerCase()} này.
             </span>
           </>
         ) : (
           errorMsg
         );
-        showModal("Lead existed", message);
+        showModal("Lead đã tồn tại", message);
         break;
       case "Email isn't valid":
-        emailError = errorMsg;
+        emailError = "Email không hợp lệ";
         break;
       case "Phone isn't valid":
-        phoneError = errorMsg;
+        phoneError = "Số điện thoại không hợp lệ";
         break;
       case "Sale user doesn't exist":
-        showModal("Invalid Entry", <>Sale person doesn&apos;t exist</>);
+        showModal("Thông tin không chính xác", <>Nhân viên không tồn tại</>);
         break;
       default:
         console.error("Unhandled error:", errorMsg);

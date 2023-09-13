@@ -111,19 +111,19 @@ const ProtectedPage = () => {
 
   let baseColumns = [
     {
-      title: "Name",
+      title: "Tên",
       dataIndex: "prodName",
       key: "prodName",
       fixed: "left",
     },
     {
-      title: "Price (₫)",
+      title: "Giá (₫)",
       dataIndex: "price",
       key: "price",
       render: (price) => formatVND(price),
     },
     {
-      title: "Description",
+      title: "Thông tin",
       dataIndex: "description",
       key: "desc",
       ellipsis: {
@@ -136,7 +136,7 @@ const ProtectedPage = () => {
       ),
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       width: "180px",
@@ -156,7 +156,7 @@ const ProtectedPage = () => {
   ];
   if (role === "admin") {
     baseColumns.push({
-      title: "Action",
+      title: "Thao tác",
       key: "action",
       width: "100px",
       align: "center",
@@ -184,10 +184,9 @@ const ProtectedPage = () => {
     });
   }
   const baseFilter = [
-    { label: "Name", value: "prodName" },
-    { label: "Price", value: "price" },
-    { label: "Created Date", value: "exactDate" },
-    { label: "Created Date From", value: "dateRange" },
+    { label: "Tên", value: "prodName" },
+    { label: "Giá", value: "price" },
+    //need status filter and time filter
   ];
   if (!isRouterReady) {
     return (
@@ -230,7 +229,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Products
+                  Sản phẩm
                 </h1>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   {role === "admin" ? (
@@ -243,7 +242,7 @@ const ProtectedPage = () => {
                       onClick={() => setShowModal(true)}
                       type="primary"
                     >
-                      Create Product
+                      Tạo sản phẩm
                     </Button>
                   ) : null}
                   <CreateForm

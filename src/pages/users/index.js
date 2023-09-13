@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import { Layout, Button, Row, Col, Spin } from "antd";
+import { Layout, Button } from "antd";
 import api from "@/api/api";
 import useLogout from "@/hooks/useLogout";
 import checkLogin from "@/Utils/checkLogin";
@@ -22,14 +22,12 @@ const App = () => {
   const [currID, setCurrID] = useState("");
   const [role, setRole] = useState("");
   const [createOk, setOk] = useState(false);
-  const [isRouterReady, setIsReady] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
   });
-  const router = useRouter();
 
   const { logOut } = useLogout();
 
@@ -62,9 +60,7 @@ const App = () => {
     }
     setCurrID(localStorage.getItem("currID"));
     setLoading(true);
-    if (router.isReady) {
-      setIsReady(true);
-    }
+
     const { pageIndex, pageSize } = pagination;
 
     let params = {};
@@ -106,7 +102,7 @@ const App = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: "Tên",
       dataIndex: "name",
       key: "name",
     },
@@ -137,7 +133,7 @@ const App = () => {
     },
 
     {
-      title: "Role",
+      title: "Vai trò",
       dataIndex: "role",
       key: "role",
       render: (text) => {
@@ -152,12 +148,12 @@ const App = () => {
       },
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
     },
     {
-      title: "Created Date",
+      title: "Ngày tạo",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
@@ -165,14 +161,14 @@ const App = () => {
       },
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (text, record) => (
         <button
           onClick={() => toggleStatus(record._id, record.status)}
           disabled={loadingStatus[record._id] || record._id === currID}
-          title={record._id === currID ? "Can't deactivate current user" : ""}
+          title={record._id === currID ? "Không thể khóa người dùng này" : ""}
         >
           {loadingStatus[record._id]
             ? "Loading..."
@@ -184,15 +180,15 @@ const App = () => {
     },
   ];
   const filter = [
-    { label: "Name", value: "name" },
+    { label: "Tên", value: "name" },
     { label: "Email", value: "email" },
-    { label: "Role", value: "role" },
-    { label: "Phone", value: "phone" },
-    { label: "Status", value: "status" },
+    { label: "Vai trò", value: "role" },
+    { label: "Số điện thoại", value: "phone" },
+    { label: "Trạng thái", value: "status" },
   ];
   const statusOptions = [
-    { value: "true", label: "Active" },
-    { value: "false", label: "Inactive" },
+    { value: "true", label: "Đang hoạt động" },
+    { value: "false", label: "Đã bị khóa" },
   ];
 
   return (
@@ -219,7 +215,7 @@ const App = () => {
                     alignItems: "center",
                   }}
                 >
-                  User List
+                  Danh sách người dùng
                 </h1>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -232,7 +228,7 @@ const App = () => {
                     onClick={() => setShowModal(true)}
                     type="primary"
                   >
-                    Create User
+                    Tạo người dùng
                   </Button>
                   <CreateForm
                     visible={showModal}

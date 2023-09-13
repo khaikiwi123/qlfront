@@ -17,7 +17,8 @@ const Login = (e) => {
   } = useLogin(e);
 
   const emailErrorMsg = errMsg === "Wrong password" ? "" : errMsg;
-  const passwordErrorMsg = errMsg === "Wrong password" ? errMsg : "";
+  const passwordErrorMsg =
+    errMsg === "Wrong password" ? "Thông tin không chính xác" : "";
 
   return (
     <Layout
@@ -29,7 +30,7 @@ const Login = (e) => {
       }}
     >
       <Content>
-        <Title level={2}>Sign In</Title>
+        <Title level={2}>Đăng nhập</Title>
         <Form onFinish={handleSubmit}>
           <Form.Item
             validateStatus={emailErrorMsg ? "error" : ""}
@@ -51,7 +52,7 @@ const Login = (e) => {
           >
             <Input.Password
               id="password"
-              placeholder="Password"
+              placeholder="Mật khẩu"
               value={password}
               required
               onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +69,7 @@ const Login = (e) => {
               htmlType="submit"
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Log in"}
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </Form.Item>
         </Form>

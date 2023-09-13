@@ -96,7 +96,7 @@ const ProtectedPage = () => {
 
   let baseColumns = [
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
       ellipsis: true,
@@ -113,7 +113,7 @@ const ProtectedPage = () => {
       ),
     },
     {
-      title: "Organization",
+      title: "Đơn vị",
       dataIndex: "org",
       key: "org",
       ellipsis: true,
@@ -136,7 +136,7 @@ const ProtectedPage = () => {
       ),
     },
     {
-      title: "Representative",
+      title: "Người đại diện",
       dataIndex: "rep",
       key: "rep",
       ellipsis: {
@@ -150,7 +150,7 @@ const ProtectedPage = () => {
     },
 
     {
-      title: "Created Date",
+      title: "Ngày tạo",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
@@ -158,7 +158,7 @@ const ProtectedPage = () => {
       },
     },
     {
-      title: "Product",
+      title: "Sản phẩm",
       dataIndex: "product",
       key: "product",
       ellipsis: true,
@@ -183,18 +183,18 @@ const ProtectedPage = () => {
     },
   ];
   const baseFilter = [
-    { label: "Phone", value: "phone" },
+    { label: "Số điện thoại", value: "phone" },
     { label: "Email", value: "email" },
-    { label: "Organization", value: "org" },
-    { label: "Representative", value: "rep" },
+    { label: "Đơn vị", value: "org" },
+    { label: "Người đại diện", value: "rep" },
   ];
   if (role === "admin") {
     baseColumns.push({
-      title: "In Charge",
+      title: "Chịu trách nhiệm",
       dataIndex: "inCharge",
       key: "inCharge",
     });
-    baseFilter.push({ label: "In Charge", value: "inCharge" });
+    baseFilter.push({ label: "Người chịu trách nhiệm", value: "inCharge" });
   }
   if (!isRouterReady) {
     return (
@@ -237,7 +237,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Accquired Customers
+                  Danh sách khách hàng
                 </h1>
               </div>
 

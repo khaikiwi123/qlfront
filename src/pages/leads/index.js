@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Row, Col, Layout, Button, Tooltip, Tabs } from "antd";
+import "dayjs/locale/vi";
+import { Layout, Button, Tooltip, Tabs } from "antd";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -20,6 +21,7 @@ import { translateStatus } from "@/Utils/translate";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 dayjs.extend(relativeTime);
+dayjs.locale("vi");
 const ProtectedPage = () => {
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
@@ -98,7 +100,7 @@ const ProtectedPage = () => {
 
   const baseColumns = [
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
       ellipsis: true,
@@ -118,7 +120,7 @@ const ProtectedPage = () => {
     },
 
     {
-      title: "Organization",
+      title: "Đơn vị",
       dataIndex: "org",
       key: "org",
       ellipsis: true,
@@ -142,7 +144,7 @@ const ProtectedPage = () => {
     },
 
     {
-      title: "Representative",
+      title: "Người đại diện",
       dataIndex: "rep",
       key: "rep",
       ellipsis: {
@@ -156,7 +158,7 @@ const ProtectedPage = () => {
     },
 
     {
-      title: "Created Date",
+      title: "Ngày tạo",
       dataIndex: "createdDate",
       key: "createdDate",
       render: (date) => {
@@ -166,13 +168,13 @@ const ProtectedPage = () => {
   ];
 
   const baseFilter = [
-    { label: "Phone", value: "phone" },
+    { label: "Số điện thoại", value: "phone" },
     { label: "Email", value: "email" },
-    { label: "Organization", value: "org" },
-    { label: "Representative", value: "rep" },
-    { label: "Created Date", value: "exactDate" },
-    { label: "Created Date Range", value: "dateRange" },
-    { label: "Last Updated", value: "lastUp" },
+    { label: "Tên đơn vị", value: "org" },
+    { label: "Người đại diện", value: "rep" },
+    { label: "Ngày tạo", value: "exactDate" },
+    { label: "Ngày tạo từ", value: "dateRange" },
+    { label: "Lần cập nhập cuối", value: "lastUp" },
   ];
   const statusOptions = [
     { value: "No contact", label: "Chưa Liên Hệ" },
@@ -184,13 +186,13 @@ const ProtectedPage = () => {
   ];
   if (activeTab === "All") {
     baseColumns.push({
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status, record) => {
         const displayStatus = translateStatus(status);
         const lastUpdated = record.statusUpdate
-          ? `Last updated ${dayjs(record.statusUpdate).fromNow()}`
+          ? `Cập nhập từ ${dayjs(record.statusUpdate).fromNow()}`
           : "";
 
         return (
@@ -202,7 +204,7 @@ const ProtectedPage = () => {
     });
   } else {
     baseColumns.push({
-      title: "Last Updated",
+      title: "Lần cuối cập nhập",
       dataIndex: "statusUpdate",
       key: "statusUpdate",
       render: (statusUpdate) => {
@@ -212,11 +214,11 @@ const ProtectedPage = () => {
   }
   if (role === "admin") {
     baseColumns.push({
-      title: "In Charge",
+      title: "Chịu trách nhiệm",
       dataIndex: "inCharge",
       key: "inCharge",
     });
-    baseFilter.push({ label: "In Charge", value: "inCharge" });
+    baseFilter.push({ label: "Người chịu trách nhiệm", value: "inCharge" });
   }
 
   const columns = baseColumns;
@@ -246,7 +248,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Leads Contact
+                  Danh sách lead
                 </h1>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -259,7 +261,7 @@ const ProtectedPage = () => {
                     onClick={() => setShowModal(true)}
                     type="primary"
                   >
-                    Create Lead
+                    Tạo lead
                   </Button>
                   <CreateForm
                     visible={showModal}
