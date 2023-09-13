@@ -219,7 +219,6 @@ const ProtectedPage = () => {
         <AppHeader />
         <Layout className="layoutC">
           <AppSider role={role} />
-
           <Content style={{ margin: "30px 0 0" }}>
             <div style={{ padding: 24, minHeight: 360 }}>
               <div
@@ -240,7 +239,6 @@ const ProtectedPage = () => {
                   Danh sách khách hàng
                 </h1>
               </div>
-
               <FilterModal
                 queryFilter={router.query}
                 onFilterApply={(newFilters) => {
