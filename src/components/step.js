@@ -1,13 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import { Button, Modal, Steps, Select, Popover, Row, Col } from "antd";
+import {
+  Button,
+  Modal,
+  Steps,
+  Select,
+  Popover,
+  Row,
+  Col,
+  Input,
+  DatePicker,
+} from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
 import api from "@/api/api";
+import dayjs from "dayjs";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -27,10 +38,14 @@ const AppStep = ({
   const [selectedStep, setSelectedStep] = useState(null);
   const [productModal, setProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [defaultPrice, setDefault] = useState("");
+  const [selectedDates, setSelectedDates] = useState([null, null]);
+  const [length, setLength] = useState("");
+  const [price, setPrice] = useState("");
   const [popVis, setPop] = useState(false);
 
   const popoverRef = useRef(null);
-
+  console.log(products);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
@@ -43,6 +58,13 @@ const AppStep = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  useEffect(() => {
+    if (length && !isNaN(length) && defaultPrice) {
+      const newPrice = defaultPrice * parseFloat(length);
+      setPrice(newPrice);
+    }
+  }, [length, defaultPrice]);
+
   const statusToIndex = {
     "No contact": 0,
     "In contact": 1,
@@ -103,6 +125,18 @@ const AppStep = ({
         router.push(`/customers?email=${email}`);
       }
       fetchChangeLogs();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsModalLoading(false);
+      setProductModal(false);
+    }
+  };
+
+  const handleBill = async () => {
+    setIsModalLoading(true);
+    try {
+      await api.post("bills", { data });
     } catch (error) {
       console.error(error);
     } finally {
@@ -238,6 +272,12 @@ const AppStep = ({
     setPop(!popVis);
     console.log(popVis);
   };
+  const computeEndDate = (date) => {
+    if (date && length) {
+      return dayjs(date).add(30 * parseFloat(length), "days");
+    }
+    return null;
+  };
 
   return (
     <>
@@ -353,22 +393,53 @@ const AppStep = ({
           </Row>,
         ]}
       >
-        {products && products.length > 0 && (
-          <Select
-            placeholder="Select a product"
-            onChange={setSelectedProduct}
-            value={selectedProduct}
-            style={{ width: "100%" }}
-          >
-            {products
-              .filter((product) => product.prodName !== currProd)
-              .map((product) => (
-                <Option key={product.prodName} value={product.prodName}>
-                  {product.prodName}
-                </Option>
-              ))}
-          </Select>
-        )}
+        <Select
+          placeholder="Select a product"
+          onChange={(value) => {
+            const selectedProd = products.find(
+              (product) => product.prodName === value
+            );
+            setSelectedProduct(selectedProd.prodName);
+            setLength(selectedProd.length);
+            setPrice(selectedProd.price);
+            setDefault(selectedProd.price);
+          }}
+          value={selectedProduct}
+          style={{ width: "100%" }}
+        >
+          {products
+            .filter((product) => product.prodName !== currProd)
+            .map((product) => (
+              <Option key={product.prodName} value={product.prodName}>
+                {product.prodName}
+              </Option>
+            ))}
+        </Select>
+        <Input
+          style={{ marginTop: "1em" }}
+          placeholder="Length"
+          value={length}
+          addonAfter="tháng"
+          onChange={(e) => setLength(e.target.value)}
+        />
+        <Input
+          style={{ marginTop: "1em" }}
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <DatePicker.RangePicker
+          style={{ marginTop: "1em", width: "100%" }}
+          onCalendarChange={(dates) => {
+            if (dates && dates.length > 0 && dates[0]) {
+              setSelectedDates([dates[0], computeEndDate(dates[0])]);
+            } else {
+              setSelectedDates([null, null]);
+            }
+          }}
+          value={selectedDates}
+          placeholder={["Select start date", "End date"]}
+        />
       </Modal>
     </>
   );

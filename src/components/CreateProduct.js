@@ -55,6 +55,23 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           <Input />
         </Form.Item>
         <Form.Item
+          label="Thời hạn mặc định"
+          name="length"
+          validateFirst="true"
+          rules={[
+            {
+              required: true,
+              message: "Cần nhập giá sản phẩm",
+            },
+            {
+              pattern: /^\d+$/,
+              message: "Giá tiền phải là số",
+            },
+          ]}
+        >
+          <Input addonAfter="tháng" />
+        </Form.Item>
+        <Form.Item
           label="Giá sản phẩm (đ)"
           name="price"
           validateFirst="true"

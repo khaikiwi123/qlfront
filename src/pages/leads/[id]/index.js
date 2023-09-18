@@ -50,7 +50,7 @@ export default function Lead() {
   };
   const fetchProducts = async () => {
     try {
-      const response = await api.get("products?list=prodName");
+      const response = await api.get("products");
       if (response.data && response.data.products) {
         setProducts(response.data.products);
       }

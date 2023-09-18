@@ -45,8 +45,6 @@ const ProtectedPage = () => {
     }
     const email = router.query.email;
     setRole(localStorage.getItem("role"));
-    const currRole = localStorage.getItem("role");
-    const id = localStorage.getItem("currUser");
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
 
@@ -56,9 +54,6 @@ const ProtectedPage = () => {
         pageNumber: pageIndex,
         pageSize: pageSize,
       };
-      if (currRole !== "admin") {
-        params.inCharge = id;
-      }
     }
     if (email && !isSet) {
       params.email = email;

@@ -47,6 +47,19 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
           <Input />
         </Form.Item>
         <Form.Item
+          label="Thời hạn mặc định"
+          name="length"
+          validateFirst="true"
+          rules={[
+            {
+              pattern: /^\d+$/,
+              message: "Thời gian phải là số",
+            },
+          ]}
+        >
+          <Input /> tháng
+        </Form.Item>
+        <Form.Item
           label="Giá sản phẩm"
           name="price"
           validateFirst="true"

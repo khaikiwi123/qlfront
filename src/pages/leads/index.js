@@ -49,8 +49,6 @@ const ProtectedPage = () => {
     }
     setRole(localStorage.getItem("role"));
     setCurrUser(localStorage.getItem("currUser"));
-    const currRole = localStorage.getItem("role");
-    const id = localStorage.getItem("currUser");
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
     let params = {};
@@ -59,9 +57,6 @@ const ProtectedPage = () => {
         pageNumber: pageIndex,
         pageSize: pageSize,
       };
-      if (currRole !== "admin") {
-        params.inCharge = id;
-      }
     }
     params = {
       ...params,
