@@ -268,6 +268,7 @@ export default function Lead() {
               <Modal
                 title="Xóa"
                 visible={delModal}
+                centered
                 onCancel={() => {
                   setDelModal(false);
                 }}

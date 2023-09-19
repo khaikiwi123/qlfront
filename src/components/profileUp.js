@@ -58,6 +58,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
   return (
     <Modal
       visible={visible}
+      centered
       title="Cập nhập người dùng"
       onCancel={onClose}
       footer={null}

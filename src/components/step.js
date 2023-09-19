@@ -434,11 +434,13 @@ const AppStep = ({
               }}
               value={selectedProduct}
             >
-              {products.map((product) => (
-                <Option key={product.prodName} value={product.prodName}>
-                  {product.prodName}
-                </Option>
-              ))}
+              {products
+                .filter((product) => product.status === "active")
+                .map((product) => (
+                  <Option key={product.prodName} value={product.prodName}>
+                    {product.prodName}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
 

@@ -41,6 +41,7 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
   return (
     <Modal
       visible={visible}
+      centered
       title="Cập nhập thông tin người dùng"
       onCancel={onClose}
       footer={null}

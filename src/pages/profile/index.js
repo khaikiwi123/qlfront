@@ -188,6 +188,7 @@ export default function User() {
               <Modal
                 title="Delete"
                 visible={delModal}
+                centered
                 onCancel={() => {
                   setDelModal(false);
                 }}

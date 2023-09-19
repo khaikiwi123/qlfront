@@ -38,6 +38,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
   return (
     <Modal
       visible={visible}
+      centered
       title="Cập nhập sản phẩm"
       onCancel={onClose}
       footer={null}
@@ -57,7 +58,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
             },
           ]}
         >
-          <Input /> tháng
+          <Input addonAfter="Tháng" />
         </Form.Item>
         <Form.Item
           label="Giá sản phẩm"

@@ -36,6 +36,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
   return (
     <Modal
       visible={visible}
+      centered
       title="Create Product"
       onCancel={onClose}
       footer={null}

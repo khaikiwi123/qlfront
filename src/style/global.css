@@ -8,6 +8,10 @@ html {
   margin-left: 200px;
 }
 
+.ant-modal {
+  padding: 0;
+}
+
 .ant-layout {
   background: #ffffff;
 }

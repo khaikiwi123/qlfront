@@ -36,7 +36,13 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
   };
 
   return (
-    <Modal visible={visible} title="Tạo lead" onCancel={onClose} footer={null}>
+    <Modal
+      visible={visible}
+      centered
+      title="Tạo lead"
+      onCancel={onClose}
+      footer={null}
+    >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Số điện thoại"
