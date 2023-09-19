@@ -11,6 +11,7 @@ import {
   Col,
   Input,
   DatePicker,
+  Form,
 } from "antd";
 import {
   CloseCircleOutlined,
@@ -20,22 +21,27 @@ import {
 import api from "@/api/api";
 import dayjs from "dayjs";
 
+const { RangePicker } = DatePicker;
 const { Step } = Steps;
 const { Option } = Select;
 const AppStep = ({
   id,
+  role,
   status,
   trackStatus,
   email,
+  org,
+  currUser,
   setLead,
   fetchChangeLogs,
   products,
-  currProd,
+  phone,
 }) => {
   const router = useRouter();
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
+  const [inCharge, setInCharge] = useState(null);
   const [productModal, setProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [defaultPrice, setDefault] = useState("");
@@ -136,7 +142,17 @@ const AppStep = ({
   const handleBill = async () => {
     setIsModalLoading(true);
     try {
-      await api.post("bills", { data });
+      const billData = {
+        customer: phone,
+        org: org,
+        product: selectedProduct,
+        length: length.toString(),
+        price: price.toString(),
+        startDate: selectedDates[0],
+        inCharge: role === "admin" ? inCharge : currUser,
+        status: "Active",
+      };
+      await api.post("bills", billData);
     } catch (error) {
       console.error(error);
     } finally {
@@ -380,9 +396,11 @@ const AppStep = ({
                 onClick={() => {
                   if (status !== "Success") {
                     handleConfirmChange("Success");
+                    handleBill();
                     setProductModal(false);
                   } else {
                     handleProductChange();
+                    handleBill();
                     setProductModal(false);
                   }
                 }}
@@ -393,53 +411,78 @@ const AppStep = ({
           </Row>,
         ]}
       >
-        <Select
-          placeholder="Select a product"
-          onChange={(value) => {
-            const selectedProd = products.find(
-              (product) => product.prodName === value
-            );
-            setSelectedProduct(selectedProd.prodName);
-            setLength(selectedProd.length);
-            setPrice(selectedProd.price);
-            setDefault(selectedProd.price);
+        <Form
+          labelCol={{
+            span: 6,
           }}
-          value={selectedProduct}
-          style={{ width: "100%" }}
+          wrapperCol={{
+            span: 18,
+          }}
+          labelAlign="left"
         >
-          {products
-            .filter((product) => product.prodName !== currProd)
-            .map((product) => (
-              <Option key={product.prodName} value={product.prodName}>
-                {product.prodName}
-              </Option>
-            ))}
-        </Select>
-        <Input
-          style={{ marginTop: "1em" }}
-          placeholder="Length"
-          value={length}
-          addonAfter="tháng"
-          onChange={(e) => setLength(e.target.value)}
-        />
-        <Input
-          style={{ marginTop: "1em" }}
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        <DatePicker.RangePicker
-          style={{ marginTop: "1em", width: "100%" }}
-          onCalendarChange={(dates) => {
-            if (dates && dates.length > 0 && dates[0]) {
-              setSelectedDates([dates[0], computeEndDate(dates[0])]);
-            } else {
-              setSelectedDates([null, null]);
-            }
-          }}
-          value={selectedDates}
-          placeholder={["Select start date", "End date"]}
-        />
+          <Form.Item label="Sản phẩm">
+            <Select
+              placeholder="Chọn sản phẩm"
+              onChange={(value) => {
+                const selectedProd = products.find(
+                  (product) => product.prodName === value
+                );
+                setSelectedProduct(selectedProd.prodName);
+                setLength(selectedProd.length);
+                setPrice(selectedProd.price);
+                setDefault(selectedProd.price);
+              }}
+              value={selectedProduct}
+            >
+              {products.map((product) => (
+                <Option key={product.prodName} value={product.prodName}>
+                  {product.prodName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Thời hạn">
+            <Input
+              placeholder="Thời hạn"
+              value={length}
+              addonAfter="tháng"
+              onChange={(e) => setLength(e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item label="Giá sản phẩm">
+            <Input
+              placeholder="Giá sản phẩm"
+              value={price}
+              addonAfter="(₫)"
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </Form.Item>
+
+          <Form.Item label="Thời gian">
+            <RangePicker
+              style={{ width: "100%" }}
+              onCalendarChange={(dates) => {
+                if (dates && dates.length > 0 && dates[0]) {
+                  setSelectedDates([dates[0], computeEndDate(dates[0])]);
+                } else {
+                  setSelectedDates([null, null]);
+                }
+              }}
+              value={selectedDates}
+              placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+            />
+          </Form.Item>
+          {role === "admin" && (
+            <Form.Item label="Cấp quyền cho">
+              <Input
+                placeholder="Email  "
+                onChange={(e) => setInCharge(e.target.value)}
+              />
+            </Form.Item>
+          )}
+        </Form>
       </Modal>
     </>
   );

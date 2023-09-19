@@ -38,6 +38,7 @@ export default function Lead() {
   const [delLoading, setDelLoading] = useState(false);
   const [updateOk, setOk] = useState(false);
   const [products, setProducts] = useState([]);
+  const [currUser, setCurrUser] = useState("");
 
   const { logOut } = useLogout();
   const fetchChangeLogs = async () => {
@@ -81,6 +82,7 @@ export default function Lead() {
       return;
     }
     setRole(localStorage.getItem("role"));
+    setCurrUser(localStorage.getItem("currUser"));
     api
       .get(`/leads/${id}`)
       .then((response) => {
@@ -218,13 +220,16 @@ export default function Lead() {
             <div>
               <AppStep
                 id={id}
+                role={role}
                 status={lead.status}
                 trackStatus={lead.trackStatus}
                 email={lead.email}
+                phone={lead.phone}
+                org={lead.org}
+                currUser={currUser}
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}
                 products={products}
-                currProd={lead.product}
               />
             </div>
             <div

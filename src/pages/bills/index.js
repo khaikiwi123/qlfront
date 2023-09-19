@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 import { Layout, Button, Tooltip, Space, Spin } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Content } = Layout;
 
@@ -16,12 +16,11 @@ import useLogout from "@/hooks/useLogout";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
-import CreateForm from "@/components/CreateProduct";
-import ProdUp from "@/components/UpdateProd";
+import FilterModal from "@/components/filter";
 
 const ProtectedPage = () => {
   const router = useRouter();
-  const [products, setProducts] = useState([]);
+  const [bills, setBills] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
@@ -30,8 +29,9 @@ const ProtectedPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showUpModal, setShowUpModal] = useState(false);
   const [isRouterReady, setIsRouterReady] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedBill, setSelectedBill] = useState(null);
 
+  const [appliedFilters, setAppliedFilters] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 10,
@@ -53,7 +53,7 @@ const ProtectedPage = () => {
     if (router.isReady) {
       setIsRouterReady(true);
     }
-    const prodName = router.query.prodName;
+    const billId = router.query.billId;
     setRole(localStorage.getItem("role"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
@@ -70,17 +70,18 @@ const ProtectedPage = () => {
         params.inCharge = id;
       }
     }
-    if (prodName && !isSet) {
-      params.prodName = prodName;
+    if (billId && !isSet) {
+      params.billId = billId;
       setIsSet(true);
     }
     params = {
       ...params,
+      ...appliedFilters,
     };
-    getProducts(params);
-  }, [pagination, createOk, router.isReady]);
+    getBills(params);
+  }, [pagination, createOk, appliedFilters, router.isReady]);
 
-  const getProducts = (params) => {
+  const getBills = (params) => {
     let queryParams = Object.keys(params)
       .map((key) => {
         if (Array.isArray(params[key])) {
@@ -91,10 +92,10 @@ const ProtectedPage = () => {
       })
       .join("&");
     api
-      .get(`/products/?${queryParams}`)
+      .get(`/bills/?${queryParams}`)
       .then((res) => {
         setTotal(res.data.total);
-        setProducts(res.data.products);
+        setBills(res.data.bills);
         setLoading(false);
       })
       .catch((error) => {
@@ -106,31 +107,34 @@ const ProtectedPage = () => {
     return new Intl.NumberFormat("vi-VN").format(price).replace(",", ".");
   }
 
-  let baseColumns = [
+  const baseColumns = [
     {
-      title: "Tên",
-      dataIndex: "prodName",
-      key: "prodName",
+      title: "Khách hàng",
+      dataIndex: "customer",
+      key: "customer",
       fixed: "left",
+      render: (customer, record) => (
+        <Tooltip placement="topLeft" title={record.org}>
+          {customer}
+        </Tooltip>
+      ),
     },
     {
-      title: "Giá (₫/tháng)",
+      title: "Sản phẩm",
+      dataIndex: "product",
+      key: "product",
+    },
+
+    {
+      title: "Giá (₫)",
       dataIndex: "price",
       key: "price",
       render: (price) => formatVND(price),
     },
     {
-      title: "Thông tin",
-      dataIndex: "description",
-      key: "desc",
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (description) => (
-        <Tooltip placement="topLeft" title={description}>
-          {description}
-        </Tooltip>
-      ),
+      title: "Thời hạn (tháng)",
+      dataIndex: "length",
+      key: "length",
     },
     {
       title: "Trạng thái",
@@ -139,47 +143,44 @@ const ProtectedPage = () => {
       width: "180px",
       render: (status) => {
         switch (status) {
-          case "active":
+          case "Active":
             return <span style={{ color: "green" }}>Active</span>;
-          case "inactive":
-            return <span style={{ color: "red" }}>Inactive</span>;
-          case "delete":
-            return <span style={{ color: "gray" }}>Removed</span>;
           default:
-            return status;
+            return <span style={{ color: "red" }}>Inactive</span>;
         }
+      },
+    },
+    {
+      title: "Ngày bắt đầu",
+      dataIndex: "startDate",
+      key: "startDate",
+      render: (date) => {
+        return dayjs(date).format("DD/MM/YYYY");
+      },
+    },
+    {
+      title: "Ngày kết thúc",
+      dataIndex: "startDate",
+      key: "endDate",
+      render: (startDate, record) => {
+        return dayjs(startDate)
+          .add(30 * parseFloat(record.length), "days")
+          .format("DD/MM/YYYY");
       },
     },
   ];
   if (role === "admin") {
     baseColumns.push({
-      title: "Thao tác",
-      key: "action",
-      width: "100px",
-      align: "center",
-      fixed: "right",
-      render: (record) => (
-        <Space size="middle">
-          <EditOutlined
-            onClick={() => {
-              setShowUpModal(true);
-              setSelectedProductId(record._id);
-            }}
-          />
-
-          <ProdUp
-            visible={showUpModal}
-            onClose={() => {
-              setShowUpModal(false);
-              setSelectedProductId(null);
-            }}
-            id={selectedProductId}
-            onSuccess={() => setOk((prev) => !prev)}
-          />
-        </Space>
-      ),
+      title: "Chịu trách nhiệm",
+      dataIndex: "inCharge",
+      key: "inCharge",
     });
   }
+  const baseFilter = [
+    { label: "Khách hàng", value: "customer" },
+    { label: "Giá", value: "price" },
+    //need status filter and time filter
+  ];
   if (!isRouterReady) {
     return (
       <div
@@ -195,6 +196,7 @@ const ProtectedPage = () => {
     );
   }
 
+  const filterOptions = baseFilter;
   const columns = baseColumns;
   return (
     <>
@@ -220,34 +222,22 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Sản phẩm
+                  Bill
                 </h1>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {role === "admin" ? (
-                    <Button
-                      style={{
-                        marginLeft: "10px",
-                        cursor: "pointer",
-                        marginTop: "10px",
-                      }}
-                      onClick={() => setShowModal(true)}
-                      type="primary"
-                    >
-                      Tạo sản phẩm
-                    </Button>
-                  ) : null}
-                  <CreateForm
-                    visible={showModal}
-                    onClose={() => setShowModal(false)}
-                    onSuccess={() => setOk(true)}
-                  />
-                </div>
               </div>
 
+              <FilterModal
+                queryFilter={router.query}
+                onFilterApply={(newFilters) => {
+                  setAppliedFilters(newFilters);
+                  setPagination({ ...pagination, pageIndex: 1 });
+                }}
+                filterOptions={filterOptions}
+              />
               <UserTable
                 key={Date.now()}
                 columns={columns}
-                data={products}
+                data={bills}
                 total={total}
                 loading={loading}
                 pagination={pagination}
@@ -260,4 +250,5 @@ const ProtectedPage = () => {
     </>
   );
 };
+
 export default ProtectedPage;

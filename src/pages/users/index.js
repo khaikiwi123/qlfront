@@ -215,7 +215,7 @@ const App = () => {
                     alignItems: "center",
                   }}
                 >
-                  Danh sách người dùng
+                  Người dùng
                 </h1>
 
                 <div style={{ display: "flex", alignItems: "center" }}>

@@ -72,7 +72,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           <Input addonAfter="tháng" />
         </Form.Item>
         <Form.Item
-          label="Giá sản phẩm (đ)"
+          label="Giá sản phẩm (đ/tháng)"
           name="price"
           validateFirst="true"
           rules={[
@@ -83,14 +83,6 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             {
               pattern: /^\d+$/,
               message: "Giá tiền phải là số",
-            },
-            {
-              validator: (_, value) => {
-                if (value && parseFloat(value) > 1000) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(new Error("Giá tiền phải lớn hơn 1000"));
-              },
             },
           ]}
         >

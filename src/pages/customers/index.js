@@ -176,21 +176,19 @@ const ProtectedPage = () => {
         </Tooltip>
       ),
     },
+    {
+      title: "Chịu trách nhiệm",
+      dataIndex: "inCharge",
+      key: "inCharge",
+    },
   ];
   const baseFilter = [
     { label: "Số điện thoại", value: "phone" },
     { label: "Email", value: "email" },
     { label: "Đơn vị", value: "org" },
     { label: "Người đại diện", value: "rep" },
+    { label: "Người chịu trách nhiệm", value: "inCharge" },
   ];
-  if (role === "admin") {
-    baseColumns.push({
-      title: "Chịu trách nhiệm",
-      dataIndex: "inCharge",
-      key: "inCharge",
-    });
-    baseFilter.push({ label: "Người chịu trách nhiệm", value: "inCharge" });
-  }
   if (!isRouterReady) {
     return (
       <div
@@ -231,7 +229,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Danh sách khách hàng
+                  Khách hàng
                 </h1>
               </div>
               <FilterModal

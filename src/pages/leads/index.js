@@ -243,7 +243,7 @@ const ProtectedPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  Danh sách lead
+                  Lead
                 </h1>
 
                 <div style={{ display: "flex", alignItems: "center" }}>

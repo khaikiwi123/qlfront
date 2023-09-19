@@ -5,6 +5,7 @@ import {
   TeamOutlined,
   DollarCircleOutlined,
   FunnelPlotOutlined,
+  SolutionOutlined,
 } from "@ant-design/icons";
 import Router, { useRouter } from "next/router";
 
@@ -23,8 +24,11 @@ const AppSider = ({ role }) => {
     case "/products":
       selectedKey = "3";
       break;
-    case "/users":
+    case "/bills":
       selectedKey = "4";
+      break;
+    case "/users":
+      selectedKey = "5";
       break;
     default:
       selectedKey = "1";
@@ -63,11 +67,16 @@ const AppSider = ({ role }) => {
             Danh sách
           </Menu.Item>
         </SubMenu>
+        <SubMenu key="sub4" icon={<SolutionOutlined />} title="Bill">
+          <Menu.Item key="4" onClick={() => Router.push("/bills")}>
+            Danh sách
+          </Menu.Item>
+        </SubMenu>
 
         {role === "admin" && (
           <>
             <Menu.Item
-              key="4"
+              key="5"
               icon={<TeamOutlined />}
               onClick={() => Router.push("/users")}
             >
