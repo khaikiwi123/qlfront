@@ -127,9 +127,6 @@ const AppStep = ({
         ...updateStatus,
       }));
 
-      if (updateStatus.status === "Success") {
-        router.push(`/customers?email=${email}`);
-      }
       fetchChangeLogs();
     } catch (error) {
       console.error(error);
@@ -165,8 +162,6 @@ const AppStep = ({
     setIsModalLoading(true);
     try {
       await api.put(`/leads/${id}`, { product: selectedProduct });
-
-      router.push(`/customers?email=${email}`);
       fetchChangeLogs();
     } catch (error) {
       console.error(error);
