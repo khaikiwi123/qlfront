@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
-import { Layout, Button, Tooltip, Space, Spin } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Layout, Tooltip, Spin } from "antd";
 import dayjs from "dayjs";
 
 const { Content } = Layout;
@@ -26,10 +26,7 @@ const ProtectedPage = () => {
   const [isSet, setIsSet] = useState(false);
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [showUpModal, setShowUpModal] = useState(false);
   const [isRouterReady, setIsRouterReady] = useState(false);
-  const [selectedBill, setSelectedBill] = useState(null);
 
   const [appliedFilters, setAppliedFilters] = useState({});
   const [pagination, setPagination] = useState({
@@ -53,7 +50,7 @@ const ProtectedPage = () => {
     if (router.isReady) {
       setIsRouterReady(true);
     }
-    const billId = router.query.billId;
+    const billId = router.query.customer;
     setRole(localStorage.getItem("role"));
     const currRole = localStorage.getItem("role");
     const id = localStorage.getItem("currUser");
@@ -71,7 +68,7 @@ const ProtectedPage = () => {
       }
     }
     if (billId && !isSet) {
-      params.billId = billId;
+      params.customer = billId;
       setIsSet(true);
     }
     params = {
@@ -123,6 +120,25 @@ const ProtectedPage = () => {
       title: "Sản phẩm",
       dataIndex: "product",
       key: "product",
+      ellipsis: true,
+
+      render: (text, record) => (
+        <Tooltip placement="topLeft" title={record.product}>
+          <Link href={`/products?prodName=${record.product}`}>
+            <div
+              style={{
+                width: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+              }}
+            >
+              {record.product}
+            </div>
+          </Link>
+        </Tooltip>
+      ),
     },
 
     {
@@ -179,7 +195,6 @@ const ProtectedPage = () => {
   const baseFilter = [
     { label: "Khách hàng", value: "customer" },
     { label: "Giá", value: "price" },
-    //need status filter and time filter
   ];
   if (!isRouterReady) {
     return (

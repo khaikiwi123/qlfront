@@ -215,6 +215,18 @@ const ProtectedPage = () => {
     });
     baseFilter.push({ label: "Người chịu trách nhiệm", value: "inCharge" });
   }
+  if (activeTab === "Success") {
+    baseColumns.push({
+      title: "Bill",
+      key: "bill",
+
+      render: (text, record) => (
+        <Tooltip placement="topLeft" title="Bill">
+          <Link href={`/bills?customer=${record.phone}`}>Bill</Link>
+        </Tooltip>
+      ),
+    });
+  }
 
   const columns = baseColumns;
   const filterOptions = baseFilter;

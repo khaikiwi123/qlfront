@@ -31,6 +31,7 @@ const ProtectedPage = () => {
   const [showUpModal, setShowUpModal] = useState(false);
   const [isRouterReady, setIsRouterReady] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [newPar, setNewPar] = useState(null);
 
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -78,7 +79,7 @@ const ProtectedPage = () => {
       ...params,
     };
     getProducts(params);
-  }, [pagination, createOk, router.isReady]);
+  }, [pagination, newPar, createOk, router.isReady]);
 
   const getProducts = (params) => {
     let queryParams = Object.keys(params)
@@ -180,6 +181,15 @@ const ProtectedPage = () => {
       ),
     });
   }
+  const clearQuery = () => {
+    router.push(router.pathname, undefined, { shallow: true });
+    setNewPar("cheat");
+    setPagination((prevState) => ({
+      ...prevState,
+      pageIndex: 1,
+    }));
+  };
+
   if (!isRouterReady) {
     return (
       <div
@@ -243,7 +253,24 @@ const ProtectedPage = () => {
                   />
                 </div>
               </div>
-
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  marginBottom: "10px",
+                }}
+              >
+                {router.query.prodName && (
+                  <Button
+                    style={{
+                      cursor: "pointer",
+                    }}
+                    onClick={clearQuery}
+                  >
+                    Xem tất cả sản phẩm
+                  </Button>
+                )}
+              </div>
               <UserTable
                 key={Date.now()}
                 columns={columns}
