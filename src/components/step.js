@@ -12,6 +12,7 @@ import {
   Input,
   DatePicker,
   Form,
+  message,
 } from "antd";
 import {
   CloseCircleOutlined,
@@ -160,7 +161,11 @@ const AppStep = ({
       await api.post("bills", billData);
       return true;
     } catch (error) {
-      console.error(error);
+      if (error.response.data.error === "Sale user doesn't exist") {
+        message.error("Người dùng không tồn tại", 2);
+      } else {
+        message.error("Lỗi tạo bill");
+      }
       return false;
     } finally {
       setIsModalLoading(false);

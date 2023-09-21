@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { Layout, Button, Tooltip, Space, Spin } from "antd";
+import { Layout, Button, Tooltip, Space, Spin, Tabs } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
-
+const { TabPane } = Tabs;
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
 import authErr from "@/api/authErr";
@@ -26,6 +26,8 @@ const ProtectedPage = () => {
   const [loading, setLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
   const [createOk, setOk] = useState(false);
+  const [tabLoading, setTabLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
   const [role, setRole] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showUpModal, setShowUpModal] = useState(false);
@@ -75,11 +77,11 @@ const ProtectedPage = () => {
       params.prodName = prodName;
       setIsSet(true);
     }
-    params = {
-      ...params,
-    };
+    if (activeTab !== "All") {
+      params.status = activeTab;
+    }
     getProducts(params);
-  }, [pagination, newPar, createOk, router.isReady]);
+  }, [pagination, newPar, createOk, router.isReady, activeTab]);
 
   const getProducts = (params) => {
     let queryParams = Object.keys(params)
@@ -97,6 +99,7 @@ const ProtectedPage = () => {
         setTotal(res.data.total);
         setProducts(res.data.products);
         setLoading(false);
+        setTabLoading(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -133,7 +136,9 @@ const ProtectedPage = () => {
         </Tooltip>
       ),
     },
-    {
+  ];
+  if (activeTab === "All") {
+    baseColumns.push({
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
@@ -150,8 +155,8 @@ const ProtectedPage = () => {
             return status;
         }
       },
-    },
-  ];
+    });
+  }
   if (role === "admin") {
     baseColumns.push({
       title: "Thao tác",
@@ -181,6 +186,11 @@ const ProtectedPage = () => {
       ),
     });
   }
+  const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "delete", label: "Removed" },
+  ];
   const clearQuery = () => {
     router.push(router.pathname, undefined, { shallow: true });
     setNewPar("cheat");
@@ -253,11 +263,29 @@ const ProtectedPage = () => {
                   />
                 </div>
               </div>
+              <Tabs
+                defaultActiveKey="All"
+                style={{ color: "#363636" }}
+                type="card"
+                onChange={(key) => {
+                  setActiveTab(key);
+                  setTabLoading(true);
+                }}
+              >
+                <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
+                {statusOptions.map((option) => (
+                  <TabPane
+                    tab={option.label}
+                    key={option.value}
+                    disabled={tabLoading}
+                  ></TabPane>
+                ))}
+              </Tabs>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "flex-start",
-                  marginBottom: "10px",
+                  marginBottom: "16px",
                 }}
               >
                 {router.query.prodName && (

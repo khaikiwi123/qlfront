@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-import { Layout, Tooltip, Spin } from "antd";
+import { Layout, Tooltip, Spin, Tabs } from "antd";
 import dayjs from "dayjs";
 
 const { Content } = Layout;
@@ -18,6 +18,7 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import FilterModal from "@/components/filter";
 
+const { TabPane } = Tabs;
 const ProtectedPage = () => {
   const router = useRouter();
   const [bills, setBills] = useState([]);
@@ -26,6 +27,8 @@ const ProtectedPage = () => {
   const [isSet, setIsSet] = useState(false);
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState("");
+  const [tabLoading, setTabLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
   const [isRouterReady, setIsRouterReady] = useState(false);
 
   const [appliedFilters, setAppliedFilters] = useState({});
@@ -75,8 +78,11 @@ const ProtectedPage = () => {
       ...params,
       ...appliedFilters,
     };
+    if (activeTab !== "All") {
+      params.status = activeTab;
+    }
     getBills(params);
-  }, [pagination, createOk, appliedFilters, router.isReady]);
+  }, [pagination, createOk, appliedFilters, router.isReady, activeTab]);
 
   const getBills = (params) => {
     let queryParams = Object.keys(params)
@@ -94,6 +100,7 @@ const ProtectedPage = () => {
         setTotal(res.data.total);
         setBills(res.data.bills);
         setLoading(false);
+        setTabLoading(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -153,20 +160,6 @@ const ProtectedPage = () => {
       key: "length",
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      width: "180px",
-      render: (status) => {
-        switch (status) {
-          case "Active":
-            return <span style={{ color: "green" }}>Active</span>;
-          default:
-            return <span style={{ color: "red" }}>Inactive</span>;
-        }
-      },
-    },
-    {
       title: "Ngày bắt đầu",
       dataIndex: "startDate",
       key: "startDate",
@@ -210,7 +203,26 @@ const ProtectedPage = () => {
       </div>
     );
   }
-
+  if (activeTab === "All") {
+    baseColumns.push({
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: "180px",
+      render: (status) => {
+        switch (status) {
+          case "Active":
+            return <span style={{ color: "green" }}>Active</span>;
+          default:
+            return <span style={{ color: "red" }}>Inactive</span>;
+        }
+      },
+    });
+  }
+  const statusOptions = [
+    { value: "Active", label: "Active" },
+    { value: "Inactive", label: "Inactive" },
+  ];
   const filterOptions = baseFilter;
   const columns = baseColumns;
   return (
@@ -240,7 +252,24 @@ const ProtectedPage = () => {
                   Bill
                 </h1>
               </div>
-
+              <Tabs
+                defaultActiveKey="All"
+                style={{ color: "#363636" }}
+                type="card"
+                onChange={(key) => {
+                  setActiveTab(key);
+                  setTabLoading(true);
+                }}
+              >
+                <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
+                {statusOptions.map((option) => (
+                  <TabPane
+                    tab={option.label}
+                    key={option.value}
+                    disabled={tabLoading}
+                  ></TabPane>
+                ))}
+              </Tabs>
               <FilterModal
                 queryFilter={router.query}
                 onFilterApply={(newFilters) => {
