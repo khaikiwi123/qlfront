@@ -73,7 +73,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           <Input addonAfter="tháng" />
         </Form.Item>
         <Form.Item
-          label="Giá sản phẩm (đ/tháng)"
+          label="Giá sản phẩm"
           name="price"
           validateFirst="true"
           rules={[
@@ -87,7 +87,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             },
           ]}
         >
-          <Input />
+          <Input addonAfter="(đ/tháng)" />
         </Form.Item>
         <Form.Item
           label="Thông tin sản phẩm"

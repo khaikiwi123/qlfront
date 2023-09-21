@@ -84,6 +84,9 @@ html {
 .ant-timeline-item-head {
   left: 125px !important;
 }
+.app-history-timeline .ant-timeline-item:last-child {
+  padding: 0;
+}
 
 /* Filter Container */
 .filter-container {

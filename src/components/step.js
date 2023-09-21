@@ -21,6 +21,7 @@ import {
 import api from "@/api/api";
 import dayjs from "dayjs";
 
+const dateFormat = "DD/MM/YYYY";
 const { RangePicker } = DatePicker;
 const { Step } = Steps;
 const { Option } = Select;
@@ -70,6 +71,13 @@ const AppStep = ({
       setPrice(newPrice);
     }
   }, [length, defaultPrice]);
+  useEffect(() => {
+    if (length && !isNaN(length)) {
+      const startDate = selectedDates[0] || dayjs();
+      const endDate = computeEndDate(startDate, length);
+      setSelectedDates([startDate, endDate]);
+    }
+  }, [length]);
 
   const statusToIndex = {
     "No contact": 0,
@@ -150,8 +158,10 @@ const AppStep = ({
         status: "Active",
       };
       await api.post("bills", billData);
+      return true;
     } catch (error) {
       console.error(error);
+      return false;
     } finally {
       setIsModalLoading(false);
       setProductModal(false);
@@ -169,6 +179,18 @@ const AppStep = ({
       setIsModalLoading(false);
       setProductModal(false);
       fetchChangeLogs();
+    }
+  };
+  const combinedFunction = async (statusType) => {
+    const billingSuccess = await handleBill();
+    if (billingSuccess) {
+      await handleConfirmChange(statusType);
+    }
+  };
+  const combinedProduct = async () => {
+    const billingSuccess = await handleBill();
+    if (billingSuccess) {
+      await handleProductChange();
     }
   };
 
@@ -283,11 +305,28 @@ const AppStep = ({
     setPop(!popVis);
     console.log(popVis);
   };
-  const computeEndDate = (date) => {
+  const computeEndDate = (date, length) => {
     if (date && length) {
       return dayjs(date).add(30 * parseFloat(length), "days");
     }
     return null;
+  };
+  const handleOk = () => {
+    if (status !== "Success") {
+      combinedFunction("Success");
+      setProductModal(false);
+    } else {
+      combinedProduct();
+      setProductModal(false);
+    }
+  };
+  const resetForm = () => {
+    setSelectedProduct(null);
+    setLength(null);
+    setPrice(null);
+    setDefault(null);
+    setSelectedDates([null, null]);
+    setInCharge("");
   };
 
   return (
@@ -371,40 +410,11 @@ const AppStep = ({
         title="Select Product"
         visible={productModal}
         centered
-        onCancel={() => setProductModal(false)}
-        footer={[
-          <Row key="footerRow" style={{ width: "100%" }}>
-            <Col span={2}>
-              <Button
-                key="back"
-                onClick={() => setProductModal(false)}
-                style={{ marginRight: "auto" }}
-              >
-                Hủy
-              </Button>
-            </Col>
-            <Col span={22} style={{ textAlign: "right" }}>
-              <Button
-                key="submit"
-                type="primary"
-                disabled={!selectedProduct}
-                onClick={() => {
-                  if (status !== "Success") {
-                    handleConfirmChange("Success");
-                    handleBill();
-                    setProductModal(false);
-                  } else {
-                    handleProductChange();
-                    handleBill();
-                    setProductModal(false);
-                  }
-                }}
-              >
-                Ok
-              </Button>
-            </Col>
-          </Row>,
-        ]}
+        onCancel={() => {
+          setProductModal(false);
+          resetForm();
+        }}
+        footer={null}
       >
         <Form
           labelCol={{
@@ -414,6 +424,7 @@ const AppStep = ({
             span: 18,
           }}
           labelAlign="left"
+          onFinish={handleOk}
         >
           <Form.Item label="Sản phẩm">
             <Select
@@ -426,6 +437,10 @@ const AppStep = ({
                 setLength(selectedProd.length);
                 setPrice(selectedProd.price);
                 setDefault(selectedProd.price);
+                const startDate = dayjs();
+                const endDate = computeEndDate(startDate, selectedProd.length);
+
+                setSelectedDates([startDate, endDate]);
               }}
               value={selectedProduct}
             >
@@ -459,10 +474,14 @@ const AppStep = ({
 
           <Form.Item label="Thời gian">
             <RangePicker
+              format={dateFormat}
               style={{ width: "100%" }}
               onCalendarChange={(dates) => {
                 if (dates && dates.length > 0 && dates[0]) {
-                  setSelectedDates([dates[0], computeEndDate(dates[0])]);
+                  setSelectedDates([
+                    dayjs(dates[0]),
+                    dayjs(computeEndDate(dates[0], length)),
+                  ]);
                 } else {
                   setSelectedDates([null, null]);
                 }
@@ -472,13 +491,43 @@ const AppStep = ({
             />
           </Form.Item>
           {role === "admin" && (
-            <Form.Item label="Cấp quyền cho">
+            <Form.Item
+              label="Cấp quyền cho"
+              name="inCharge"
+              rules={[
+                {
+                  required: true,
+                  message: "Xin vui lòng nhập người được cấp quyền",
+                },
+              ]}
+            >
               <Input
                 placeholder="Email  "
                 onChange={(e) => setInCharge(e.target.value)}
               />
             </Form.Item>
           )}
+          <Row justify="space-between">
+            <Col>
+              <Button
+                onClick={() => {
+                  setProductModal(false);
+                  resetForm();
+                }}
+              >
+                Cancel
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={!selectedProduct}
+              >
+                OK
+              </Button>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </>

@@ -11,7 +11,7 @@ const AppHistory = ({ changeLog }) => {
         }}
       >
         {changeLog.length > 0 ? (
-          <Timeline mode="left">
+          <Timeline mode="left" className="app-history-timeline">
             {changeLog.map((log, index) => {
               let message;
 
