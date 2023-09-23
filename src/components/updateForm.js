@@ -34,6 +34,11 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
     }
   };
 
+  const handleNumber = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ phone: value });
+  };
+
   return (
     <Modal
       visible={visible}
@@ -84,13 +89,13 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
             },
           ]}
         >
-          <Input />
+          <Input onChange={handleNumber} />
         </Form.Item>
 
         <Form.Item label="Người đại diện" name="rep">
           <Input />
         </Form.Item>
-        <Form.Item label="Đơn vị" name="org">
+        <Form.Item label="Tổ chức" name="org">
           <Input />
         </Form.Item>
         {roleId === "admin" && (

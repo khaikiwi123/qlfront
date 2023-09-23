@@ -21,6 +21,7 @@ export default function Customer() {
   const id = router.query.id;
 
   const [customer, setCustomer] = useState(null);
+  const [bill, setBill] = useState(null);
   const [role, setRole] = useState("");
   const [showModal, setModal] = useState(false);
   const [updateOk, setOk] = useState(false);
@@ -35,10 +36,16 @@ export default function Customer() {
       return;
     }
     setRole(localStorage.getItem("role"));
+    fetchCustomer();
+    console.log(bill);
+  }, [id, router, updateOk]);
+
+  const fetchCustomer = () => {
     api
       .get(`/customers/${id}`)
       .then((response) => {
         setCustomer(response.data);
+        setBill(response.data.bill);
       })
       .catch((err) => {
         console.error(err);
@@ -49,7 +56,7 @@ export default function Customer() {
           router.push("/customers/");
         }
       });
-  }, [id, router, updateOk]);
+  };
 
   if (customer === null) {
     return (
@@ -91,10 +98,34 @@ export default function Customer() {
       label: "Ngày tạo",
       children: dayjs(customer.createdDate).format("DD/MM/YYYY"),
     },
+  ];
+  const billItem = [
     {
-      key: "6",
-      label: "Sản phẩm",
-      children: customer.product,
+      key: "1",
+      label: "Giá",
+      children: `${bill.price} đồng`,
+    },
+    {
+      key: "2",
+      label: "Độ dài",
+      children: `${bill.length} tháng`,
+    },
+    {
+      key: "3",
+      label: "Trạng thái",
+      children: bill.status,
+    },
+    {
+      key: "4",
+      label: "Thời hạn từ",
+      children: dayjs(bill.startDate).format("DD/MM/YYYY"),
+    },
+    {
+      key: "5",
+      label: "Hết hạn",
+      children: dayjs(bill.startDate)
+        .add(30 * bill.length, "day")
+        .format("DD/MM/YYYY"),
     },
   ];
 
@@ -156,6 +187,33 @@ export default function Customer() {
                 userId={id}
                 onSuccess={() => setOk(true)}
                 uType="customers"
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                borderBottom: "1px solid #A9A9A9",
+              }}
+            >
+              <Descriptions
+                title={
+                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                    {bill.product}
+                  </div>
+                }
+                size="small"
+                layout="vertical"
+                labelStyle={{}}
+                contentStyle={{
+                  fontWeight: "400",
+                  color: "black",
+                  marginTop: -15,
+                }}
+                items={billItem}
+                className="Desc"
+                colon={false}
               />
             </div>
           </Content>

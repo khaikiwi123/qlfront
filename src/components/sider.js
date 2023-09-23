@@ -7,7 +7,7 @@ import {
   FunnelPlotOutlined,
   SolutionOutlined,
 } from "@ant-design/icons";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 const { Sider } = Layout;
 const { SubMenu } = Menu;

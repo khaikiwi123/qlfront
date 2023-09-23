@@ -55,6 +55,11 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
     }
   };
 
+  const handlePhone = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    userInfoForm.setFieldValue({ phone: value });
+  };
+
   return (
     <Modal
       visible={visible}
@@ -128,7 +133,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
                 },
               ]}
             >
-              <Input />
+              <Input onChange={handlePhone} />
             </Form.Item>
             <Form.Item>
               <Button

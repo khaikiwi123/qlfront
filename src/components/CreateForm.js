@@ -35,6 +35,11 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
       setLoading(false);
     }
   };
+  const handleNumber = (e) => {
+    //need to set () and -
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ phone: value });
+  };
 
   return (
     <Modal
@@ -70,7 +75,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
             },
           ]}
         >
-          <Input />
+          <Input onChange={handleNumber} />
         </Form.Item>
         <Form.Item
           label="Email"
@@ -93,9 +98,9 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
           <Input />
         </Form.Item>
         <Form.Item
-          label="Tên đơn vị"
+          label="Tên tổ chức"
           name="org"
-          rules={[{ required: true, message: "Cần nhập tên đơn vị" }]}
+          rules={[{ required: true, message: "Cần nhập tên tổ chức" }]}
         >
           <Input />
         </Form.Item>

@@ -115,7 +115,7 @@ const ProtectedPage = () => {
     },
 
     {
-      title: "Đơn vị",
+      title: "Tổ chức",
       dataIndex: "org",
       key: "org",
       ellipsis: true,
@@ -165,7 +165,7 @@ const ProtectedPage = () => {
   const baseFilter = [
     { label: "Số điện thoại", value: "phone" },
     { label: "Email", value: "email" },
-    { label: "Tên đơn vị", value: "org" },
+    { label: "Tên tổ chức", value: "org" },
     { label: "Người đại diện", value: "rep" },
     { label: "Ngày tạo", value: "exactDate" },
     { label: "Ngày tạo từ", value: "dateRange" },

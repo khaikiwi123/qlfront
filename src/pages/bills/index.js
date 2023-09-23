@@ -160,21 +160,11 @@ const ProtectedPage = () => {
       key: "length",
     },
     {
-      title: "Ngày bắt đầu",
-      dataIndex: "startDate",
-      key: "startDate",
+      title: "Ngày tạo",
+      dataIndex: "createdDate",
+      key: "createdDate",
       render: (date) => {
         return dayjs(date).format("DD/MM/YYYY");
-      },
-    },
-    {
-      title: "Ngày kết thúc",
-      dataIndex: "startDate",
-      key: "endDate",
-      render: (startDate, record) => {
-        return dayjs(startDate)
-          .add(30 * parseFloat(record.length), "days")
-          .format("DD/MM/YYYY");
       },
     },
   ];
@@ -188,6 +178,7 @@ const ProtectedPage = () => {
   const baseFilter = [
     { label: "Khách hàng", value: "customer" },
     { label: "Giá", value: "price" },
+    { label: "Thời hạn từ", value: "dateRange" },
   ];
   if (!isRouterReady) {
     return (
@@ -212,16 +203,16 @@ const ProtectedPage = () => {
       render: (status) => {
         switch (status) {
           case "Active":
-            return <span style={{ color: "green" }}>Active</span>;
+            return <span style={{ color: "green" }}>Đã xuất</span>;
           default:
-            return <span style={{ color: "red" }}>Inactive</span>;
+            return <span style={{ color: "red" }}>Đã thu hồi</span>;
         }
       },
     });
   }
   const statusOptions = [
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
+    { value: "Active", label: "Đã xuất" },
+    { value: "Inactive", label: "Đã thu hồi" },
   ];
   const filterOptions = baseFilter;
   const columns = baseColumns;
@@ -260,7 +251,7 @@ const ProtectedPage = () => {
                   setTabLoading(true);
                 }}
               >
-                <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
+                <TabPane tab="Tất cả" key="All" disabled={tabLoading}></TabPane>
                 {statusOptions.map((option) => (
                   <TabPane
                     tab={option.label}

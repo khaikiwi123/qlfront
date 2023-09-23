@@ -32,6 +32,14 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
+  const handleLength = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ length: value });
+  };
+  const handlePrice = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ price: value });
+  };
 
   return (
     <Modal
@@ -62,15 +70,15 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           rules={[
             {
               required: true,
-              message: "Cần nhập giá sản phẩm",
+              message: "Cần nhập thời gian mặc định",
             },
             {
               pattern: /^\d+$/,
-              message: "Giá tiền phải là số",
+              message: "Thời gian phải là số",
             },
           ]}
         >
-          <Input addonAfter="tháng" />
+          <Input addonAfter="tháng" onChange={handleLength} />
         </Form.Item>
         <Form.Item
           label="Giá sản phẩm"
@@ -87,7 +95,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             },
           ]}
         >
-          <Input addonAfter="(đ/tháng)" />
+          <Input addonAfter="(đ/tháng)" onChange={handlePrice} />
         </Form.Item>
         <Form.Item
           label="Thông tin sản phẩm"

@@ -34,6 +34,14 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
       setLoading(false);
     }
   };
+  const handleLength = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ length: value });
+  };
+  const handlePrice = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    form.setFieldsValue({ price: value });
+  };
 
   return (
     <Modal
@@ -58,7 +66,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
             },
           ]}
         >
-          <Input addonAfter="Tháng" />
+          <Input addonAfter="Tháng" onChange={handleLength} />
         </Form.Item>
         <Form.Item
           label="Giá sản phẩm"
@@ -71,7 +79,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
             },
           ]}
         >
-          <Input />
+          <Input onChange={handlePrice} />
         </Form.Item>
         <Form.Item label="Thông tin sản phẩm" name="description">
           <Input.TextArea rows={4} placeholder="Xin vui lòng điền thông tin" />
