@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/router";
 
 import {
   Button,
@@ -22,6 +21,8 @@ import {
 import api from "@/api/api";
 import dayjs from "dayjs";
 
+import { useUsers } from "@/context/context";
+
 const dateFormat = "DD/MM/YYYY";
 const { RangePicker } = DatePicker;
 const { Step } = Steps;
@@ -31,15 +32,14 @@ const AppStep = ({
   role,
   status,
   trackStatus,
-  email,
   org,
   currUser,
   setLead,
   fetchChangeLogs,
   products,
   phone,
+  setOk,
 }) => {
-  const router = useRouter();
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
@@ -53,6 +53,7 @@ const AppStep = ({
   const [popVis, setPop] = useState(false);
 
   const popoverRef = useRef(null);
+  const { users } = useUsers();
   console.log(products);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -137,6 +138,7 @@ const AppStep = ({
       }));
 
       fetchChangeLogs();
+      setOk((prev) => !prev);
     } catch (error) {
       console.error(error);
     } finally {
@@ -178,6 +180,7 @@ const AppStep = ({
     try {
       await api.put(`/leads/${id}`, { product: selectedProduct });
       fetchChangeLogs();
+      setOk((prev) => !prev);
     } catch (error) {
       console.error(error);
     } finally {
@@ -496,20 +499,18 @@ const AppStep = ({
             />
           </Form.Item>
           {role === "admin" && (
-            <Form.Item
-              label="Cấp quyền cho"
-              name="inCharge"
-              rules={[
-                {
-                  required: true,
-                  message: "Xin vui lòng nhập người được cấp quyền",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Email  "
-                onChange={(e) => setInCharge(e.target.value)}
-              />
+            <Form.Item label="Cấp quyền cho" name="inCharge">
+              <Select
+                style={{ width: "100%" }}
+                placeholder="Chọn người phụ trách"
+                onChange={(value) => setInCharge(value)}
+              >
+                {users.map((user) => (
+                  <Select.Option value={user.email} key={user.email}>
+                    {user.email}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           )}
           <Row justify="space-between">

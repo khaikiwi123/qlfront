@@ -8,7 +8,7 @@ import {
   SolutionOutlined,
 } from "@ant-design/icons";
 import Router, { useRouter } from "next/router";
-
+import Link from "next/link";
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 const AppSider = ({ role }) => {
@@ -53,36 +53,44 @@ const AppSider = ({ role }) => {
     >
       <Menu theme="dark" selectedKeys={[selectedKey]} mode="inline">
         <SubMenu key="sub1" icon={<FunnelPlotOutlined />} title="Leads">
-          <Menu.Item key="1" onClick={() => Router.push("/leads")}>
-            Danh sách
-          </Menu.Item>
+          <Link href="/leads">
+            <Menu.Item key="1" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+              Danh sách
+            </Menu.Item>
+          </Link>
         </SubMenu>
         <SubMenu key="sub2" icon={<UsergroupAddOutlined />} title="Khách hàng">
-          <Menu.Item key="2" onClick={() => Router.push("/customers")}>
-            Danh sách
-          </Menu.Item>
+          <Link href="/customers">
+            <Menu.Item key="2" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+              Danh sách
+            </Menu.Item>
+          </Link>
         </SubMenu>
         <SubMenu key="sub3" icon={<DollarCircleOutlined />} title="Sản phẩm">
-          <Menu.Item key="3" onClick={() => Router.push("/products")}>
-            Danh sách
-          </Menu.Item>
+          <Link href="/products">
+            <Menu.Item key="3" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+              Danh sách
+            </Menu.Item>
+          </Link>
         </SubMenu>
         <SubMenu key="sub4" icon={<SolutionOutlined />} title="Bill">
-          <Menu.Item key="4" onClick={() => Router.push("/bills")}>
-            Danh sách
-          </Menu.Item>
+          <Link href="/bills">
+            <Menu.Item key="4" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+              Danh sách
+            </Menu.Item>
+          </Link>
         </SubMenu>
 
         {role === "admin" && (
-          <>
+          <Link href="/users">
             <Menu.Item
               key="5"
               icon={<TeamOutlined />}
-              onClick={() => Router.push("/users")}
+              style={{ color: "rgba(255, 255, 255, 0.65)" }}
             >
               Người dùng
             </Menu.Item>
-          </>
+          </Link>
         )}
       </Menu>
     </Sider>

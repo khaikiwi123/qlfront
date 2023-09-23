@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Select, DatePicker, Input, InputNumber } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useUsers } from "@/context/context";
 import dayjs from "dayjs";
 
 const dateFormat = "DD/MM/YYYY";
@@ -13,6 +14,14 @@ const FilterModal = ({
   statusOptions,
 }) => {
   const router = useRouter();
+  const getUnselectedOptions = (currentFilterId) => {
+    const selectedValues = filters
+      .filter((filter) => filter.id !== currentFilterId)
+      .map((filter) => filter.selectValue);
+    return filterOptions.filter(
+      (option) => !selectedValues.includes(option.value)
+    );
+  };
 
   const transformQueryToFilters = (query) => {
     const result = [];
@@ -30,6 +39,7 @@ const FilterModal = ({
   };
 
   const [filters, setFilters] = useState(transformQueryToFilters(queryFilter));
+  const { users } = useUsers();
 
   const setFilter = () => {
     let newFilters = {};
@@ -84,7 +94,7 @@ const FilterModal = ({
             }}
             placeholder="Chọn bộ lọc"
           >
-            {filterOptions.map((option) => (
+            {getUnselectedOptions(filter.id).map((option) => (
               <Select.Option value={option.value} key={option.value}>
                 {option.label}
               </Select.Option>
@@ -177,6 +187,24 @@ const FilterModal = ({
                   setFilters(updatedFilters);
                 }}
               />
+            ) : filter.selectValue === "inCharge" ? (
+              <Select
+                style={{ width: 305, marginRight: 10 }}
+                value={filter.value || null}
+                placeholder="Chọn người phụ trách"
+                onChange={(value) => {
+                  const updatedFilters = filters.map((f) =>
+                    f.id === filter.id ? { ...f, value } : f
+                  );
+                  setFilters(updatedFilters);
+                }}
+              >
+                {users.map((user) => (
+                  <Select.Option value={user.email} key={user.email}>
+                    {user.email}
+                  </Select.Option>
+                ))}
+              </Select>
             ) : (
               <Input
                 style={{ width: 305, marginRight: 10 }}

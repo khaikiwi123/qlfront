@@ -230,6 +230,7 @@ export default function Lead() {
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}
                 products={products}
+                setOk={setOk}
               />
             </div>
             <div

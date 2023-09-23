@@ -229,7 +229,6 @@ const ProtectedPage = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
-
         <Layout className="layoutC">
           <AppSider role={role} />
           <Content style={{ margin: "30px 0 0" }}>

@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Modal, Form, Input, Button, Select } from "antd";
 import api from "@/api/api";
 import { metaErr } from "@/api/metaErr";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
+import { useUsers } from "@/context/context";
 
 const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   const { logOut } = useLogout();
-
+  const { users } = useUsers();
   const onFinish = async (values) => {
     setLoading(true);
 
@@ -117,7 +118,16 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
               },
             ]}
           >
-            <Input />
+            <Select
+              placeholder="Chọn người phụ trách"
+              onChange={(value) => form.setFieldsValue({ inCharge: value })}
+            >
+              {users.map((user) => (
+                <Select.Option value={user.email} key={user.email}>
+                  {user.email}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         )}
         <Form.Item>
