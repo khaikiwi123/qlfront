@@ -143,6 +143,7 @@ export default function User() {
                 onClose={() => setModal(false)}
                 onSuccess={() => setOk(true)}
                 userId={id}
+                user={user}
               />
               <Descriptions
                 size="small"

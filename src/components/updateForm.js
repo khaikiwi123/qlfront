@@ -6,7 +6,16 @@ import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 import { useUsers } from "@/context/context";
 
-const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
+const UpdateForm = ({
+  visible,
+  onClose,
+  roleId,
+  userId,
+  onSuccess,
+  uType,
+  customer,
+}) => {
+  const { email, phone, rep, org, inCharge } = customer;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +55,18 @@ const UpdateForm = ({ visible, onClose, roleId, userId, onSuccess, uType }) => {
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          email: email,
+          phone: phone,
+          rep: rep,
+          org: org,
+          inCharge: inCharge,
+        }}
+      >
         <Form.Item
           label="Email"
           name="email"

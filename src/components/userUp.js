@@ -10,7 +10,8 @@ import useLogout from "@/hooks/useLogout";
 const { TabPane } = Tabs;
 const { Option } = Select;
 
-const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
+const UserUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
+  const { name, phone, role } = user;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -55,7 +56,12 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
         type="card"
       >
         <TabPane tab="Thông tin" key="1">
-          <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            initialValues={{ name: name, phone: phone, role: role }}
+          >
             {/* <Form.Item
               label="Email"
               name="email"

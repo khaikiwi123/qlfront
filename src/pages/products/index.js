@@ -2,8 +2,20 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { Layout, Button, Tooltip, Space, Spin, Tabs } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import {
+  Layout,
+  Button,
+  Tooltip,
+  Space,
+  Spin,
+  Tabs,
+  Menu,
+  Dropdown,
+  Modal,
+  Row,
+  Col,
+} from "antd";
+import { EditOutlined, EllipsisOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 const { TabPane } = Tabs;
@@ -32,8 +44,10 @@ const ProtectedPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showUpModal, setShowUpModal] = useState(false);
   const [isRouterReady, setIsRouterReady] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [newPar, setNewPar] = useState(null);
+  const [selectedProd, setSelectedProd] = useState(null);
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+  const [productToChange, setProductToChange] = useState(null);
+  const [newStatus, setNewStatus] = useState(null);
 
   const [pagination, setPagination] = useState({
     pageIndex: 1,
@@ -49,9 +63,6 @@ const ProtectedPage = () => {
     }
     setRole(localStorage.getItem("role"));
 
-    if (createOk) {
-      setOk(false);
-    }
     if (!router.isReady) return;
     if (router.isReady) {
       setIsRouterReady(true);
@@ -81,7 +92,20 @@ const ProtectedPage = () => {
       params.status = activeTab;
     }
     getProducts(params);
-  }, [pagination, newPar, createOk, router.isReady, activeTab]);
+  }, [pagination, createOk, router.isReady, activeTab]);
+  const handleConfirmStatusChange = () => {
+    if (!productToChange || !newStatus) return;
+
+    api
+      .put(`/products/${productToChange._id}`, { status: newStatus })
+      .then((response) => {
+        setOk((prev) => !prev);
+        setIsConfirmModalVisible(false);
+      })
+      .catch((error) => {
+        console.error("Failed to update status", error);
+      });
+  };
 
   const getProducts = (params) => {
     let queryParams = Object.keys(params)
@@ -146,11 +170,11 @@ const ProtectedPage = () => {
       render: (status) => {
         switch (status) {
           case "active":
-            return <span style={{ color: "green" }}>Active</span>;
+            return <span style={{ color: "green" }}>Được sử dụng</span>;
           case "inactive":
-            return <span style={{ color: "red" }}>Inactive</span>;
+            return <span style={{ color: "red" }}>Tạm thời dừng</span>;
           case "delete":
-            return <span style={{ color: "gray" }}>Removed</span>;
+            return <span style={{ color: "gray" }}>Đã xóa</span>;
           default:
             return status;
         }
@@ -169,31 +193,95 @@ const ProtectedPage = () => {
           <EditOutlined
             onClick={() => {
               setShowUpModal(true);
-              setSelectedProductId(record._id);
+              setSelectedProd(record);
             }}
           />
+          <Dropdown overlay={getDropdownMenu(record)} placement="bottom">
+            <EllipsisOutlined />
+          </Dropdown>
 
           <ProdUp
             visible={showUpModal}
             onClose={() => {
               setShowUpModal(false);
-              setSelectedProductId(null);
             }}
-            id={selectedProductId}
+            product={selectedProd}
             onSuccess={() => setOk((prev) => !prev)}
           />
         </Space>
       ),
     });
   }
+
+  const getDropdownMenu = (record) => {
+    let menuItems = [];
+
+    const handleMenuItemClick = (status) => {
+      setProductToChange(record);
+      setNewStatus(status);
+      setIsConfirmModalVisible(true);
+    };
+
+    switch (record.status) {
+      case "active":
+        menuItems = [
+          <Menu.Item
+            key="inactive"
+            onClick={() => handleMenuItemClick("inactive")}
+          >
+            Tạm dừng
+          </Menu.Item>,
+          <Menu.Divider key="divider1" />,
+          <Menu.Item key="delete" onClick={() => handleMenuItemClick("delete")}>
+            Xóa
+          </Menu.Item>,
+        ];
+        break;
+      case "inactive":
+        menuItems = [
+          <Menu.Item key="active" onClick={() => handleMenuItemClick("active")}>
+            Sử dụng lại
+          </Menu.Item>,
+          <Menu.Divider key="divider1" />,
+          <Menu.Item key="delete" onClick={() => handleMenuItemClick("delete")}>
+            Xóa
+          </Menu.Item>,
+        ];
+        break;
+      case "delete":
+        menuItems = [
+          <Menu.Item key="active" onClick={() => handleMenuItemClick("active")}>
+            Sử dụng lại
+          </Menu.Item>,
+        ];
+        break;
+      default:
+        break;
+    }
+
+    return <Menu>{menuItems}</Menu>;
+  };
   const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "delete", label: "Removed" },
+    { value: "active", label: "Được sử dụng" },
+    { value: "inactive", label: "Tạm thời dừng" },
+    { value: "delete", label: "Đã xóa" },
   ];
+  const formatStatus = (status) => {
+    switch (status) {
+      case "active":
+        return "Được sử dụng";
+      case "inactive":
+        return "Tạm thời dừng";
+      case "delete":
+        return "Đã xóa";
+      default:
+        return status;
+    }
+  };
+
   const clearQuery = () => {
     router.push(router.pathname, undefined, { shallow: true });
-    setNewPar("cheat");
+    setOk((prev) => !prev);
     setPagination((prevState) => ({
       ...prevState,
       pageIndex: 1,
@@ -259,7 +347,7 @@ const ProtectedPage = () => {
                   <CreateForm
                     visible={showModal}
                     onClose={() => setShowModal(false)}
-                    onSuccess={() => setOk(true)}
+                    onSuccess={() => setOk((prev) => !prev)}
                   />
                 </div>
               </div>
@@ -272,7 +360,7 @@ const ProtectedPage = () => {
                   setTabLoading(true);
                 }}
               >
-                <TabPane tab="All" key="All" disabled={tabLoading}></TabPane>
+                <TabPane tab="Tất cả" key="All" disabled={tabLoading}></TabPane>
                 {statusOptions.map((option) => (
                   <TabPane
                     tab={option.label}
@@ -312,6 +400,37 @@ const ProtectedPage = () => {
           </Content>
         </Layout>
       </Layout>
+      <Modal
+        title="Confirm Status Change"
+        visible={isConfirmModalVisible}
+        onCancel={() => setIsConfirmModalVisible(false)}
+        footer={[
+          <Row key="footerRow" style={{ width: "100%" }}>
+            <Col span={2}>
+              <Button
+                key="cancel"
+                onClick={() => setIsConfirmModalVisible(false)}
+              >
+                Không
+              </Button>
+            </Col>
+            <Col span={22} style={{ textAlign: "right" }}>
+              <Button
+                key="submit"
+                type="primary"
+                onClick={handleConfirmStatusChange}
+              >
+                Có
+              </Button>
+            </Col>
+          </Row>,
+        ]}
+      >
+        <p>
+          Bạn có chắc bạn muốn đổi trạng thái của {productToChange?.prodName}{" "}
+          sang {formatStatus(newStatus)}?
+        </p>
+      </Modal>
     </>
   );
 };

@@ -9,7 +9,8 @@ import useLogout from "@/hooks/useLogout";
 
 const { TabPane } = Tabs;
 
-const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
+const ProfileUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
+  const { name, phone } = user;
   const [userInfoForm] = Form.useForm();
   const [passwordForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -85,6 +86,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
             form={userInfoForm}
             layout="vertical"
             onFinish={onFinishUserInfo}
+            initialValues={{ name: name, phone: phone }}
           >
             {/* <Form.Item
               label="Email"

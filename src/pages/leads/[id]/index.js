@@ -212,6 +212,7 @@ export default function Lead() {
                 onClose={() => setShowModal(false)}
                 roleId={role}
                 userId={id}
+                customer={lead}
                 onSuccess={() => setOk((prev) => !prev)}
                 uType="leads"
               />

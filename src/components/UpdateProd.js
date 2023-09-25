@@ -7,7 +7,8 @@ import { metaErr } from "@/api/prodErr";
 
 const { Option } = Select;
 
-const ProdUp = ({ visible, onClose, onSuccess, id }) => {
+const ProdUp = ({ visible, onClose, onSuccess, product }) => {
+  const { _id, prodName, description, price, length, status } = product || {};
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +18,7 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
     setLoading(true);
 
     try {
-      await api.put(`/products/${id}`, {
+      await api.put(`/products/${_id}`, {
         ...values,
       });
       form.resetFields();
@@ -51,7 +52,18 @@ const ProdUp = ({ visible, onClose, onSuccess, id }) => {
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          prodName: prodName,
+          length: length,
+          price: price,
+          description: description,
+          status: status,
+        }}
+      >
         <Form.Item label="Tên sản phẩm" name="prodName">
           <Input />
         </Form.Item>

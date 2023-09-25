@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../api/api";
-import {
-  Layout,
-  Button,
-  Spin,
-  Descriptions,
-  Modal,
-  Row,
-  Col,
-  message,
-} from "antd";
+import { Layout, Button, Spin, Descriptions } from "antd";
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import checkLogin from "@/Utils/checkLogin";
@@ -24,8 +15,8 @@ export default function User() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("");
   const [showModal, setModal] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
-  const [delModal, setDelModal] = useState(false);
+  // const [loadingDelete, setLoadingDelete] = useState(false);
+  // const [delModal, setDelModal] = useState(false);
   const [updateOk, setOk] = useState(false);
   const [currId, setId] = useState(false);
   const { logOut } = useLogout();
@@ -50,20 +41,20 @@ export default function User() {
         authErr(err, logOut);
       });
   }, [updateOk]);
-  const onDelete = async (currId) => {
-    setLoadingDelete(true);
-    try {
-      await api.delete(`/users/${currId}`);
-      setDelModal(false);
-      message.success("User deleted");
-      router.push("/users");
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      message.error("Error deleting user");
-    } finally {
-      setLoadingDelete(false);
-    }
-  };
+  // const onDelete = async (currId) => {
+  //   setLoadingDelete(true);
+  //   try {
+  //     await api.delete(`/users/${currId}`);
+  //     setDelModal(false);
+  //     message.success("User deleted");
+  //     router.push("/users");
+  //   } catch (error) {
+  //     console.error("Failed to delete user:", error);
+  //     message.error("Error deleting user");
+  //   } finally {
+  //     setLoadingDelete(false);
+  //   }
+  // };
   const items = user
     ? [
         {
@@ -135,6 +126,7 @@ export default function User() {
                 onClose={() => setModal(false)}
                 onSuccess={() => setOk(true)}
                 userId={currId}
+                user={user}
               />
               <Descriptions
                 size="small"

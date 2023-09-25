@@ -25,7 +25,6 @@ const ProtectedPage = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
-  const [createOk, setOk] = useState(false);
   const [role, setRole] = useState("");
   const [tabLoading, setTabLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
@@ -46,9 +45,6 @@ const ProtectedPage = () => {
     }
     setRole(localStorage.getItem("role"));
 
-    if (createOk) {
-      setOk(false);
-    }
     if (!router.isReady) return;
     if (router.isReady) {
       setIsRouterReady(true);
@@ -82,7 +78,7 @@ const ProtectedPage = () => {
       params.status = activeTab;
     }
     getBills(params);
-  }, [pagination, createOk, appliedFilters, router.isReady, activeTab]);
+  }, [pagination, appliedFilters, router.isReady, activeTab]);
 
   const getBills = (params) => {
     let queryParams = Object.keys(params)

@@ -185,6 +185,7 @@ export default function Customer() {
                 onClose={() => setModal(false)}
                 roleId={role}
                 userId={id}
+                customer={customer}
                 onSuccess={() => setOk(true)}
                 uType="customers"
               />
@@ -199,7 +200,13 @@ export default function Customer() {
             >
               <Descriptions
                 title={
-                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                  <div
+                    style={{
+                      whiteSpace: "normal",
+                      fontSize: "18px",
+                      marginTop: 15,
+                    }}
+                  >
                     {bill.product}
                   </div>
                 }
