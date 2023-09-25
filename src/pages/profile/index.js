@@ -171,7 +171,7 @@ export default function User() {
                 colon={false}
               />
             </div>
-            <div>
+            {/* <div>
               <Row
                 type="flex"
                 justify="center"
@@ -221,7 +221,7 @@ export default function User() {
               >
                 <p>Bạn có chắc là bạn muốn xóa tài khoản không?</p>
               </Modal>
-            </div>
+            </div> */}
           </Content>
         </Layout>
       </Layout>
