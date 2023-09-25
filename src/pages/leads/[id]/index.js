@@ -226,6 +226,7 @@ export default function Lead() {
                 email={lead.email}
                 phone={lead.phone}
                 org={lead.org}
+                sale={lead.inCharge}
                 currUser={currUser}
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}

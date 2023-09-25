@@ -178,7 +178,8 @@ const ProtectedPage = () => {
   const baseFilter = [
     { label: "Khách hàng", value: "customer" },
     { label: "Giá", value: "price" },
-    { label: "Thời hạn từ", value: "dateRange" },
+    { label: "Ngày được tạo", value: "exactDate" },
+    { label: "Ngày được tạo từ", value: "dateRange" },
   ];
   if (!isRouterReady) {
     return (

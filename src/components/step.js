@@ -1,38 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 
-import {
-  Button,
-  Modal,
-  Steps,
-  Select,
-  Popover,
-  Row,
-  Col,
-  Input,
-  DatePicker,
-  Form,
-  message,
-} from "antd";
+import { Button, Steps, Popover } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
 import api from "@/api/api";
-import dayjs from "dayjs";
+import BillForm from "./billForm";
 
-import { useUsers } from "@/context/context";
-
-const dateFormat = "DD/MM/YYYY";
-const { RangePicker } = DatePicker;
 const { Step } = Steps;
-const { Option } = Select;
 const AppStep = ({
   id,
   role,
   status,
   trackStatus,
   org,
+  sale,
   currUser,
   setLead,
   fetchChangeLogs,
@@ -43,18 +27,10 @@ const AppStep = ({
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
-  const [inCharge, setInCharge] = useState(null);
   const [productModal, setProductModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [defaultPrice, setDefault] = useState("");
-  const [selectedDates, setSelectedDates] = useState([null, null]);
-  const [length, setLength] = useState("");
-  const [price, setPrice] = useState("");
   const [popVis, setPop] = useState(false);
 
   const popoverRef = useRef(null);
-  const { users } = useUsers();
-  console.log(products);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
@@ -67,19 +43,6 @@ const AppStep = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  useEffect(() => {
-    if (length && !isNaN(length) && defaultPrice) {
-      const newPrice = defaultPrice * parseFloat(length);
-      setPrice(newPrice);
-    }
-  }, [length, defaultPrice]);
-  useEffect(() => {
-    if (length && !isNaN(length)) {
-      const startDate = selectedDates[0] || dayjs();
-      const endDate = computeEndDate(startDate, length);
-      setSelectedDates([startDate, endDate]);
-    }
-  }, [length]);
 
   const statusToIndex = {
     "No contact": 0,
@@ -114,94 +77,6 @@ const AppStep = ({
     }
   };
 
-  const handleConfirmChange = async (statusType) => {
-    setIsModalLoading(true);
-
-    try {
-      let updateStatus;
-      if (statusType === "Failed") {
-        updateStatus = { status: "Failed", trackStatus: pendingStatus };
-      } else if (statusType === "Success") {
-        updateStatus = {
-          status: pendingStatus,
-          trackStatus: pendingStatus,
-          product: selectedProduct,
-        };
-      } else {
-        updateStatus = { status: pendingStatus, trackStatus: pendingStatus };
-      }
-
-      await api.put(`/leads/${id}`, updateStatus);
-      setLead((prevState) => ({
-        ...prevState,
-        ...updateStatus,
-      }));
-
-      fetchChangeLogs();
-      setOk((prev) => !prev);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsModalLoading(false);
-      setProductModal(false);
-    }
-  };
-
-  const handleBill = async () => {
-    setIsModalLoading(true);
-    try {
-      const billData = {
-        customer: phone,
-        org: org,
-        product: selectedProduct,
-        length: length.toString(),
-        price: price.toString(),
-        startDate: selectedDates[0],
-        inCharge: role === "admin" ? inCharge : currUser,
-        status: "Active",
-      };
-      await api.post("bills", billData);
-      return true;
-    } catch (error) {
-      if (error.response.data.error === "Sale user doesn't exist") {
-        message.error("Người dùng không tồn tại", 2);
-      } else {
-        message.error("Lỗi tạo bill");
-      }
-      return false;
-    } finally {
-      setIsModalLoading(false);
-      setProductModal(false);
-    }
-  };
-
-  const handleProductChange = async () => {
-    setIsModalLoading(true);
-    try {
-      await api.put(`/leads/${id}`, { product: selectedProduct });
-      fetchChangeLogs();
-      setOk((prev) => !prev);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsModalLoading(false);
-      setProductModal(false);
-      fetchChangeLogs();
-    }
-  };
-  const combinedFunction = async (statusType) => {
-    const billingSuccess = await handleBill();
-    if (billingSuccess) {
-      await handleConfirmChange(statusType);
-    }
-  };
-  const combinedProduct = async () => {
-    const billingSuccess = await handleBill();
-    if (billingSuccess) {
-      await handleProductChange();
-    }
-  };
-
   const clickableWrapper = (content, index) => (
     <span
       onClick={() => (isModalLoading ? null : onChangeStatusStep(index))}
@@ -223,6 +98,23 @@ const AppStep = ({
       }
     }
   };
+  const handleFailed = async () => {
+    setIsModalLoading(true);
+
+    try {
+      let updateStatus;
+      updateStatus = { status: "Failed", trackStatus: pendingStatus };
+      await api.put(`/leads/${id}`, updateStatus);
+      setLead((prevState) => ({ ...prevState, ...updateStatus }));
+      fetchChangeLogs;
+      setOk((prev) => !prev);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsModalLoading(false);
+      setProductModal(false);
+    }
+  };
   const popContent = (
     <>
       <div
@@ -238,7 +130,7 @@ const AppStep = ({
             key="failed"
             danger
             style={{ flex: 1, marginRight: 10 }}
-            onClick={() => handleConfirmChange("Failed")}
+            onClick={handleFailed}
             loading={isModalLoading}
           >
             {status === "Success" ? "Đổi sang thất bại" : "Thất bại"}
@@ -311,30 +203,6 @@ const AppStep = ({
 
   const handlePop = () => {
     setPop(!popVis);
-    console.log(popVis);
-  };
-  const computeEndDate = (date, length) => {
-    if (date && length) {
-      return dayjs(date).add(30 * parseFloat(length), "days");
-    }
-    return null;
-  };
-  const handleOk = () => {
-    if (status !== "Success") {
-      combinedFunction("Success");
-      setProductModal(false);
-    } else {
-      combinedProduct();
-      setProductModal(false);
-    }
-  };
-  const resetForm = () => {
-    setSelectedProduct(null);
-    setLength(null);
-    setPrice(null);
-    setDefault(null);
-    setSelectedDates([null, null]);
-    setInCharge("");
   };
 
   return (
@@ -414,128 +282,24 @@ const AppStep = ({
           />
         </Steps>
       </div>
-      <Modal
-        title="Select Product"
-        visible={productModal}
-        centered
-        onCancel={() => {
-          setProductModal(false);
-          resetForm();
-        }}
-        footer={null}
-      >
-        <Form
-          labelCol={{
-            span: 6,
-          }}
-          wrapperCol={{
-            span: 18,
-          }}
-          labelAlign="left"
-          onFinish={handleOk}
-        >
-          <Form.Item label="Sản phẩm">
-            <Select
-              placeholder="Chọn sản phẩm"
-              onChange={(value) => {
-                const selectedProd = products.find(
-                  (product) => product.prodName === value
-                );
-                setSelectedProduct(selectedProd.prodName);
-                setLength(selectedProd.length);
-                setPrice(selectedProd.price);
-                setDefault(selectedProd.price);
-                const startDate = dayjs();
-                const endDate = computeEndDate(startDate, selectedProd.length);
-
-                setSelectedDates([startDate, endDate]);
-              }}
-              value={selectedProduct}
-            >
-              {products
-                .filter((product) => product.status === "active")
-                .map((product) => (
-                  <Option key={product.prodName} value={product.prodName}>
-                    {product.prodName}
-                  </Option>
-                ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="Thời hạn">
-            <Input
-              placeholder="Thời hạn"
-              value={length}
-              addonAfter="tháng"
-              onChange={(e) => setLength(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item label="Giá sản phẩm">
-            <Input
-              placeholder="Giá sản phẩm"
-              value={price}
-              addonAfter="(₫)"
-              onChange={(e) => setPrice(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item label="Thời gian">
-            <RangePicker
-              format={dateFormat}
-              style={{ width: "100%" }}
-              onCalendarChange={(dates) => {
-                if (dates && dates.length > 0 && dates[0]) {
-                  setSelectedDates([
-                    dayjs(dates[0]),
-                    dayjs(computeEndDate(dates[0], length)),
-                  ]);
-                } else {
-                  setSelectedDates([null, null]);
-                }
-              }}
-              value={selectedDates}
-              placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-            />
-          </Form.Item>
-          {role === "admin" && (
-            <Form.Item label="Cấp quyền cho" name="inCharge">
-              <Select
-                style={{ width: "100%" }}
-                placeholder="Chọn người phụ trách"
-                onChange={(value) => setInCharge(value)}
-              >
-                {users.map((user) => (
-                  <Select.Option value={user.email} key={user.email}>
-                    {user.email}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          )}
-          <Row justify="space-between">
-            <Col>
-              <Button
-                onClick={() => {
-                  setProductModal(false);
-                  resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={!selectedProduct}
-              >
-                OK
-              </Button>
-            </Col>
-          </Row>
-        </Form>
-      </Modal>
+      <BillForm
+        role={role}
+        org={org}
+        sale={sale}
+        currUser={currUser}
+        products={products}
+        phone={phone}
+        setOk={setOk}
+        id={id}
+        status={status}
+        isModalLoading={isModalLoading}
+        setIsModalLoading={setIsModalLoading}
+        productModal={productModal}
+        setProductModal={setProductModal}
+        pendingStatus={pendingStatus}
+        setLead={setLead}
+        fetchChangeLogs={fetchChangeLogs}
+      />
     </>
   );
 };
