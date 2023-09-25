@@ -86,7 +86,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
             layout="vertical"
             onFinish={onFinishUserInfo}
           >
-            <Form.Item
+            {/* <Form.Item
               label="Email"
               name="email"
               validateFirst="true"
@@ -107,8 +107,8 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId }) => {
               ]}
             >
               <Input />
-            </Form.Item>
-            <Form.Item label="Name" name="name">
+            </Form.Item> */}
+            <Form.Item label="Tên" name="name">
               <Input />
             </Form.Item>
             <Form.Item

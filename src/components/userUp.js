@@ -56,7 +56,7 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
       >
         <TabPane tab="Thông tin" key="1">
           <Form form={form} layout="vertical" onFinish={onFinish}>
-            <Form.Item
+            {/* <Form.Item
               label="Email"
               name="email"
               validateFirst="true"
@@ -77,7 +77,7 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId }) => {
               ]}
             >
               <Input />
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item label="Tên" name="name">
               <Input />
             </Form.Item>
