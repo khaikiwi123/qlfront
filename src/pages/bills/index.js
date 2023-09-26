@@ -17,6 +17,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import FilterModal from "@/components/filter";
+import { UserProvider } from "@/context/context";
 
 const { TabPane } = Tabs;
 const ProtectedPage = () => {
@@ -221,69 +222,75 @@ const ProtectedPage = () => {
   const columns = baseColumns;
   return (
     <>
-      <Layout style={{ minHeight: "100vh" }}>
-        <AppHeader />
-        <Layout className="layoutC">
-          <AppSider role={role} />
-          <Content style={{ margin: "30px 0 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0px",
-                }}
-              >
-                <h1
+      <UserProvider>
+        <Layout style={{ minHeight: "100vh" }}>
+          <AppHeader />
+          <Layout className="layoutC">
+            <AppSider role={role} />
+            <Content style={{ margin: "30px 0 0" }}>
+              <div style={{ padding: 24, minHeight: 360 }}>
+                <div
                   style={{
-                    fontSize: "2em",
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginBottom: "0px",
                   }}
                 >
-                  Bill
-                </h1>
-              </div>
-              <Tabs
-                defaultActiveKey="All"
-                style={{ color: "#363636" }}
-                type="card"
-                onChange={(key) => {
-                  setActiveTab(key);
-                  setTabLoading(true);
-                }}
-              >
-                <TabPane tab="Tất cả" key="All" disabled={tabLoading}></TabPane>
-                {statusOptions.map((option) => (
+                  <h1
+                    style={{
+                      fontSize: "2em",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Bill
+                  </h1>
+                </div>
+                <Tabs
+                  defaultActiveKey="All"
+                  style={{ color: "#363636" }}
+                  type="card"
+                  onChange={(key) => {
+                    setActiveTab(key);
+                    setTabLoading(true);
+                  }}
+                >
                   <TabPane
-                    tab={option.label}
-                    key={option.value}
+                    tab="Tất cả"
+                    key="All"
                     disabled={tabLoading}
                   ></TabPane>
-                ))}
-              </Tabs>
-              <FilterModal
-                queryFilter={router.query}
-                onFilterApply={(newFilters) => {
-                  setAppliedFilters(newFilters);
-                  setPagination({ ...pagination, pageIndex: 1 });
-                }}
-                filterOptions={filterOptions}
-              />
-              <UserTable
-                key={Date.now()}
-                columns={columns}
-                data={bills}
-                total={total}
-                loading={loading}
-                pagination={pagination}
-                setPagination={setPagination}
-              />
-            </div>
-          </Content>
+                  {statusOptions.map((option) => (
+                    <TabPane
+                      tab={option.label}
+                      key={option.value}
+                      disabled={tabLoading}
+                    ></TabPane>
+                  ))}
+                </Tabs>
+                <FilterModal
+                  queryFilter={router.query}
+                  onFilterApply={(newFilters) => {
+                    setAppliedFilters(newFilters);
+                    setPagination({ ...pagination, pageIndex: 1 });
+                  }}
+                  filterOptions={filterOptions}
+                />
+                <UserTable
+                  key={Date.now()}
+                  columns={columns}
+                  data={bills}
+                  total={total}
+                  loading={loading}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
+              </div>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </UserProvider>
     </>
   );
 };

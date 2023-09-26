@@ -8,6 +8,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import AppCrumbs from "@/components/breadcrumbs";
 import UpdateForm from "@/components/updateForm";
+import { UserProvider } from "@/context/context";
 
 import api from "@/api/api";
 import checkLogin from "@/Utils/checkLogin";
@@ -131,101 +132,104 @@ export default function Customer() {
 
   return (
     <>
-      <Layout style={{ minHeight: "100vh" }}>
-        <AppHeader />
-        <Layout className="layoutC">
-          <AppSider role={role} />
-          <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs paths={[{ name: "Customers", href: "/customers" }]} />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                borderBottom: "1px solid #A9A9A9",
-                borderTop: "1px solid #A9A9A9",
-              }}
-            >
-              <Descriptions
-                title={
-                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
-                    {customer.org}
-                  </div>
-                }
-                size="small"
-                extra={
-                  <Button
-                    onClick={() => setModal(true)}
-                    type="primary"
-                    ghost
-                    style={{
-                      marginLeft: "10px",
-                      fontSize: "16px",
-                      minWidth: "100px",
-                      marginTop: "20px",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    Cập nhập
-                  </Button>
-                }
-                layout="vertical"
-                labelStyle={{}}
-                contentStyle={{
-                  fontWeight: "400",
-                  color: "black",
-                  marginTop: -15,
+      <UserProvider>
+        {" "}
+        <Layout style={{ minHeight: "100vh" }}>
+          <AppHeader />
+          <Layout className="layoutC">
+            <AppSider role={role} />
+            <Content style={{ margin: "64px 16px 0" }}>
+              <AppCrumbs paths={[{ name: "Customers", href: "/customers" }]} />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  borderBottom: "1px solid #A9A9A9",
+                  borderTop: "1px solid #A9A9A9",
                 }}
-                items={items}
-                className="Desc"
-                colon={false}
-              />
-              <UpdateForm
-                visible={showModal}
-                onClose={() => setModal(false)}
-                roleId={role}
-                userId={id}
-                customer={customer}
-                onSuccess={() => setOk(true)}
-                uType="customers"
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                borderBottom: "1px solid #A9A9A9",
-              }}
-            >
-              <Descriptions
-                title={
-                  <div
-                    style={{
-                      whiteSpace: "normal",
-                      fontSize: "18px",
-                      marginTop: 15,
-                    }}
-                  >
-                    {bill.product}
-                  </div>
-                }
-                size="small"
-                layout="vertical"
-                labelStyle={{}}
-                contentStyle={{
-                  fontWeight: "400",
-                  color: "black",
-                  marginTop: -15,
+              >
+                <Descriptions
+                  title={
+                    <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                      {customer.org}
+                    </div>
+                  }
+                  size="small"
+                  extra={
+                    <Button
+                      onClick={() => setModal(true)}
+                      type="primary"
+                      ghost
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "16px",
+                        minWidth: "100px",
+                        marginTop: "20px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      Cập nhập
+                    </Button>
+                  }
+                  layout="vertical"
+                  labelStyle={{}}
+                  contentStyle={{
+                    fontWeight: "400",
+                    color: "black",
+                    marginTop: -15,
+                  }}
+                  items={items}
+                  className="Desc"
+                  colon={false}
+                />
+                <UpdateForm
+                  visible={showModal}
+                  onClose={() => setModal(false)}
+                  roleId={role}
+                  userId={id}
+                  customer={customer}
+                  onSuccess={() => setOk(true)}
+                  uType="customers"
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  borderBottom: "1px solid #A9A9A9",
                 }}
-                items={billItem}
-                className="Desc"
-                colon={false}
-              />
-            </div>
-          </Content>
+              >
+                <Descriptions
+                  title={
+                    <div
+                      style={{
+                        whiteSpace: "normal",
+                        fontSize: "18px",
+                        marginTop: 15,
+                      }}
+                    >
+                      {bill.product}
+                    </div>
+                  }
+                  size="small"
+                  layout="vertical"
+                  labelStyle={{}}
+                  contentStyle={{
+                    fontWeight: "400",
+                    color: "black",
+                    marginTop: -15,
+                  }}
+                  items={billItem}
+                  className="Desc"
+                  colon={false}
+                />
+              </div>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </UserProvider>
     </>
   );
 }

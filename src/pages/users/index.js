@@ -12,6 +12,7 @@ import authErr from "@/api/authErr";
 import dayjs from "dayjs";
 import FilterModal from "@/components/filter";
 import CreateForm from "@/components/UserForm";
+import { UserProvider } from "@/context/context";
 
 const { Content } = Layout;
 const App = () => {
@@ -191,71 +192,73 @@ const App = () => {
 
   return (
     <>
-      <Layout style={{ minHeight: "100vh" }}>
-        <AppHeader />
-        <Layout className="layoutC">
-          <AppSider role={role} />
+      <UserProvider>
+        <Layout style={{ minHeight: "100vh" }}>
+          <AppHeader />
+          <Layout className="layoutC">
+            <AppSider role={role} />
 
-          <Content style={{ margin: "30px 0 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0px",
-                }}
-              >
-                <h1
+            <Content style={{ margin: "30px 0 0" }}>
+              <div style={{ padding: 24, minHeight: 360 }}>
+                <div
                   style={{
-                    fontSize: "2em",
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginBottom: "0px",
                   }}
                 >
-                  Người dùng
-                </h1>
-
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Button
+                  <h1
                     style={{
-                      marginLeft: "10px",
-                      cursor: "pointer",
-                      marginTop: "10px",
+                      fontSize: "2em",
+                      display: "flex",
+                      alignItems: "center",
                     }}
-                    onClick={() => setShowModal(true)}
-                    type="primary"
                   >
-                    Tạo người dùng
-                  </Button>
-                  <CreateForm
-                    visible={showModal}
-                    onClose={() => setShowModal(false)}
-                    onSuccess={() => setOk((prev) => !prev)}
-                  />
+                    Người dùng
+                  </h1>
+
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Button
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginTop: "10px",
+                      }}
+                      onClick={() => setShowModal(true)}
+                      type="primary"
+                    >
+                      Tạo người dùng
+                    </Button>
+                    <CreateForm
+                      visible={showModal}
+                      onClose={() => setShowModal(false)}
+                      onSuccess={() => setOk((prev) => !prev)}
+                    />
+                  </div>
                 </div>
+                <FilterModal
+                  onFilterApply={(newFilters) => {
+                    setAppliedFilters(newFilters);
+                    setPagination({ ...pagination, pageIndex: 1 });
+                  }}
+                  filterOptions={filter}
+                  statusOptions={statusOptions}
+                />
+                <UserTable
+                  key={Date.now()}
+                  columns={columns}
+                  data={data}
+                  total={total}
+                  loading={loading}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
               </div>
-              <FilterModal
-                onFilterApply={(newFilters) => {
-                  setAppliedFilters(newFilters);
-                  setPagination({ ...pagination, pageIndex: 1 });
-                }}
-                filterOptions={filter}
-                statusOptions={statusOptions}
-              />
-              <UserTable
-                key={Date.now()}
-                columns={columns}
-                data={data}
-                total={total}
-                loading={loading}
-                pagination={pagination}
-                setPagination={setPagination}
-              />
-            </div>
-          </Content>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </UserProvider>
     </>
   );
 };

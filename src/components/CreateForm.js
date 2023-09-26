@@ -16,7 +16,7 @@ const CreateForm = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [saleName, setSaleName] = useState(""); // New state for saleName
+  const [saleName, setSaleName] = useState("");
 
   const { logOut } = useLogout();
   const { users } = useUsers();
@@ -29,7 +29,7 @@ const CreateForm = ({
         ...values,
         createdBy: userId,
         inCharge: roleId === "admin" ? values.inCharge : userId,
-        saleName: roleId === "admin" ? saleName : userName, // Include saleName in the API request
+        saleName: roleId === "admin" ? saleName : userName,
       });
       form.resetFields();
       if (onSuccess) {

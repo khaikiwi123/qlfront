@@ -10,6 +10,7 @@ import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import CreateForm from "@/components/CreateForm";
 import FilterModal from "@/components/filter";
+import { UserProvider } from "@/context/context";
 
 import useLogout from "@/hooks/useLogout";
 
@@ -236,7 +237,7 @@ const ProtectedPage = () => {
   const filterOptions = baseFilter;
 
   return (
-    <>
+    <UserProvider>
       <Layout style={{ minHeight: "100vh" }}>
         <AppHeader />
         <Layout className="layoutC">
@@ -323,7 +324,7 @@ const ProtectedPage = () => {
           </Content>
         </Layout>
       </Layout>
-    </>
+    </UserProvider>
   );
 };
 export default ProtectedPage;

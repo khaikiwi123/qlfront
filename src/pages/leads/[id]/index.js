@@ -25,6 +25,7 @@ import AppCrumbs from "@/components/breadcrumbs";
 import UpdateForm from "@/components/updateForm";
 import AppStep from "@/components/step";
 import AppHistory from "@/components/history";
+import { UserProvider } from "@/context/context";
 
 export default function Lead() {
   const router = useRouter();
@@ -160,157 +161,159 @@ export default function Lead() {
 
   return (
     <>
-      <Layout style={{ minHeight: "100vh" }}>
-        <AppHeader />
-        <Layout className="layoutC">
-          <AppSider role={role} />
-          <Content style={{ margin: "64px 16px 0" }}>
-            <AppCrumbs paths={[{ name: "Leads", href: "/leads" }]} />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                borderBottom: "1px solid #A9A9A9",
-                borderTop: "1px solid #A9A9A9",
-              }}
-            >
-              <Descriptions
-                size="small"
-                title={
-                  <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
-                    {leadTitle}
-                  </div>
-                }
-                extra={
-                  <Button
-                    onClick={() => setShowModal(true)}
-                    type="primary"
-                    ghost
-                    style={{
-                      marginLeft: "10px",
-                      minWidth: "100px",
-                      marginTop: "20px",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    Cập nhập
-                  </Button>
-                }
-                layout="vertical"
-                labelStyle={{}}
-                contentStyle={{
-                  fontWeight: "400",
-                  color: "black",
-                  marginTop: -15,
+      <UserProvider>
+        <Layout style={{ minHeight: "100vh" }}>
+          <AppHeader />
+          <Layout className="layoutC">
+            <AppSider role={role} />
+            <Content style={{ margin: "64px 16px 0" }}>
+              <AppCrumbs paths={[{ name: "Leads", href: "/leads" }]} />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  borderBottom: "1px solid #A9A9A9",
+                  borderTop: "1px solid #A9A9A9",
                 }}
-                items={items}
-                className="Desc"
-                colon={false}
-              />
-              <UpdateForm
-                visible={showUpModal}
-                onClose={() => setShowModal(false)}
-                roleId={role}
-                userId={id}
-                customer={lead}
-                onSuccess={() => setOk((prev) => !prev)}
-                uType="leads"
-              />
-            </div>
+              >
+                <Descriptions
+                  size="small"
+                  title={
+                    <div style={{ whiteSpace: "normal", fontSize: "25px" }}>
+                      {leadTitle}
+                    </div>
+                  }
+                  extra={
+                    <Button
+                      onClick={() => setShowModal(true)}
+                      type="primary"
+                      ghost
+                      style={{
+                        marginLeft: "10px",
+                        minWidth: "100px",
+                        marginTop: "20px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      Cập nhập
+                    </Button>
+                  }
+                  layout="vertical"
+                  labelStyle={{}}
+                  contentStyle={{
+                    fontWeight: "400",
+                    color: "black",
+                    marginTop: -15,
+                  }}
+                  items={items}
+                  className="Desc"
+                  colon={false}
+                />
+                <UpdateForm
+                  visible={showUpModal}
+                  onClose={() => setShowModal(false)}
+                  roleId={role}
+                  userId={id}
+                  customer={lead}
+                  onSuccess={() => setOk((prev) => !prev)}
+                  uType="leads"
+                />
+              </div>
 
-            <div>
-              <AppStep
-                id={id}
-                role={role}
-                status={lead.status}
-                trackStatus={lead.trackStatus}
-                email={lead.email}
-                phone={lead.phone}
-                org={lead.org}
-                sale={lead.inCharge}
-                saleName={lead.saleName}
-                currUser={currUser}
-                currName={currName}
-                setLead={setLead}
-                fetchChangeLogs={fetchChangeLogs}
-                products={products}
-                setOk={setOk}
-              />
-            </div>
-            <div
-              style={{
-                textAlign: "left",
-                borderTop: "1px solid #A9A9A9",
-              }}
-            >
-              <h3
+              <div>
+                <AppStep
+                  id={id}
+                  role={role}
+                  status={lead.status}
+                  trackStatus={lead.trackStatus}
+                  email={lead.email}
+                  phone={lead.phone}
+                  org={lead.org}
+                  sale={lead.inCharge}
+                  saleName={lead.saleName}
+                  currUser={currUser}
+                  currName={currName}
+                  setLead={setLead}
+                  fetchChangeLogs={fetchChangeLogs}
+                  products={products}
+                  setOk={setOk}
+                />
+              </div>
+              <div
                 style={{
                   textAlign: "left",
-                  marginTop: 15,
-                  color: "#00000073",
+                  borderTop: "1px solid #A9A9A9",
                 }}
               >
-                Lịch sử
-              </h3>
-              <AppHistory id={id} changeLog={changeLog} />
-            </div>
-
-            <div>
-              <Row
-                type="flex"
-                justify="center"
-                style={{ width: "100%", marginBottom: 40 }}
-              >
-                <Button
-                  danger
-                  style={{ marginTop: 15 }}
-                  onClick={() => setDelModal(true)}
+                <h3
+                  style={{
+                    textAlign: "left",
+                    marginTop: 15,
+                    color: "#00000073",
+                  }}
                 >
-                  Xóa lead này
-                </Button>
-              </Row>
+                  Lịch sử
+                </h3>
+                <AppHistory id={id} changeLog={changeLog} />
+              </div>
 
-              <Modal
-                title="Xóa"
-                visible={delModal}
-                centered
-                onCancel={() => {
-                  setDelModal(false);
-                }}
-                footer={[
-                  <Row key="footerRow" style={{ width: "100%" }}>
-                    <Col span={2}>
-                      <Button
-                        key="no"
-                        onClick={() => {
-                          setDelModal(false);
-                        }}
-                        loading={delLoading}
-                      >
-                        Không
-                      </Button>
-                    </Col>
-                    <Col span={22} style={{ textAlign: "right" }}>
-                      <Button
-                        key="complete"
-                        type="primary"
-                        onClick={() => onDelete(id)}
-                        danger
-                        loading={delLoading}
-                      >
-                        Có
-                      </Button>
-                    </Col>
-                  </Row>,
-                ]}
-              >
-                <p>Bạn có chắc là bạn muốn xóa lead này?</p>
-              </Modal>
-            </div>
-          </Content>
+              <div>
+                <Row
+                  type="flex"
+                  justify="center"
+                  style={{ width: "100%", marginBottom: 40 }}
+                >
+                  <Button
+                    danger
+                    style={{ marginTop: 15 }}
+                    onClick={() => setDelModal(true)}
+                  >
+                    Xóa lead này
+                  </Button>
+                </Row>
+
+                <Modal
+                  title="Xóa"
+                  visible={delModal}
+                  centered
+                  onCancel={() => {
+                    setDelModal(false);
+                  }}
+                  footer={[
+                    <Row key="footerRow" style={{ width: "100%" }}>
+                      <Col span={2}>
+                        <Button
+                          key="no"
+                          onClick={() => {
+                            setDelModal(false);
+                          }}
+                          loading={delLoading}
+                        >
+                          Không
+                        </Button>
+                      </Col>
+                      <Col span={22} style={{ textAlign: "right" }}>
+                        <Button
+                          key="complete"
+                          type="primary"
+                          onClick={() => onDelete(id)}
+                          danger
+                          loading={delLoading}
+                        >
+                          Có
+                        </Button>
+                      </Col>
+                    </Row>,
+                  ]}
+                >
+                  <p>Bạn có chắc là bạn muốn xóa lead này?</p>
+                </Modal>
+              </div>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </UserProvider>
     </>
   );
 }

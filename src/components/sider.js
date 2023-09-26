@@ -82,15 +82,13 @@ const AppSider = ({ role }) => {
         </SubMenu>
 
         {role === "admin" && (
-          <Link href="/users">
-            <Menu.Item
-              key="5"
-              icon={<TeamOutlined />}
-              style={{ color: "rgba(255, 255, 255, 0.65)" }}
-            >
-              Người dùng
-            </Menu.Item>
-          </Link>
+          <SubMenu key="sub5" icon={<TeamOutlined />} title="User">
+            <Link href="/users">
+              <Menu.Item key="5" style={{ color: "rgba(255, 255, 255, 0.65)" }}>
+                Người dùng
+              </Menu.Item>
+            </Link>
+          </SubMenu>
         )}
       </Menu>
     </Sider>

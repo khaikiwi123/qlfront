@@ -17,6 +17,7 @@ import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
 import UserTable from "@/components/table";
 import FilterModal from "@/components/filter";
+import { UserProvider } from "@/context/context";
 
 const ProtectedPage = () => {
   const router = useRouter();
@@ -213,51 +214,53 @@ const ProtectedPage = () => {
   const columns = baseColumns;
   return (
     <>
-      <Layout style={{ minHeight: "100vh" }}>
-        <AppHeader />
-        <Layout className="layoutC">
-          <AppSider role={role} />
-          <Content style={{ margin: "30px 0 0" }}>
-            <div style={{ padding: 24, minHeight: 360 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0px",
-                }}
-              >
-                <h1
+      <UserProvider>
+        <Layout style={{ minHeight: "100vh" }}>
+          <AppHeader />
+          <Layout className="layoutC">
+            <AppSider role={role} />
+            <Content style={{ margin: "30px 0 0" }}>
+              <div style={{ padding: 24, minHeight: 360 }}>
+                <div
                   style={{
-                    fontSize: "2em",
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginBottom: "0px",
                   }}
                 >
-                  Khách hàng
-                </h1>
+                  <h1
+                    style={{
+                      fontSize: "2em",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Khách hàng
+                  </h1>
+                </div>
+                <FilterModal
+                  queryFilter={router.query}
+                  onFilterApply={(newFilters) => {
+                    setAppliedFilters(newFilters);
+                    setPagination({ ...pagination, pageIndex: 1 });
+                  }}
+                  filterOptions={filterOptions}
+                />
+                <UserTable
+                  key={Date.now()}
+                  columns={columns}
+                  data={customers}
+                  total={total}
+                  loading={loading}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
               </div>
-              <FilterModal
-                queryFilter={router.query}
-                onFilterApply={(newFilters) => {
-                  setAppliedFilters(newFilters);
-                  setPagination({ ...pagination, pageIndex: 1 });
-                }}
-                filterOptions={filterOptions}
-              />
-              <UserTable
-                key={Date.now()}
-                columns={columns}
-                data={customers}
-                total={total}
-                loading={loading}
-                pagination={pagination}
-                setPagination={setPagination}
-              />
-            </div>
-          </Content>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </UserProvider>
     </>
   );
 };
