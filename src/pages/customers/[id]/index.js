@@ -38,7 +38,6 @@ export default function Customer() {
     }
     setRole(localStorage.getItem("role"));
     fetchCustomer();
-    console.log(bill);
   }, [id, router, updateOk]);
 
   const fetchCustomer = () => {

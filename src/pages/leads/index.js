@@ -3,7 +3,8 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
-import { Layout, Button, Tooltip, Tabs } from "antd";
+import { Layout, Button, Tooltip, Tabs, Spin } from "antd";
+import { useRouter } from "next/router";
 
 import AppHeader from "@/components/header";
 import AppSider from "@/components/sider";
@@ -24,6 +25,7 @@ const { TabPane } = Tabs;
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 const ProtectedPage = () => {
+  const router = useRouter();
   const [leads, setLeads] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -31,6 +33,8 @@ const ProtectedPage = () => {
   const [currName, setCurrName] = useState("");
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState(null);
+  const [isSet, setIsSet] = useState(false);
+  const [isRouterReady, setIsRouterReady] = useState(false);
   const [tabLoading, setTabLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
@@ -46,6 +50,11 @@ const ProtectedPage = () => {
       checkLogin();
       return;
     }
+    if (!router.isReady) return;
+    if (router.isReady) {
+      setIsRouterReady(true);
+    }
+    const email = router.query.email;
     setRole(localStorage.getItem("role"));
     setCurrUser(localStorage.getItem("currUser"));
     setCurrName(localStorage.getItem("currName"));
@@ -58,6 +67,10 @@ const ProtectedPage = () => {
         pageSize: pageSize,
       };
     }
+    if (email && !isSet) {
+      params.email = email;
+      setIsSet(true);
+    }
     params = {
       ...params,
       ...appliedFilters,
@@ -66,7 +79,7 @@ const ProtectedPage = () => {
       params.status = activeTab;
     }
     fetchLead(params);
-  }, [pagination, createOk, appliedFilters, activeTab]);
+  }, [pagination, createOk, appliedFilters, activeTab, router.isReady]);
 
   const fetchLead = (params) => {
     let queryParams = Object.keys(params)
@@ -232,6 +245,20 @@ const ProtectedPage = () => {
       ),
     });
   }
+  if (!isRouterReady) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const columns = baseColumns;
   const filterOptions = baseFilter;
@@ -304,6 +331,7 @@ const ProtectedPage = () => {
                 ))}
               </Tabs>
               <FilterModal
+                queryFilter={router.query}
                 onFilterApply={(newFilters) => {
                   setAppliedFilters(newFilters);
                   setPagination({ ...pagination, pageIndex: 1 });
