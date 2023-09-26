@@ -64,14 +64,14 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             },
           ]}
         >
-          <Input />
+          <Input placeholder="Email" />
         </Form.Item>
         <Form.Item
-          label="Name"
+          label="Tên"
           name="name"
           rules={[{ required: true, message: "Cần nhập tên" }]}
         >
-          <Input />
+          <Input placeholder="Tên" />
         </Form.Item>
         <Form.Item
           label="Số điện thoại"
@@ -98,7 +98,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             },
           ]}
         >
-          <Input />
+          <Input placeholder="Số điện thoại" />
         </Form.Item>
         <Form.Item
           label="Role"
@@ -140,6 +140,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
+            placeholder="Nhập mật khẩu"
           />
         </Form.Item>
         <Form.Item
@@ -166,6 +167,7 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
+            placeholder="Nhập lại mật khẩu"
           />
         </Form.Item>
         <Form.Item>

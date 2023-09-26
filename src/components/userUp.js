@@ -84,13 +84,14 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
             >
               <Input />
             </Form.Item> */}
-            <Form.Item label="Tên" name="name">
-              <Input />
+            <Form.Item label="Tên" name="name" required>
+              <Input placeholder="Tên" />
             </Form.Item>
             <Form.Item
               label="Số điện thoại"
               name="phone"
               validateFirst="true"
+              required
               rules={[
                 {
                   message: "Số điện thoại không hợp lệ",
@@ -109,9 +110,9 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
                 },
               ]}
             >
-              <Input />
+              <Input placeholder="Số điện thoại" />
             </Form.Item>
-            <Form.Item label="Vai trò" name="role">
+            <Form.Item label="Vai trò" name="role" required>
               <Select placeholder="Chọn vai trò">
                 <Option value="user">Nhân viên sale</Option>
                 <Option value="admin">Admin</Option>
@@ -135,6 +136,7 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
               label="Mật khẩu mới"
               name="newPassword"
               validateFirst="true"
+              required
               rules={[
                 {
                   message:
@@ -175,6 +177,7 @@ const UserUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
                   },
                 }),
               ]}
+              required
             >
               <Input.Password
                 iconRender={(visible) =>

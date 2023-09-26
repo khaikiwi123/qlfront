@@ -187,11 +187,11 @@ const FilterModal = ({
                   setFilters(updatedFilters);
                 }}
               />
-            ) : filter.selectValue === "inCharge" ? (
+            ) : filter.selectValue === "saleName" ? (
               <Select
                 style={{ width: 305, marginRight: 10 }}
                 value={filter.value || null}
-                placeholder="Chọn người phụ trách"
+                placeholder="Chọn người chịu trách nhiệm"
                 onChange={(value) => {
                   const updatedFilters = filters.map((f) =>
                     f.id === filter.id ? { ...f, value } : f
@@ -200,8 +200,8 @@ const FilterModal = ({
                 }}
               >
                 {users.map((user) => (
-                  <Select.Option value={user.email} key={user.email}>
-                    {user.email}
+                  <Select.Option value={user.name} key={user.name}>
+                    {`${user.name} (${user.email})`}
                   </Select.Option>
                 ))}
               </Select>

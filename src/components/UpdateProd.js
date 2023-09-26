@@ -64,13 +64,14 @@ const ProdUp = ({ visible, onClose, onSuccess, product }) => {
           status: status,
         }}
       >
-        <Form.Item label="Tên sản phẩm" name="prodName">
+        <Form.Item label="Tên sản phẩm" name="prodName" required>
           <Input />
         </Form.Item>
         <Form.Item
           label="Thời hạn mặc định"
           name="length"
           validateFirst="true"
+          required
           rules={[
             {
               pattern: /^\d+$/,
@@ -78,12 +79,13 @@ const ProdUp = ({ visible, onClose, onSuccess, product }) => {
             },
           ]}
         >
-          <Input addonAfter="Tháng" onChange={handleLength} />
+          <Input addonAfter="tháng" onChange={handleLength} />
         </Form.Item>
         <Form.Item
           label="Giá sản phẩm"
           name="price"
           validateFirst="true"
+          required
           rules={[
             {
               pattern: /^\d+$/,
@@ -91,18 +93,12 @@ const ProdUp = ({ visible, onClose, onSuccess, product }) => {
             },
           ]}
         >
-          <Input onChange={handlePrice} />
+          <Input onChange={handlePrice} addonAfter="(đ/tháng)" />
         </Form.Item>
-        <Form.Item label="Thông tin sản phẩm" name="description">
+        <Form.Item label="Thông tin sản phẩm" name="description" required>
           <Input.TextArea rows={4} placeholder="Xin vui lòng điền thông tin" />
         </Form.Item>
-        <Form.Item label="Trạng thái" name="status">
-          <Select placeholder="Chọn trạng thái">
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
-            <Option value="delete">Removed</Option>
-          </Select>
-        </Form.Item>
+
         <Form.Item>
           <Button
             type="primary"

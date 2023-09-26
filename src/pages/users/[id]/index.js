@@ -141,7 +141,7 @@ export default function User() {
               <UserUpForm
                 visible={showModal}
                 onClose={() => setModal(false)}
-                onSuccess={() => setOk(true)}
+                onSuccess={() => setOk((prev) => !prev)}
                 userId={id}
                 user={user}
               />
@@ -159,7 +159,6 @@ export default function User() {
                     ghost
                     style={{
                       marginLeft: "10px",
-                      fontSize: "16px",
                       minWidth: "100px",
                       marginTop: "20px",
                       marginBottom: "10px",

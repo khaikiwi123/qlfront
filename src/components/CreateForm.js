@@ -6,12 +6,21 @@ import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 import { useUsers } from "@/context/context";
 
-const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
+const CreateForm = ({
+  visible,
+  onClose,
+  roleId,
+  userId,
+  userName,
+  onSuccess,
+}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [saleName, setSaleName] = useState(""); // New state for saleName
 
   const { logOut } = useLogout();
   const { users } = useUsers();
+
   const onFinish = async (values) => {
     setLoading(true);
 
@@ -20,6 +29,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
         ...values,
         createdBy: userId,
         inCharge: roleId === "admin" ? values.inCharge : userId,
+        saleName: roleId === "admin" ? saleName : userName, // Include saleName in the API request
       });
       form.resetFields();
       if (onSuccess) {
@@ -35,8 +45,8 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
       setLoading(false);
     }
   };
+
   const handleNumber = (e) => {
-    //need to set () and -
     const value = e.target.value.replace(/\D/g, "");
     form.setFieldsValue({ phone: value });
   };
@@ -75,7 +85,7 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
             },
           ]}
         >
-          <Input onChange={handleNumber} />
+          <Input onChange={handleNumber} placeholder="Số điện thoại" />
         </Form.Item>
         <Form.Item
           label="Email"
@@ -95,41 +105,47 @@ const CreateForm = ({ visible, onClose, roleId, userId, onSuccess }) => {
             },
           ]}
         >
-          <Input />
+          <Input placeholder="Email" />
         </Form.Item>
         <Form.Item
           label="Tên tổ chức"
           name="org"
           rules={[{ required: true, message: "Cần nhập tên tổ chức" }]}
         >
-          <Input />
+          <Input placeholder="Tên tổ chức" />
         </Form.Item>
         <Form.Item
           label="Người đại diện"
           name="rep"
           rules={[{ required: true, message: "Cần nhập tên người đại diện" }]}
         >
-          <Input />
+          <Input placeholder="Người đại diện" />
         </Form.Item>
 
         {roleId === "admin" && (
           <Form.Item
-            label="Cấp quyền cho"
+            label="Người chịu trách nhiệm"
             name="inCharge"
             rules={[
               {
                 required: true,
-                message: "Cần nhập tên người được cấp quyền",
+                message: "Cần nhập tên người chịu trách nhiệm",
               },
             ]}
           >
             <Select
-              placeholder="Chọn người phụ trách"
-              onChange={(value) => form.setFieldsValue({ inCharge: value })}
+              placeholder="Chọn người chịu trách nhiệm"
+              onChange={(value) => {
+                const selectedUser = users.find((user) => user.email === value);
+                if (selectedUser) {
+                  form.setFieldsValue({ inCharge: value });
+                  setSaleName(selectedUser.name);
+                }
+              }}
             >
               {users.map((user) => (
                 <Select.Option value={user.email} key={user.email}>
-                  {user.email}
+                  {`${user.name} (${user.email})`}
                 </Select.Option>
               ))}
             </Select>

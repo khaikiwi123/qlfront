@@ -33,6 +33,7 @@ const useLogin = () => {
     localStorage.setItem("currID", data.id);
     localStorage.setItem("role", data.role);
     localStorage.setItem("currUser", data.user);
+    localStorage.setItem("currName", data.name);
   };
 
   const handleSubmit = async (e) => {

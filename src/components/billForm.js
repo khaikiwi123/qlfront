@@ -30,7 +30,9 @@ const BillForm = ({
   status,
   org,
   sale,
+  sName,
   currUser,
+  currName,
   setLead,
   fetchChangeLogs,
   products,
@@ -38,6 +40,7 @@ const BillForm = ({
   setOk,
 }) => {
   const [inCharge, setInCharge] = useState(null);
+  const [saleName, setSaleName] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [defaultPrice, setDefault] = useState("");
   const [selectedDates, setSelectedDates] = useState([null, null]);
@@ -104,6 +107,7 @@ const BillForm = ({
         price: price.toString(),
         startDate: selectedDates[0],
         inCharge: role === "admin" ? inCharge : currUser,
+        saleName: role === "admin" ? saleName : currName,
         status: "Active",
       };
       await api.post("bills", billData);
@@ -170,6 +174,7 @@ const BillForm = ({
     setDefault(null);
     setSelectedDates([null, null]);
     setInCharge(null);
+    setSaleName(null);
   };
   const isButtonDisabled =
     !selectedProduct || !inCharge || !price || !selectedDates || !length;
@@ -208,6 +213,7 @@ const BillForm = ({
                 setPrice(selectedProd.price);
                 setDefault(selectedProd.price);
                 setInCharge(sale);
+                setSaleName(sName);
                 const startDate = dayjs();
                 const endDate = computeEndDate(startDate, selectedProd.length);
 
@@ -278,12 +284,20 @@ const BillForm = ({
               <Select
                 style={{ width: "100%" }}
                 placeholder="Chọn người phụ trách"
-                onChange={(value) => setInCharge(value)}
+                onChange={(value) => {
+                  const selectedUser = users.find(
+                    (user) => user.email === value
+                  );
+                  if (selectedUser) {
+                    setInCharge(value);
+                    setSaleName(selectedUser.name);
+                  }
+                }}
                 value={inCharge}
               >
                 {users.map((user) => (
                   <Select.Option value={user.email} key={user.email}>
-                    {user.email}
+                    {`${user.name} (${user.email})`}
                   </Select.Option>
                 ))}
               </Select>

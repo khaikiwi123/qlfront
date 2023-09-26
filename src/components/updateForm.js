@@ -18,6 +18,7 @@ const UpdateForm = ({
   const { email, phone, rep, org, inCharge } = customer;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [saleName, setSaleName] = useState(""); // New state for saleName
 
   const { logOut } = useLogout();
   const { users } = useUsers();
@@ -27,6 +28,7 @@ const UpdateForm = ({
     try {
       await api.put(`/${uType}/${userId}`, {
         ...values,
+        saleName: roleId === "admin" ? saleName : null,
       });
       form.resetFields();
       if (onSuccess) {
@@ -54,6 +56,7 @@ const UpdateForm = ({
       title="Cập nhập Lead"
       onCancel={onClose}
       footer={null}
+      centered
     >
       <Form
         form={form}
@@ -68,29 +71,10 @@ const UpdateForm = ({
         }}
       >
         <Form.Item
-          label="Email"
-          name="email"
-          validateFirst="true"
-          rules={[
-            {
-              message: "Email không hợp lệ",
-              validator: (_, value) => {
-                if (!value || /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
-                  return Promise.resolve();
-                } else {
-                  return Promise.reject("Email is invalid");
-                }
-              },
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
           label="Số điện thoại"
           name="phone"
           validateFirst="true"
+          required
           rules={[
             {
               message: "Số điện thoại không hợp lệ",
@@ -111,22 +95,48 @@ const UpdateForm = ({
         >
           <Input onChange={handleNumber} />
         </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          validateFirst="true"
+          required
+          rules={[
+            {
+              message: "Email không hợp lệ",
+              validator: (_, value) => {
+                if (!value || /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject("Email is invalid");
+                }
+              },
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item label="Tên tổ chức" name="org" required>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Người đại diện" name="rep" required>
+          <Input />
+        </Form.Item>
 
-        <Form.Item label="Người đại diện" name="rep">
-          <Input />
-        </Form.Item>
-        <Form.Item label="Tổ chức" name="org">
-          <Input />
-        </Form.Item>
         {roleId === "admin" && (
-          <Form.Item label="Cấp quyền cho" name="inCharge">
+          <Form.Item label="Người chịu trách nhiệm" name="inCharge" required>
             <Select
-              placeholder="Chọn người phụ trách"
-              onChange={(value) => form.setFieldsValue({ inCharge: value })}
+              placeholder="Chọn người chịu trách nhiệm"
+              onChange={(value) => {
+                const selectedUser = users.find((user) => user.email === value);
+                if (selectedUser) {
+                  form.setFieldsValue({ inCharge: value });
+                  setSaleName(selectedUser.name);
+                }
+              }}
             >
               {users.map((user) => (
                 <Select.Option value={user.email} key={user.email}>
-                  {user.email}
+                  {`${user.name} (${user.email})`}
                 </Select.Option>
               ))}
             </Select>

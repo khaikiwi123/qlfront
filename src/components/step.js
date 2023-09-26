@@ -17,7 +17,9 @@ const AppStep = ({
   trackStatus,
   org,
   sale,
+  saleName,
   currUser,
+  currName,
   setLead,
   fetchChangeLogs,
   products,
@@ -286,11 +288,13 @@ const AppStep = ({
         role={role}
         org={org}
         sale={sale}
+        sName={saleName}
         currUser={currUser}
         products={products}
         phone={phone}
         setOk={setOk}
         id={id}
+        currName={currName}
         status={status}
         isModalLoading={isModalLoading}
         setIsModalLoading={setIsModalLoading}

@@ -39,6 +39,7 @@ export default function Lead() {
   const [updateOk, setOk] = useState(false);
   const [products, setProducts] = useState([]);
   const [currUser, setCurrUser] = useState("");
+  const [currName, setCurrName] = useState(null);
 
   const { logOut } = useLogout();
   const fetchChangeLogs = async () => {
@@ -83,6 +84,7 @@ export default function Lead() {
     }
     setRole(localStorage.getItem("role"));
     setCurrUser(localStorage.getItem("currUser"));
+    setCurrName(localStorage.getItem("currName"));
     api
       .get(`/leads/${id}`)
       .then((response) => {
@@ -139,7 +141,7 @@ export default function Lead() {
     {
       key: "4",
       label: "Chịu trách nhiệm",
-      children: lead.inCharge,
+      children: lead.saleName,
     },
     {
       key: "5",
@@ -187,7 +189,6 @@ export default function Lead() {
                     ghost
                     style={{
                       marginLeft: "10px",
-                      fontSize: "16px",
                       minWidth: "100px",
                       marginTop: "20px",
                       marginBottom: "10px",
@@ -228,7 +229,9 @@ export default function Lead() {
                 phone={lead.phone}
                 org={lead.org}
                 sale={lead.inCharge}
+                saleName={lead.saleName}
                 currUser={currUser}
+                currName={currName}
                 setLead={setLead}
                 fetchChangeLogs={fetchChangeLogs}
                 products={products}

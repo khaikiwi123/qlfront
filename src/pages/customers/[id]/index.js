@@ -91,7 +91,7 @@ export default function Customer() {
     {
       key: "4",
       label: "Người chịu trách nhiệm",
-      children: customer.inCharge,
+      children: customer.saleName,
     },
     {
       key: "5",
@@ -166,7 +166,7 @@ export default function Customer() {
                       marginBottom: "10px",
                     }}
                   >
-                    Edit
+                    Cập nhập
                   </Button>
                 }
                 layout="vertical"

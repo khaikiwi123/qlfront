@@ -167,13 +167,19 @@ const ProtectedPage = () => {
   if (role === "admin") {
     baseColumns.push({
       title: "Chịu trách nhiệm",
-      dataIndex: "inCharge",
-      key: "inCharge",
+      dataIndex: "saleName",
+      key: "saleName",
+      render: (saleName, record) => (
+        <Tooltip placement="topLeft" title={record.inCharge}>
+          {saleName}
+        </Tooltip>
+      ),
     });
   }
   const baseFilter = [
     { label: "Khách hàng", value: "customer" },
     { label: "Giá", value: "price" },
+    { label: "Người chịu trách nhiệm", value: "saleName" },
     { label: "Ngày được tạo", value: "exactDate" },
     { label: "Ngày được tạo từ", value: "dateRange" },
   ];

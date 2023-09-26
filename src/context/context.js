@@ -10,7 +10,7 @@ const UserProvider = ({ children }) => {
 
   useEffect(() => {
     api
-      .get("users?list=email")
+      .get("users?list=email,name")
 
       .then((data) => {
         setUsers(data.data.users);

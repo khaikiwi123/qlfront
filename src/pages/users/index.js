@@ -55,9 +55,7 @@ const App = () => {
       checkLogin();
       return;
     }
-    if (createOk) {
-      setOk(false);
-    }
+
     setCurrID(localStorage.getItem("currID"));
     setLoading(true);
 
@@ -233,7 +231,7 @@ const App = () => {
                   <CreateForm
                     visible={showModal}
                     onClose={() => setShowModal(false)}
-                    onSuccess={() => setOk(true)}
+                    onSuccess={() => setOk((prev) => !prev)}
                   />
                 </div>
               </div>

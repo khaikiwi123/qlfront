@@ -36,6 +36,7 @@ const ProtectedPage = () => {
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isSet, setIsSet] = useState(false);
   const [createOk, setOk] = useState(false);
   const [tabLoading, setTabLoading] = useState(true);
@@ -95,7 +96,7 @@ const ProtectedPage = () => {
   }, [pagination, createOk, router.isReady, activeTab]);
   const handleConfirmStatusChange = () => {
     if (!productToChange || !newStatus) return;
-
+    setIsButtonLoading(true);
     api
       .put(`/products/${productToChange._id}`, { status: newStatus })
       .then((response) => {
@@ -104,6 +105,9 @@ const ProtectedPage = () => {
       })
       .catch((error) => {
         console.error("Failed to update status", error);
+      })
+      .finally(() => {
+        setIsButtonLoading(false);
       });
   };
 
@@ -418,7 +422,9 @@ const ProtectedPage = () => {
               <Button
                 key="submit"
                 type="primary"
+                ghost
                 onClick={handleConfirmStatusChange}
+                loading={isButtonLoading}
               >
                 Có
               </Button>

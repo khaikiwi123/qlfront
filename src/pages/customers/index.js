@@ -178,8 +178,13 @@ const ProtectedPage = () => {
     },
     {
       title: "Chịu trách nhiệm",
-      dataIndex: "inCharge",
-      key: "inCharge",
+      dataIndex: "saleName",
+      key: "saleName",
+      render: (saleName, record) => (
+        <Tooltip placement="topLeft" title={record.inCharge}>
+          {saleName}
+        </Tooltip>
+      ),
     },
   ];
   const baseFilter = [
@@ -187,7 +192,7 @@ const ProtectedPage = () => {
     { label: "Email", value: "email" },
     { label: "Tổ chức", value: "org" },
     { label: "Người đại diện", value: "rep" },
-    { label: "Người chịu trách nhiệm", value: "inCharge" },
+    { label: "Người chịu trách nhiệm", value: "saleName" },
   ];
   if (!isRouterReady) {
     return (

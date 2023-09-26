@@ -27,6 +27,7 @@ const ProtectedPage = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [currUser, setCurrUser] = useState("");
+  const [currName, setCurrName] = useState("");
   const [createOk, setOk] = useState(false);
   const [role, setRole] = useState(null);
   const [tabLoading, setTabLoading] = useState(true);
@@ -44,11 +45,9 @@ const ProtectedPage = () => {
       checkLogin();
       return;
     }
-    if (createOk) {
-      setOk(false);
-    }
     setRole(localStorage.getItem("role"));
     setCurrUser(localStorage.getItem("currUser"));
+    setCurrName(localStorage.getItem("currName"));
     setLoading(true);
     const { pageIndex, pageSize } = pagination;
     let params = {};
@@ -210,10 +209,15 @@ const ProtectedPage = () => {
   if (role === "admin") {
     baseColumns.push({
       title: "Chịu trách nhiệm",
-      dataIndex: "inCharge",
-      key: "inCharge",
+      dataIndex: "saleName",
+      key: "saleName",
+      render: (saleName, record) => (
+        <Tooltip placement="topLeft" title={record.inCharge}>
+          {saleName}
+        </Tooltip>
+      ),
     });
-    baseFilter.push({ label: "Người chịu trách nhiệm", value: "inCharge" });
+    baseFilter.push({ label: "Người chịu trách nhiệm", value: "saleName" });
   }
   if (activeTab === "Success") {
     baseColumns.push({
@@ -275,7 +279,8 @@ const ProtectedPage = () => {
                     onClose={() => setShowModal(false)}
                     roleId={role}
                     userId={currUser}
-                    onSuccess={() => setOk(true)}
+                    userName={currName}
+                    onSuccess={() => setOk((prev) => !prev)}
                   />
                 </div>
               </div>

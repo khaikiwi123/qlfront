@@ -110,13 +110,14 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
             >
               <Input />
             </Form.Item> */}
-            <Form.Item label="Tên" name="name">
-              <Input />
+            <Form.Item label="Tên" name="name" required>
+              <Input placeholder="Tên" />
             </Form.Item>
             <Form.Item
               label="Số điện thoại"
               name="phone"
               validateFirst="true"
+              required
               rules={[
                 {
                   message: "Số điện thoại không hợp lệ",
@@ -135,7 +136,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
                 },
               ]}
             >
-              <Input onChange={handlePhone} />
+              <Input onChange={handlePhone} placeholder="Số điện thoại" />
             </Form.Item>
             <Form.Item>
               <Button
@@ -224,6 +225,7 @@ const ProfileUpForm = ({ visible, onClose, onSuccess, userId, user }) => {
             <Form.Item
               label="Nhập lại mật khẩu mới"
               name="confirmNewPassword"
+              required
               rules={[
                 ({ getFieldValue }) => ({
                   validator(_, value) {
