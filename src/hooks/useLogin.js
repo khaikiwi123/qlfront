@@ -45,6 +45,7 @@ const useLogin = () => {
         password,
       });
 
+      console.log(response.data);
       setUserData(response.data);
       if (response.data.role === "admin") {
         router.push("/users");

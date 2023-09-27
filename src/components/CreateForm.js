@@ -29,7 +29,7 @@ const CreateForm = ({
     try {
       await api.post(`/leads`, {
         ...values,
-        createdBy: userId,
+        createdBy: userName,
         inCharge: roleId === "admin" ? values.inCharge : userId,
         saleName: roleId === "admin" ? saleName : userName,
       });
@@ -37,7 +37,7 @@ const CreateForm = ({
       if (onSuccess) {
         onSuccess();
       }
-      Router.push(`/leads?email=${values.email}`);
+      window.location.href = `/leads?email=${values.email}`;
       onClose();
     } catch (error) {
       console.error(error);

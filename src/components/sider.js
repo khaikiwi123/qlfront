@@ -37,6 +37,12 @@ const AppSider = ({ role }) => {
     <Sider
       breakpoint="lg"
       collapsedWidth="0"
+      onBreakpoint={(broken) => {
+        console.log(broken);
+      }}
+      onCollapse={(collapsed, type) => {
+        console.log(collapsed, type);
+      }}
       style={{
         marginTop: 64,
         height: "100%",

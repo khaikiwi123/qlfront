@@ -19,14 +19,16 @@ const AppHistory = ({ changeLog }) => {
                 message = `${log.changedBy} đã tạo lead này`;
               } else if (log.field === "product") {
                 message = `${log.changedBy} đã thay đổi sản phẩm từ ${log.oldValue} sang ${log.newValue}`;
-              } else if (log.product) {
-                message = `${
-                  log.changedBy
-                } đã thay đổi trạng thái từ ${translateStatus(
-                  log.oldValue
-                )} sang ${translateStatus(log.newValue)} với ${
-                  log.product
-                } sau ${log.daysLastUp ? log.daysLastUp : "?"} ngày`;
+              } else if (log.field === "saleName") {
+                message = `${log.changedBy} đã thay đổi người chịu trách nhiệm từ ${log.oldValue} sang ${log.newValue}`;
+              } else if (log.field === "email") {
+                message = `${log.changedBy} đã thay đổi email từ ${log.oldValue} sang ${log.newValue}`;
+              } else if (log.field === "phone") {
+                message = `${log.changedBy} đã thay đổi số điện thoại từ ${log.oldValue} sang ${log.newValue}`;
+              } else if (log.field === "org") {
+                message = `${log.changedBy} đã thay đổi tên tổ chức từ ${log.oldValue} sang ${log.newValue}`;
+              } else if (log.field === "rep") {
+                message = `${log.changedBy} đã thay đổi tên người đại diện từ ${log.oldValue} sang ${log.newValue}`;
               } else {
                 message = `${
                   log.changedBy
