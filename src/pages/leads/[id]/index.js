@@ -104,8 +104,9 @@ export default function Lead() {
 
           router.push("/leads");
         }
-      }, fetchChangeLogs());
+      });
     fetchProducts();
+    fetchChangeLogs();
   }, [id, router, updateOk]);
 
   if (lead === null) {

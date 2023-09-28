@@ -29,6 +29,10 @@ const AppHistory = ({ changeLog }) => {
                 message = `${log.changedBy} đã thay đổi tên tổ chức từ ${log.oldValue} sang ${log.newValue}`;
               } else if (log.field === "rep") {
                 message = `${log.changedBy} đã thay đổi tên người đại diện từ ${log.oldValue} sang ${log.newValue}`;
+              } else if (log.oldValue === log.newValue) {
+                message = `${
+                  log.changedBy
+                } đã thay đổi trạng thái ${translateStatus(log.oldValue)}`;
               } else {
                 message = `${
                   log.changedBy
@@ -38,7 +42,8 @@ const AppHistory = ({ changeLog }) => {
                   log.daysLastUp ? log.daysLastUp : "?"
                 } ngày`;
               }
-
+              const textStyle =
+                index !== changeLog.length - 1 ? { color: "gray" } : {};
               return (
                 <Timeline.Item
                   key={index}
@@ -55,13 +60,14 @@ const AppHistory = ({ changeLog }) => {
                   }
                   color={index !== changeLog.length - 1 ? "gray" : "green"}
                 >
-                  <span
-                    style={
-                      index !== changeLog.length - 1 ? { color: "gray" } : {}
-                    }
-                  >
-                    {message}
-                  </span>
+                  <span style={textStyle}>{message}</span>
+                  {log.note !== null &&
+                    log.note !== "" &&
+                    log.note !== undefined && (
+                      <div style={{ ...textStyle, whiteSpace: "pre-line" }}>
+                        Ghi chú: {log.note}
+                      </div>
+                    )}
                 </Timeline.Item>
               );
             })}

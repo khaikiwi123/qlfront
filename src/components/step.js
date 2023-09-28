@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { Button, Steps, Popover } from "antd";
+import { Button, Steps, Popover, Form, Modal, Input, Row, Col } from "antd";
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import api from "@/api/api";
 import BillForm from "./billForm";
+import { translateStatus } from "@/Utils/translate";
 
 const { Step } = Steps;
 const AppStep = ({
@@ -26,11 +27,17 @@ const AppStep = ({
   phone,
   setOk,
 }) => {
+  const [form] = Form.useForm();
   const [pendingStatus, setPendingStatus] = useState("");
   const [isModalLoading, setIsModalLoading] = useState(false);
+  const [noteLoading, setNoteLoad] = useState(false);
   const [selectedStep, setSelectedStep] = useState(null);
   const [productModal, setProductModal] = useState(false);
+  const [noteModal, setNoteModal] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [note, setNote] = useState(null);
   const [popVis, setPop] = useState(false);
+  const [actionType, setActionType] = useState(null);
 
   const popoverRef = useRef(null);
   useEffect(() => {
@@ -53,29 +60,53 @@ const AppStep = ({
     Consulted: 3,
     Success: 4,
   };
-  const onChangeStatusStep = async (currentIndex) => {
+
+  const onChangeStatusStep = (currentIndex) => {
     const statusKeys = Object.keys(statusToIndex);
     const newStatus = statusKeys[currentIndex];
     setSelectedStep(currentIndex);
+
     if (currentIndex === statusKeys.length - 1) {
       setPendingStatus(newStatus);
       handlePop();
+    } else if (currentIndex === currentStep) {
+      console.log("current");
+      setConfirm(true);
     } else {
-      setIsModalLoading(true);
-      try {
-        const updateStatus = { status: newStatus, trackStatus: newStatus };
+      setActionType("updateStatus");
+      setNoteModal(true);
+    }
+  };
+  const handleOk = async () => {
+    setNoteLoad(true);
+    setIsModalLoading(true);
+    try {
+      let updateStatus;
 
-        await api.put(`/leads/${id}`, updateStatus);
-        setLead((prevState) => ({
-          ...prevState,
-          ...updateStatus,
-        }));
-        fetchChangeLogs();
-      } catch (error) {
-        console.error(error);
+      if (actionType === "updateStatus") {
+        const statusKeys = Object.keys(statusToIndex);
+        const newStatus = statusKeys[selectedStep];
+        updateStatus = { status: newStatus, trackStatus: newStatus };
+      } else if (actionType === "failed") {
+        updateStatus = { status: "Failed", trackStatus: pendingStatus };
       }
+
+      if (note) {
+        updateStatus.note = note;
+      }
+
+      await api.put(`/leads/${id}`, updateStatus);
+      setLead((prevState) => ({ ...prevState, ...updateStatus }));
+      fetchChangeLogs();
+      form.resetFields();
+    } catch (error) {
+      console.error(error);
+    } finally {
       setIsModalLoading(false);
-      setSelectedStep(null);
+      setNoteModal(false);
+      setNote(null);
+      setActionType(null);
+      setNoteLoad(false);
     }
   };
 
@@ -100,22 +131,9 @@ const AppStep = ({
       }
     }
   };
-  const handleFailed = async () => {
-    setIsModalLoading(true);
-
-    try {
-      let updateStatus;
-      updateStatus = { status: "Failed", trackStatus: pendingStatus };
-      await api.put(`/leads/${id}`, updateStatus);
-      setLead((prevState) => ({ ...prevState, ...updateStatus }));
-      fetchChangeLogs;
-      setOk((prev) => !prev);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsModalLoading(false);
-      setProductModal(false);
-    }
+  const handleFailed = () => {
+    setActionType("failed");
+    setNoteModal(true);
   };
   const popContent = (
     <>
@@ -304,6 +322,75 @@ const AppStep = ({
         setLead={setLead}
         fetchChangeLogs={fetchChangeLogs}
       />
+      <Modal
+        title="Ghi chú"
+        footer={null}
+        visible={noteModal}
+        centered
+        onCancel={() => {
+          setNoteModal(false);
+          setNote("");
+          form.resetFields();
+        }}
+      >
+        <Form form={form}>
+          <Form.Item name="note">
+            <Input.TextArea
+              placeholder="Bạn nó muốn viết ghi chú không?"
+              rows={4}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            ></Input.TextArea>
+          </Form.Item>
+
+          <Row justify="space-between">
+            <Col>
+              <Button
+                onClick={() => {
+                  setNoteModal(false);
+                  form.resetFields();
+                }}
+                loading={noteLoading}
+              >
+                Cancel
+              </Button>
+            </Col>
+            <Col>
+              <Button type="primary" loading={noteLoading} onClick={handleOk}>
+                Ok
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+      <Modal
+        visible={confirm}
+        centered
+        title="Xác nhận"
+        onCancel={() => setConfirm(false)}
+        footer={
+          <Row justify="space-between">
+            <Col>
+              <Button onClick={() => setConfirm(false)}>Cancel</Button>
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setConfirm(false);
+                  setActionType("updateStatus");
+                  setNoteModal(true);
+                }}
+              >
+                Ok
+              </Button>
+            </Col>
+          </Row>
+        }
+      >
+        Bạn có chắc muốn cập nhật trạng thái {translateStatus(status)} một lần
+        nữa không?
+      </Modal>
     </>
   );
 };

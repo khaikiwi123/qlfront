@@ -5,7 +5,6 @@ import { metaErr } from "@/api/metaErr";
 import authErr from "@/api/authErr";
 import useLogout from "@/hooks/useLogout";
 import { useUsers } from "@/context/context";
-import Router, { useRouter } from "next/router";
 
 const CreateForm = ({
   visible,
@@ -15,7 +14,6 @@ const CreateForm = ({
   userName,
   onSuccess,
 }) => {
-  const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [saleName, setSaleName] = useState("");
