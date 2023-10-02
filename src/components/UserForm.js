@@ -79,13 +79,10 @@ const CreateForm = ({ visible, onClose, onSuccess }) => {
           validateFirst="true"
           rules={[
             {
-              required: true,
-              message: "Cần nhập số điện thoại",
-            },
-            {
               message: "Số điện thoại không hợp lệ",
               validator: (_, value) => {
                 if (
+                  value === "" ||
                   /^((\+?84)|0)((3([2-9]))|(5([25689]))|(7([0|6-9]))|(8([1-9]))|(9([0-9])))([0-9]{7})$/.test(
                     value
                   )

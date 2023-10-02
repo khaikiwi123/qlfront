@@ -18,7 +18,7 @@ const UpdateForm = ({
   const { email, phone, rep, org, inCharge } = customer;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [saleName, setSaleName] = useState(""); // New state for saleName
+  const [saleName, setSaleName] = useState("");
 
   const { logOut } = useLogout();
   const { users } = useUsers();
