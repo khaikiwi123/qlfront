@@ -38,7 +38,6 @@ export default function Customer() {
     }
     setRole(localStorage.getItem("role"));
     fetchCustomer();
-    console.log(bill);
   }, [id, router, updateOk]);
 
   const fetchCustomer = () => {
@@ -100,35 +99,38 @@ export default function Customer() {
       children: dayjs(customer.createdDate).format("DD/MM/YYYY"),
     },
   ];
-  const billItem = [
-    {
-      key: "1",
-      label: "Giá",
-      children: `${bill.price} đồng`,
-    },
-    {
-      key: "2",
-      label: "Độ dài",
-      children: `${bill.length} tháng`,
-    },
-    {
-      key: "3",
-      label: "Trạng thái",
-      children: bill.status,
-    },
-    {
-      key: "4",
-      label: "Thời hạn từ",
-      children: dayjs(bill.startDate).format("DD/MM/YYYY"),
-    },
-    {
-      key: "5",
-      label: "Hết hạn",
-      children: dayjs(bill.startDate)
-        .add(30 * bill.length, "day")
-        .format("DD/MM/YYYY"),
-    },
-  ];
+  let billItem = [];
+  if (bill) {
+    billItem = [
+      {
+        key: "1",
+        label: "Giá",
+        children: `${bill.price} đồng`,
+      },
+      {
+        key: "2",
+        label: "Độ dài",
+        children: `${bill.length} tháng`,
+      },
+      {
+        key: "3",
+        label: "Trạng thái",
+        children: bill.status,
+      },
+      {
+        key: "4",
+        label: "Thời hạn từ",
+        children: dayjs(bill.startDate).format("DD/MM/YYYY"),
+      },
+      {
+        key: "5",
+        label: "Hết hạn",
+        children: dayjs(bill.startDate)
+          .add(30 * bill.length, "day")
+          .format("DD/MM/YYYY"),
+      },
+    ];
+  }
 
   return (
     <>
@@ -210,7 +212,7 @@ export default function Customer() {
                         marginTop: 15,
                       }}
                     >
-                      {bill.product}
+                      {bill ? bill.product : ""}
                     </div>
                   }
                   size="small"

@@ -17,10 +17,10 @@ const useLogout = () => {
     });
 
     setLoadingOut(true);
-    const token = localStorage.getItem("refresh_token");
 
     try {
-      const response = await axios.post(
+      const token = localStorage.getItem("refresh_token");
+      await axios.post(
         `https://83vr7x9yp1.execute-api.ap-southeast-2.amazonaws.com/Prod/auth/logout`,
         {},
         {
@@ -29,8 +29,6 @@ const useLogout = () => {
           },
         }
       );
-
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     } finally {

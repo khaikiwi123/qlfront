@@ -70,7 +70,6 @@ const AppStep = ({
       setPendingStatus(newStatus);
       handlePop();
     } else if (currentIndex === currentStep) {
-      console.log("current");
       setConfirm(true);
     } else {
       setActionType("updateStatus");
